@@ -1,0 +1,76 @@
+{
+  "_note": "Maestro template — copy to .aiassistant/config/repo-map.json and fill in all required fields. Remove optional null fields if not applicable to your project.",
+  "name": "<project-slug>",
+  "repo": "wp-media/<project-slug>",
+  "type": "wordpress-plugin",
+  "description": "<Plugin description>",
+  "entrypoints": {
+    "plugin_bootstrap": "<main-file>.php",
+    "uninstall": "uninstall.php"
+  },
+  "areas": [
+    {
+      "path": "src/",
+      "role": "namespaced-php",
+      "notes": "Modern PSR-4 codebase."
+    },
+    {
+      "path": "tests/",
+      "role": "tests",
+      "notes": "PHPUnit unit and integration tests."
+    },
+    {
+      "path": "assets/",
+      "role": "built-assets",
+      "notes": "Compiled JS/CSS for production."
+    },
+    {
+      "path": "vendor/",
+      "role": "third-party",
+      "notes": "Composer dependencies (do not edit)."
+    }
+  ],
+  "tooling": {
+    "composer": "composer.json",
+    "phpcs": "phpcs.xml",
+    "phpstan": "phpstan.neon.dist",
+    "node": "package.json"
+  },
+  "notes": [
+    "Prefer minimal diffs and avoid unrelated formatting changes."
+  ],
+  "ai": {
+    "_note": "AI delivery pipeline configuration — read by Maestro agents at startup via jq.",
+
+    "slug": "<project-slug>",
+    "display_name": "<Human Readable Plugin Name>",
+    "repo": "wp-media/<project-slug>",
+    "temp_root": ".TemporaryItems/Issues/<project-slug>",
+
+    "architecture_skill": "<project-slug>-architecture",
+    "frontend_skill": "<project-slug>-frontend-architecture",
+
+    "text_domain": "<text-domain>",
+    "namespace": "<PHP\\Namespace\\Root>",
+
+    "rest_namespace": null,
+
+    "push_agent": "release-agent",
+
+    "editions": null,
+
+    "capabilities": [],
+
+    "slack_channel": null,
+    "slack_threads_dir": null,
+
+    "e2e": {
+      "local_url": "http://localhost:8888",
+      "boot_cmd": "bash bin/dev-up.sh",
+      "seed_cmd": null,
+      "test_cmd": null,
+      "settings_path": "/wp-admin/options-general.php?page=<plugin-page>",
+      "ci_integration": false
+    }
+  }
+}
