@@ -1,1 +1,164 @@
-../../.aiassistant/skills/e2e/SKILL.md
+---
+name: e2e
+description: >
+  Shared end-to-end test execution skill at two tiers. Basic tier
+  (grooming-agent + backend-agent + frontend-agent): behavioral verification and smoke
+  tests for the primary happy path. Extended tier (qa-engineer): full acceptance criteria,
+  regression, edge cases, screenshot evidence, and temporary spec authoring — extended
+  tier is owned by the `e2e-qa-tester` sub-agent. Pass tier: "basic" or tier: "extended"
+  when invoking.
+---
+
+# E2E SKILL
+
+## Config loading
+
+Read `.claude/maestro.json` to resolve project-specific values:
+- `{TEMP_ROOT}` = `.ai.temp_root`
+- `{REPO}` = `.ai.repo`
+- `{SLUG}` = `.ai.slug`
+- `{E2E_URL}` = `.ai.e2e.local_url`
+- `{E2E_BOOT}` = `.ai.e2e.boot_cmd`
+- `{E2E_SETTINGS}` = `.ai.e2e.settings_path`
+- `{E2E_CI}` = `.ai.e2e.ci_integration`
+
+This skill provides end-to-end test execution at two tiers. The tooling is the same
+(Playwright MCP + curl + WP-CLI); the difference is scope and depth.
+
+The local WordPress environment is at `{E2E_URL}` (admin / password). Boot
+or restart it with `{E2E_BOOT}`.
+
+---
+
+## Tier 1 — Basic
+
+**Purpose:** behavioral verification and smoke tests. Fast enough to fit inside a planning
+or implementation agent's execution window.
+
+**Invokers:**
+- `grooming-agent` — verify behavioral assumptions about the current system *before*
+  writing the spec. Use to confirm: does the current feature behave as described in the
+  issue? What does the current API or AJAX endpoint return for the scenario being changed?
+- `backend-agent` / `frontend-agent` (post-implementation) — confirm the primary happy
+  path works with the new code before handing off to lead-reviewer.
+
+### Anti-rationalization table
+
+| You'll be tempted to say | Why you can't |
+|---|---|
+| "The environment probably isn't up, I'll skip" | Run `{E2E_BOOT}`. It's idempotent. If it fails, log `SKIP` with the reason — do not silently omit the step. |
+| "The change is backend-only, no need to smoke it" | The primary happy path must be verified. A backend change with no observable behavior change still needs a confirming assertion. |
+| "I already read the code, I know it works" | "Seems right" never closes a task. Run the scenario. |
+| "One scenario is too slow for this stage" | Basic tier is exactly one primary scenario. The cost is acceptable. |
+
+### Basic tier process
+
+1. Boot the environment (idempotent — safe to run if already up):
+   ```bash
+   {E2E_BOOT}
+   ```
+   If the script exits non-zero, set `status: "SKIP"`, note the reason, and do not block
+   the pipeline.
+
+2. Run the primary happy path scenario from the spec or grooming plan.
+
+   **Backend / AJAX / REST:**
+   ```bash
+   # Public REST or AJAX
+   curl -s -X POST {E2E_URL}/wp-admin/admin-ajax.php \
+     -H "Cookie: $(cat .wp-session-cookie 2>/dev/null)" \
+     -d 'action=<action>&nonce=...'
+
+   # Cache headers
+   curl -sI {E2E_URL}/ | grep -E '(x-cache|cf-cache)'
+
+   # WP-CLI inside the dev environment
+   bin/wp <command>
+   ```
+
+   **Browser (settings page, dashboard notices, interactive UI):**
+   Use the Playwright MCP directly for basic-tier smoke. Do not delegate to
+   `e2e-qa-tester` at this tier (that is the extended tier path):
+   ```
+   mcp__playwright__navigate({ url: "{E2E_URL}/wp-login.php" })
+   # login
+   mcp__playwright__fill({ selector: "#user_login", value: "admin" })
+   mcp__playwright__fill({ selector: "#user_pass", value: "password" })
+   mcp__playwright__click({ selector: "#wp-submit" })
+   # primary scenario
+   mcp__playwright__navigate({ url: "{E2E_SETTINGS}" })
+   mcp__playwright__assert_text({ selector: "...", text: "..." })
+   ```
+
+   Take at most 1–2 screenshots if helpful, but do not publish them at this tier.
+
+3. Report:
+   ```json
+   {
+     "status": "PASS|FAIL|SKIP",
+     "scenarios_tested": ["Settings page loads without errors after enabling X option"],
+     "details": "Logged in as admin, navigated to {E2E_SETTINGS}, confirmed no JS console errors and X toggle present"
+   }
+   ```
+
+   `SKIP`: `{E2E_BOOT}` failed or environment unreachable. Record reason. Do not block
+   the pipeline.
+
+### Basic tier boundaries
+
+- ✅ Do: verify the **one primary scenario** from the spec or grooming plan
+- ✅ Do: probe current-system behavior (grooming-agent only) when an assumption needs verification
+- 🚫 Do not: cover all acceptance criteria (that is extended tier)
+- 🚫 Do not: write or commit Playwright specs (that is extended tier via `e2e-qa-tester`)
+- 🚫 Do not: publish screenshots (that is extended tier)
+
+---
+
+## Tier 2 — Extended
+
+**Purpose:** full acceptance criteria coverage, regression testing, edge cases, visual
+comparison, and Playwright spec authoring with screenshot evidence.
+
+**Invoker:** `qa-engineer` only.
+
+**Execution:** the qa-engineer agent delegates browser flows to the `e2e-qa-tester`
+sub-agent, which handles Playwright MCP driving, temporary spec authoring under
+`.e2e-temp/`, screenshot publishing via the commit-SHA method, and clean-up.
+
+The qa-engineer agent itself handles:
+- Strategy A (API / functional validation via curl and WP-CLI)
+- Strategy C (test-suite-only fallback when the environment is unreachable)
+
+For details, read:
+- `.claude/agents/qa-engineer.md` — strategy selection and report format
+- `.claude/agents/e2e-qa-tester.md` — browser flow execution, spec authoring, screenshot publishing
+
+The extended tier writes Playwright specs to `.e2e-temp/` (gitignored, never committed)
+and screenshots to `.e2e-screenshots/`. Screenshots are temporarily committed to obtain
+a SHA-based raw URL, then removed in a follow-up commit.
+
+---
+
+## When to use which tier
+
+| Invoker | Tier | Purpose |
+|---|---|---|
+| `grooming-agent` | Basic | Verify a behavioral assumption before writing the spec |
+| `backend-agent` (post-implement) | Basic | Smoke the primary happy path before hand-off |
+| `frontend-agent` (post-implement) | Basic | Smoke the primary happy path before hand-off |
+| `qa-engineer` | Extended | Full acceptance criteria + regression + screenshots |
+
+---
+
+## Project-specific notes
+
+- The boot script `{E2E_BOOT}` is **idempotent**. Always run it before testing — don't pre-check whether the environment is up.
+- Admin credentials: `admin` / `password`.
+- Settings page URL: `{E2E_SETTINGS}`.
+- Plugin activation check (no login needed):
+  ```bash
+  curl -s -o /dev/null -w "%{http_code}" {E2E_SETTINGS}
+  ```
+- For cache-header tests, send a request to a front-end URL and inspect the project's cache response headers.
+- The basic tier never writes Playwright spec files. If a flow is complex enough to need a deterministic spec, that signals it should go through the extended tier (qa-engineer + e2e-qa-tester).
+- If `{E2E_CI}` is true, the project maintains a permanent E2E suite — `e2e-qa-tester` will commit spec files rather than delete them.

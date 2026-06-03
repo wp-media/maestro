@@ -33,17 +33,17 @@ Maestro is the single source of truth. Projects no longer *own* the pipeline —
 Without Maestro                    With Maestro
 ─────────────────────              ─────────────────────────────
 wp-rocket/                         maestro/
-  .aiassistant/agents/ ──┐           .aiassistant/agents/      ← one copy
-  .aiassistant/skills/ ──┤           .aiassistant/skills/      ← one copy
-                         │           .aiassistant/specs/       ← one copy
+  .aiassistant/agents/ ──┐           .claude/agents/           ← one copy
+  .aiassistant/skills/ ──┤           .claude/commands/         ← one copy
+                         │           .claude/specs/            ← one copy
 backwpup/                │
   .aiassistant/agents/ ──┤         wp-rocket/
-  .aiassistant/skills/ ──┤           .aiassistant/config/      ← identity only
-         (older, drifted)│           .aiassistant/skills/wp-rocket-architecture/
+  .aiassistant/skills/ ──┤           .claude/maestro.json      ← identity only
+         (older, drifted)│           .claude/commands/wp-rocket-architecture.md
                          │
 imagify/                 │         backwpup/
-  .aiassistant/agents/ ──┘           .aiassistant/config/      ← identity only
-  .aiassistant/skills/               .aiassistant/skills/backwpup-architecture/
+  .aiassistant/agents/ ──┘           .claude/maestro.json      ← identity only
+  .aiassistant/skills/               .claude/commands/backwpup-architecture.md
          (oldest, most diverged)
 ```
 
@@ -92,13 +92,14 @@ flowchart TD
 maestro/
 │
 ├── AGENTS.md                                ← Base guardrails every project extends
+├── plugin.json                              ← Claude Code plugin manifest
 ├── .template/
-│   └── repo-map.json                        ← Full config schema — copy this to onboard
+│   └── repo-map.json                        ← Full config schema — copy to .claude/maestro.json
 │
 ├── bin/
-│   └── sync-pipeline.sh                     ← Pull updates into a project (idempotent)
+│   └── sync-pipeline.sh                     ← Fallback: pull updates manually (idempotent)
 │
-└── .aiassistant/
+└── .claude/                                 ← Claude Code native home (auto-distributed)
     │
     ├── agents/                              ← 9 fully config-driven agents
     │   ├── grooming-agent.md                  Analyses issues, writes implementation specs
@@ -111,23 +112,23 @@ maestro/
     │   ├── ticket-writer.md                   Creates well-formed GitHub issues
     │   └── e2e-qa-tester.md                   Browser QA via Playwright MCP
     │
-    ├── skills/
+    ├── commands/                            ← Skills (slash commands)
+    │   ├── orchestrator.md                  ← Central pipeline coordinator (~900 lines)
     │   ├── orchestrator/
-    │   │   ├── SKILL.md                     ← Central pipeline coordinator (~900 lines)
     │   │   └── html-log-format.md           ← Live run log format spec
-    │   ├── dod/SKILL.md                     ← Definition of Done (L1 self-check + L2 gate)
-    │   ├── docs/SKILL.md                    ← Developer documentation updater
-    │   ├── e2e/SKILL.md                     ← E2E test execution (basic + extended tiers)
+    │   ├── dod.md                           ← Definition of Done (L1 self-check + L2 gate)
+    │   ├── docs.md                          ← Developer documentation updater
+    │   ├── e2e.md                           ← E2E test execution (basic + extended tiers)
+    │   ├── issue-workflow.md                ← Entry point: issue number → full pipeline
     │   ├── issue-workflow/
-    │   │   ├── SKILL.md                     ← Entry point: issue number → full pipeline
     │   │   ├── refs/pr-template.md
     │   │   └── scripts/
     │   │       ├── issue-sync.sh            ← Fetch & snapshot GitHub issues locally
     │   │       ├── make-issue-branch.sh     ← Create convention-named branch
     │   │       ├── init-pr-draft.sh         ← Initialise PR body from template
     │   │       └── slack-notify.js          ← Forward pipeline events to Slack
-    │   ├── knowledge-graph/SKILL.md         ← Codebase dependency graph reader
-    │   └── wordpress-compliance/SKILL.md    ← WP.org + PHPCS compliance rules
+    │   ├── knowledge-graph.md               ← Codebase dependency graph reader
+    │   └── wordpress-compliance.md          ← WP.org + PHPCS compliance rules
     │
     └── specs/phpcs/                         ← Recurring PHPCS fix patterns
         ├── escaped-output.md
@@ -141,7 +142,7 @@ maestro/
 
 Every project tells Maestro who it is through a single file:
 
-**`.aiassistant/config/repo-map.json`** → `ai` section
+**`.claude/maestro.json`** → `ai` section
 
 Agents read this at startup. Nothing is hardcoded.
 
@@ -258,25 +259,24 @@ Five steps to onboard a new project:
 
 **1. Copy the config template**
 ```bash
-cp maestro/.template/repo-map.json <project>/.aiassistant/config/repo-map.json
+cp maestro/.template/repo-map.json <project>/.claude/maestro.json
 ```
 
 **2. Fill in the `ai` section** — every field the agents need to know about your project.
 
 **3. Write your architecture skill**
 ```bash
-mkdir -p <project>/.aiassistant/skills/<slug>-architecture
-# Write SKILL.md — define your DI patterns, module structure, static analysis rules
+# Write .claude/commands/<slug>-architecture.md — define your DI patterns, module structure, static analysis rules
 ```
 
 **4. Write your `AGENTS.md`** — start from Maestro's base, add your **Project Overview** and leave room for **Session Learnings** at the bottom.
 
-**5. Sync the pipeline**
+**5. Sync the pipeline** (one-time setup, then auto-updated)
 ```bash
 MAESTRO_DIR=/path/to/maestro bash /path/to/maestro/bin/sync-pipeline.sh
 ```
 
-That's it. The next `/task <N>` starts the full pipeline.
+That's it. The next `/issue-workflow <N>` starts the full pipeline.
 
 ---
 
@@ -292,13 +292,13 @@ MAESTRO_DIR=/path/to/maestro bash /path/to/maestro/bin/sync-pipeline.sh
 MAESTRO_DIR=/path/to/maestro bash /path/to/maestro/bin/sync-pipeline.sh --dry-run
 ```
 
-The sync script is **idempotent** and **safe to re-run**. It copies agents, shared skills, and specs — and never touches:
+The sync script is **idempotent** and **safe to re-run**. It copies agents, commands, and specs into the project's `.claude/` directory — and never touches:
 
 | Protected | Why |
 |---|---|
-| `.aiassistant/config/` | Your project's identity and tune |
-| `.aiassistant/skills/<slug>-architecture/` | Your codebase's unique rules |
-| `.aiassistant/graph/` | Auto-generated from your code |
+| `.claude/maestro.json` | Your project's identity and config |
+| `.claude/commands/<slug>-architecture.md` | Your codebase's unique rules |
+| `.claude/graph/` | Auto-generated from your code |
 | `AGENTS.md` | Your Project Overview and Session Learnings |
 
 ---
@@ -380,7 +380,7 @@ Autonomy flags (append to any `/issue-workflow` call):
 
 The pipeline lives in one place. When it improves, every project can pick it up.
 
-### Option A — Git submodule (recommended for now)
+### Option A — Git submodule + sync script (current approach)
 
 Add Maestro as a submodule once per project:
 
@@ -396,7 +396,7 @@ git submodule update --remote .maestro && MAESTRO_DIR=.maestro bash .maestro/bin
 
 Pin the submodule to a specific release tag for stability. Bump it deliberately, like any other dependency.
 
-### Option B — GitHub Actions auto-PR (recommended soon)
+### Option B — GitHub Actions auto-PR (recommended)
 
 The gold standard: zero human effort, human still approves.
 
@@ -441,14 +441,6 @@ jobs:
 ```
 
 Push to Maestro → PRs open automatically in all three projects → humans review and merge.
-
-### Why not Composer or npm?
-
-- **Composer** → ends up in `/vendor`, which is gitignored and not where agents live.
-- **npm** → ends up in `node_modules/`, same problem.
-- **Direct clone / curl** → no version pinning, everyone drifts to different versions.
-
-Git submodule gives you versioning, native git tooling, and no extra registry.
 
 ---
 

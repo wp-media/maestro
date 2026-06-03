@@ -111,7 +111,7 @@ AI must NOT:
 * Use `add_action` / `add_filter` directly where the project uses a Subscriber pattern.
 
 Follow existing patterns — read the project's architecture skill
-(`.aiassistant/skills/<slug>-architecture/SKILL.md`) before making structural changes.
+(`.claude/commands/<slug>-architecture.md`) before making structural changes.
 
 ---
 
@@ -222,7 +222,7 @@ The `qa-engineer` sub-agent validates PRs automatically as part of the issue wor
 It reads the PR spec, selects a validation strategy (API / Browser / Analysis), and produces
 a structured test report.
 
-Agent definition: `.aiassistant/agents/qa-engineer.md`.
+Agent definition: `.claude/agents/qa-engineer.md`.
 
 The local WordPress environment at `http://localhost:8888` (admin / password) is used for
 browser validation via Playwright MCP.
@@ -231,7 +231,7 @@ browser validation via Playwright MCP.
 
 # 10. Skills Activation
 
-The repository defines AI Skills under `.aiassistant/skills`.
+The repository defines AI Skills under `.claude/commands`.
 
 Agents MUST activate the relevant skill depending on the task:
 
@@ -242,7 +242,7 @@ Agents MUST activate the relevant skill depending on the task:
 
 ## 10.1 Knowledge Graph
 
-A pre-built dependency graph is available at `.aiassistant/graph/dependency-graph.json`.
+A pre-built dependency graph is available at `.claude/graph/dependency-graph.json`.
 
 Before exploring the codebase structure (finding a class, tracing dependencies, checking
 namespace boundaries), **read this file first**. It contains:
@@ -255,7 +255,7 @@ Run `node bin/build-knowledge-graph.js` to refresh after structural changes (`--
 
 # 11. Repository Identity
 
-The canonical GitHub repository is defined in `.aiassistant/config/repo-map.json` under
+The canonical GitHub repository is defined in `.claude/maestro.json` under
 `ai.repo`. Agents read that file at startup — never hardcode repo names.
 
 ---
@@ -264,7 +264,7 @@ The canonical GitHub repository is defined in `.aiassistant/config/repo-map.json
 
 The repository may define task-specific implementation specs under:
 
-`.aiassistant/specs/`
+`.claude/specs/`
 
 Specs provide detailed guidance for recurring technical problems
 (e.g. PHPCS warnings, architecture migrations, WordPress compliance patterns).

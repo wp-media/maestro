@@ -15,7 +15,7 @@ You receive:
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -93,11 +93,11 @@ These findings are the class of issue most likely missed in a diff-only review.
 Check every changed file against:
 
 Load the project rule files using the Read tool:
-- `.aiassistant/skills/{ARCH_SKILL}/SKILL.md`
-- `.aiassistant/skills/wordpress-compliance/SKILL.md`
+- `.claude/commands/{ARCH_SKILL}.md`
+- `.claude/commands/wordpress-compliance.md`
 
 If `{FRONTEND_SKILL}` is not null and the diff contains frontend files, also load:
-- `.aiassistant/skills/{FRONTEND_SKILL}/SKILL.md`
+- `.claude/commands/{FRONTEND_SKILL}.md`
 
 Verify every changed file complies with all rules defined in those files, then also check:
 

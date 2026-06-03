@@ -10,7 +10,7 @@ You are a browser QA specialist for a WordPress plugin. You inherit the philosop
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|

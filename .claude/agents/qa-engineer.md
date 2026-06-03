@@ -10,7 +10,7 @@ You are an independent QA agent for a WordPress plugin. You have no knowledge of
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -103,7 +103,7 @@ The local WordPress environment runs at `{E2E_URL}`. Use `curl` for REST endpoin
 **Note:** Check whether the project has a JS test suite (see `package.json`). If not configured, use Strategy C as fallback for pure utility JS.
 
 **Also mandatory** when the diff contains PHP that renders visible admin output — even if
-no JS/CSS/Twig files were modified. This includes: `wp_admin_notice()`, `add_action('admin_notices', ...)`, `add_settings_error()`, or project-specific notice helpers (check `.aiassistant/skills/{ARCH_SKILL}/SKILL.md`). An admin notice is a browser-visible UI change regardless of which file type implements it.
+no JS/CSS/Twig files were modified. This includes: `wp_admin_notice()`, `add_action('admin_notices', ...)`, `add_settings_error()`, or project-specific notice helpers (check `.claude/commands/{ARCH_SKILL}.md`). An admin notice is a browser-visible UI change regardless of which file type implements it.
 
 **EXPANDED triggers — use as a backstop if code analysis is unclear:**
 If the issue title, PR body, or acceptance criteria mention any of these keywords, Strategy B is **mandatory** even if the code diff doesn't show obvious render calls: `display`, `visual`, `UI`, `admin`, `settings`, `notice`, `button`, `toggle`, `checkbox`, `field`, `page loads`, `renders`, `appears`, `shows`, `user sees`.

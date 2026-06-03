@@ -39,8 +39,8 @@ if ! gh auth status -h github.com >/dev/null 2>&1; then
 fi
 
 # Read project identity from repo-map.json
-CONFIG_FILE="${ROOT_DIR}/.aiassistant/config/repo-map.json"
-[ -f "$CONFIG_FILE" ] || die "No .aiassistant/config/repo-map.json found at ${ROOT_DIR}."
+CONFIG_FILE="${ROOT_DIR}/.claude/maestro.json"
+[ -f "$CONFIG_FILE" ] || die "No .claude/maestro.json found at ${ROOT_DIR}."
 REPO="$(jq -r '.ai.repo' "$CONFIG_FILE")"
 TEMP_ROOT="$(jq -r '.ai.temp_root' "$CONFIG_FILE")"
 

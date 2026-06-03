@@ -20,7 +20,7 @@ unconditional and non-negotiable:
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -101,7 +101,7 @@ attempt force-push without explicit instruction.
 ### Step 3 — Initialize PR draft
 
 ```bash
-bash .aiassistant/skills/issue-workflow/scripts/init-pr-draft.sh <N>
+bash .claude/commands/issue-workflow/scripts/init-pr-draft.sh <N>
 ```
 
 This creates `{TEMP_ROOT}/pull/<N>.md` from the template.
