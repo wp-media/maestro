@@ -25,15 +25,15 @@ if [ ! -d "$ROOT_DIR" ]; then
 fi
 
 # Read project config
-CONFIG_FILE="${ROOT_DIR}/.aiassistant/config/repo-map.json"
+CONFIG_FILE="${ROOT_DIR}/.claude/maestro.json"
 if ! command -v jq >/dev/null 2>&1; then
   die "Missing required command: jq. Install it to use this script."
 fi
-[ -f "$CONFIG_FILE" ] || die "No .aiassistant/config/repo-map.json found at ${ROOT_DIR}."
+[ -f "$CONFIG_FILE" ] || die "No .claude/maestro.json found at ${ROOT_DIR}."
 TEMP_ROOT="$(jq -r '.ai.temp_root' "$CONFIG_FILE")"
 
 # Template path and output location.
-TEMPLATE="${ROOT_DIR}/.aiassistant/skills/issue-workflow/refs/pr-template.md"
+TEMPLATE="${ROOT_DIR}/.claude/commands/issue-workflow/refs/pr-template.md"
 OUT_DIR="${ROOT_DIR}/${TEMP_ROOT}/pull"
 OUT_FILE="${OUT_DIR}/${ISSUE_NUMBER}.md"
 

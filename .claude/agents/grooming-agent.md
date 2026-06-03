@@ -8,7 +8,7 @@ color: blue
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -69,7 +69,7 @@ Extract:
 
 Use the knowledge graph first, then read files.
 
-1. Read `.aiassistant/graph/dependency-graph.json`. If `base_commit` ≠ current HEAD, refresh: `node bin/build-knowledge-graph.js`.
+1. Read `.claude/graph/dependency-graph.json`. If `base_commit` ≠ current HEAD, refresh: `node bin/build-knowledge-graph.js`.
 2. Use the graph to locate every class, method, hook, subscriber, or module involved:
    - **Where is the target class?** → `symbol_index["WP_Rocket\\Engine\\...\\ClassName"]`
    - **What does it depend on?** → `nodes[file].imports`
@@ -85,7 +85,7 @@ Use the knowledge graph first, then read files.
 
 If the issue describes a current behavior that you want to verify *before* writing the
 spec — for example, "the cache header is missing on logged-in users" — invoke the `e2e`
-skill (`.aiassistant/skills/e2e/SKILL.md`) with `tier: "basic"` to reproduce against the
+skill (`.claude/commands/e2e.md`) with `tier: "basic"` to reproduce against the
 local environment at `http://localhost:8888`.
 
 Use this only when an assumption needs verification. Skip it for changes where the
@@ -121,7 +121,7 @@ This is a separate question from where the fix goes — ask it first.
   - Option B: move/refactor — state effort, risk, and the architectural improvement gained.
 
 **d. Project-specific architecture checks:**
-Read `.aiassistant/skills/{ARCH_SKILL}/SKILL.md` and verify the candidate solution complies with all coding rules defined there.
+Read `.claude/commands/{ARCH_SKILL}.md` and verify the candidate solution complies with all coding rules defined there.
 
 **e. Are there edge cases the issue does not mention?**
 List them. The implementation must handle them.

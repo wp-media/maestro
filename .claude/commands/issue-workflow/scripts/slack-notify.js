@@ -9,7 +9,7 @@ const path  = require('path');
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 
 // Load project config
-const configPath = path.join(process.cwd(), '.aiassistant', 'config', 'repo-map.json');
+const configPath = path.join(process.cwd(), '.claude', 'maestro.json');
 let _ai = {};
 try { _ai = JSON.parse(fs.readFileSync(configPath, 'utf8')).ai || {}; } catch {}
 const CHANNEL_ID  = _ai.slack_channel || '';

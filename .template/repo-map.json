@@ -1,5 +1,5 @@
 {
-  "_note": "Maestro template — copy to .aiassistant/config/repo-map.json and fill in all required fields. Remove optional null fields if not applicable to your project.",
+  "_note": "Maestro template — copy to .claude/maestro.json and fill in all required fields. Remove optional null fields if not applicable to your project.",
   "name": "<project-slug>",
   "repo": "wp-media/<project-slug>",
   "type": "wordpress-plugin",

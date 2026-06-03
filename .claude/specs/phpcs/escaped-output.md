@@ -24,7 +24,7 @@ and source directories.
 - Allowed HTML: `wp_kses_post()` or `wp_kses( $html, $allowed_html )`
 
 ## Text domain
-Use the project's text domain from `.aiassistant/config/repo-map.json` under `ai.text_domain`
+Use the project's text domain from `.claude/maestro.json` under `ai.text_domain`
 for all translation function calls:
 
 ```php

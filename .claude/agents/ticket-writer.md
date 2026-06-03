@@ -13,7 +13,7 @@ color: gray
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -38,7 +38,7 @@ You operate in two modes:
   and create a follow-up ticket without asking clarifying questions.
 
 The project lives on GitHub. Always use `gh` for issue operations. The canonical repo is
-`{REPO}` (read from `.aiassistant/config/repo-map.json`).
+`{REPO}` (read from `.claude/maestro.json`).
 
 ---
 
@@ -206,7 +206,7 @@ Emit to the event queue and create the issue. Do NOT wait for a response — emi
 ## Rules
 
 - Title: **imperative mood**, under 70 chars (e.g. "Add retry logic to API client")
-- Repo is always `{REPO}` (read from `.aiassistant/config/repo-map.json`) unless explicitly overridden
+- Repo is always `{REPO}` (read from `.claude/maestro.json`) unless explicitly overridden
 - Each issue must be **standalone**: one concern, one definition of done
 - Never create an issue without first searching for duplicates (skip this check in `nth_followup` mode)
 - **All created issues must include the AI-generated notice** at the top of the body:

@@ -8,7 +8,7 @@ color: red
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|

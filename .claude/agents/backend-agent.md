@@ -18,7 +18,7 @@ You receive:
 
 ## Config loading (always first)
 
-Before any step, read `.aiassistant/config/repo-map.json` and extract:
+Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
@@ -59,7 +59,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 1. Read the spec in full.
 2. Read the dispatch plan — note exactly which files you own and any constraints.
-3. Read `.aiassistant/skills/{ARCH_SKILL}/SKILL.md` and `.aiassistant/skills/wordpress-compliance/SKILL.md`.
+3. Read `.claude/commands/{ARCH_SKILL}.md` and `.claude/commands/wordpress-compliance.md`.
 4. Read each PHP file you are responsible for in full.
 
 ---
@@ -71,15 +71,15 @@ Follow the spec's **Implementation Plan** for backend files only. Do not touch J
 - Follow TDD: write or update tests alongside implementation.
 - Unit tests in `tests/Unit/`, integration tests in `tests/Integration/`.
 - Integration tests use `@group FeatureName` for targeted runs.
-- Follow the project's hook pattern as defined in `.aiassistant/skills/{ARCH_SKILL}/SKILL.md`.
-- Follow the project's option access pattern defined in `.aiassistant/skills/{ARCH_SKILL}/SKILL.md`.
+- Follow the project's hook pattern as defined in `.claude/commands/{ARCH_SKILL}.md`.
+- Follow the project's option access pattern defined in `.claude/commands/{ARCH_SKILL}.md`.
 - WordPress hooks through a Subscriber — never direct `add_action`/`add_filter`.
 
 ---
 
 ### Step 2.5 — Documentation update
 
-Invoke the `docs` skill inline (`.aiassistant/skills/docs/SKILL.md`).
+Invoke the `docs` skill inline (`.claude/commands/docs.md`).
 
 Pass the explicit list of PHP files you changed in Step 2 — the skill needs this rather than inferring from git.
 
@@ -93,7 +93,7 @@ Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ### Step 3 — E2E smoke test (basic tier)
 
-Invoke the `e2e` skill inline (`.aiassistant/skills/e2e/SKILL.md`) with `tier: "basic"`.
+Invoke the `e2e` skill inline (`.claude/commands/e2e.md`) with `tier: "basic"`.
 
 Run the primary happy path scenario from the spec's `test_plan` to confirm your changes don't break the main flow. Use curl, WP-CLI, or Playwright MCP as appropriate for what you changed.
 
@@ -105,7 +105,7 @@ Record: `e2e_smoke.status`, `e2e_smoke.scenarios_tested`, `e2e_smoke.details`.
 
 ### Step 3b — DOD L1 (self-check)
 
-Invoke the `dod` skill inline (`.aiassistant/skills/dod/SKILL.md`) with `layer: "1"`.
+Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
 
 The skill runs the 5 checks: manual validation, automated tests, documentation, PR description, CI (local commands at this layer). It returns `overall: "PASS" | "WARN"` plus per-check evidence.
 
