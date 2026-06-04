@@ -1,4 +1,4 @@
-import { RawEvent, Session, Turn, ToolCall, ToolCategory, SessionStatus, ItemStatus } from '../types'
+import { RawEvent, Session, Turn, ToolCall, ToolCategory, SessionStatus, ItemStatus, AgentPipelineStep } from '../types'
 import { labelTurn } from './labeler'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -240,6 +240,8 @@ export function processEvents(events: RawEvent[], sessionId: string): Session {
   const totalToolCalls = turns.reduce((n, t) => n + t.tool_calls.length, 0)
   const totalAgentSpawns = turns.reduce((n, t) => n + t.agent_spawns.length, 0)
 
+  const { pipeline, isOrchestratorMode } = buildAgentPipeline(turns)
+
   return {
     id: sessionId,
     cwd,
@@ -251,6 +253,8 @@ export function processEvents(events: RawEvent[], sessionId: string): Session {
     turns,
     total_tool_calls: totalToolCalls,
     total_agent_spawns: totalAgentSpawns,
+    agent_pipeline: pipeline,
+    is_orchestrator_mode: isOrchestratorMode,
   }
 }
 
@@ -401,6 +405,8 @@ export function appendEvents(session: Session, newEvents: RawEvent[]): Session {
   const totalToolCalls = turns.reduce((n, t) => n + t.tool_calls.length, 0)
   const totalAgentSpawns = turns.reduce((n, t) => n + t.agent_spawns.length, 0)
 
+  const { pipeline, isOrchestratorMode } = buildAgentPipeline(turns)
+
   return {
     ...session,
     cwd,
@@ -412,6 +418,8 @@ export function appendEvents(session: Session, newEvents: RawEvent[]): Session {
     turns,
     total_tool_calls: totalToolCalls,
     total_agent_spawns: totalAgentSpawns,
+    agent_pipeline: pipeline,
+    is_orchestrator_mode: isOrchestratorMode,
   }
 }
 
@@ -480,4 +488,174 @@ function recomputeTurn(turn: Turn): void {
     turn.ended_at = null
     turn.duration_ms = null
   }
+}
+
+// ── Agent pipeline (orchestrator-mode) ──────────────────────────────────────────
+
+/** Map a cleaned agent name to its Maestro pipeline stage label */
+export function getStageLabel(agentName: string): string | null {
+  const n = agentName.toLowerCase()
+  if (n.includes('grooming'))  return 'Grooming'
+  if (n.includes('challenger')) return 'Challenge'
+  if (n.includes('backend') || n.includes('frontend')) return 'Implementation'
+  if (n.includes('reviewer') || n.includes('lead')) return 'Review'
+  if (n.includes('e2e') || n.includes('e2e-qa')) return 'E2E Testing'
+  if (n.includes('qa')) return 'Quality Assurance'
+  if (n.includes('release')) return 'Release'
+  if (n.includes('ticket')) return 'Tickets'
+  return null
+}
+
+/** Clean a raw subagent_type like "maestro:grooming-agent" → "grooming-agent" */
+export function cleanAgentName(raw: string | null | undefined): string {
+  if (!raw) return 'agent'
+  const i = raw.indexOf(':')
+  return i >= 0 ? raw.slice(i + 1) : raw
+}
+
+/**
+ * Parse a Maestro agent return value (JSON or plain text) into a short human
+ * summary of what the agent reported back to the orchestrator.
+ */
+export function parseReturnSummary(output: string | null, agentName: string): string {
+  if (!output || !output.trim()) return ''
+  const name = agentName.toLowerCase()
+  void name
+
+  // Try JSON parse
+  let json: Record<string, unknown> | null = null
+  const trimmed = output.trim()
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(trimmed)
+      json = typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : null
+    } catch {
+      // not JSON
+    }
+  }
+
+  if (json) {
+    // grooming-agent: {effort, risk_level, open_questions}
+    if (json.effort && json.risk_level) {
+      const oq = Array.isArray(json.open_questions) ? json.open_questions.length : 0
+      return `effort=${json.effort} · risk=${json.risk_level}${oq > 0 ? ` · ${oq} open q` : ''}`
+    }
+    // challenger: {verdict, must_have, should_have}
+    if (json.verdict === 'APPROVED' || json.verdict === 'NEEDS_REVISION' || json.verdict === 'BLOCKED') {
+      const mh = Array.isArray(json.must_have) ? json.must_have.length : 0
+      return mh > 0 ? `${json.verdict} · ${mh} must-fix` : String(json.verdict)
+    }
+    // backend/frontend: {files_changed, dod_layer1}
+    if (Array.isArray(json.files_changed)) {
+      const dod = (json.dod_layer1 as Record<string,unknown>)?.status ?? ''
+      return `${json.files_changed.length} files${dod ? ` · DOD ${dod}` : ''}`
+    }
+    // lead-reviewer: {verdict, blockers}
+    if ((json.verdict === 'PASS' || json.verdict === 'CHANGES_REQUESTED') && json.blockers !== undefined) {
+      const bl = Array.isArray(json.blockers) ? json.blockers.length : 0
+      return bl > 0 ? `${json.verdict} · ${bl} blocker${bl > 1 ? 's' : ''}` : String(json.verdict)
+    }
+    // qa-engineer: {ac_results, blockers}
+    if (json.ac_results && typeof json.ac_results === 'object') {
+      const vals = Object.values(json.ac_results as Record<string, unknown>)
+      const passed = vals.filter((v) => (v as Record<string,unknown>)?.status === 'PASS').length
+      return `${passed}/${vals.length} AC passing`
+    }
+    // release-agent: {pr_number, pr_url}
+    if (json.pr_number) return `PR #${json.pr_number} created`
+    // Generic: first short string value
+    for (const v of Object.values(json)) {
+      if (typeof v === 'string' && v.length > 0 && v.length <= 80) return v
+    }
+  }
+
+  // Plain text fallback
+  return trimmed.slice(0, 70).replace(/\n/g, ' ')
+}
+
+/**
+ * Detect parallel groups among agent spawns.
+ * Two agents are parallel if their execution time ranges overlap.
+ */
+export function detectParallelGroups(agents: ToolCall[]): ToolCall[][] {
+  if (agents.length === 0) return []
+  const sorted = [...agents].sort((a, b) => a.started_at - b.started_at)
+
+  const groups: ToolCall[][] = []
+  let group: ToolCall[] = [sorted[0]]
+  let groupEnd = sorted[0].ended_at ?? sorted[0].started_at + 1
+
+  for (let i = 1; i < sorted.length; i++) {
+    const cur = sorted[i]
+    if (cur.started_at < groupEnd) {
+      // Overlap → parallel
+      group.push(cur)
+      const curEnd = cur.ended_at ?? cur.started_at + 1
+      if (curEnd > groupEnd) groupEnd = curEnd
+    } else {
+      groups.push(group)
+      group = [cur]
+      groupEnd = cur.ended_at ?? cur.started_at + 1
+    }
+  }
+  groups.push(group)
+  return groups
+}
+
+/**
+ * Build the agent pipeline from a list of turns.
+ * Returns the pipeline steps and whether orchestrator mode should be used.
+ */
+export function buildAgentPipeline(turns: Turn[]): {
+  pipeline: AgentPipelineStep[]
+  isOrchestratorMode: boolean
+} {
+  // Collect ALL agent spawns across all turns, preserving order
+  const allAgents = turns
+    .flatMap((t) => t.agent_spawns)
+    .sort((a, b) => a.started_at - b.started_at)
+
+  if (allAgents.length === 0) return { pipeline: [], isOrchestratorMode: false }
+
+  // Orchestrator mode: ≥2 agent spawns
+  // (For regular conversations, each turn typically has 0–1 agents)
+  const isOrchestratorMode = allAgents.length >= 2
+
+  const parallelGroups = detectParallelGroups(allAgents)
+
+  // For orchestrator_work: collect non-agent tool calls that occur between agent groups
+  const allToolCallsSorted = turns
+    .flatMap((t) => t.tool_calls)
+    .sort((a, b) => a.started_at - b.started_at)
+
+  const pipeline: AgentPipelineStep[] = parallelGroups.map((groupAgents, stepIndex) => {
+    const stepStart = groupAgents[0].started_at
+    const prevGroupEnd = stepIndex === 0
+      ? 0
+      : Math.max(...parallelGroups[stepIndex - 1].map((a) => a.ended_at ?? a.started_at))
+
+    // Non-agent tools between previous group's end and this group's start
+    const orchestratorWork = allToolCallsSorted.filter(
+      (tc) =>
+        tc.category !== 'agent' &&
+        tc.started_at >= prevGroupEnd &&
+        tc.started_at < stepStart,
+    )
+
+    // Pick stage label from first agent in the group
+    const firstName = cleanAgentName(groupAgents[0].subagent_type)
+    const stageLabel = getStageLabel(firstName)
+
+    return {
+      step_index: stepIndex,
+      agents: groupAgents,
+      is_parallel: groupAgents.length > 1,
+      orchestrator_work: orchestratorWork,
+      stage_label: stageLabel,
+    }
+  })
+
+  return { pipeline, isOrchestratorMode }
 }

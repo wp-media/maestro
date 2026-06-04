@@ -1,19 +1,40 @@
 import { Node, Edge, MarkerType } from 'reactflow'
 import dagre from '@dagrejs/dagre'
-import { Session } from '../types'
+import { Session, ToolCall, AgentPipelineStep } from '../types'
+import { parseReturnSummary, cleanAgentName } from './event-processor'
 
-// Node dimensions used purely for dagre layout. Real nodes can render larger;
-// dagre only needs consistent boxes to compute spacing.
-const TURN_W  = 300   // matches new 280px node + breathing room
-const TURN_H  = 110  // taller — now includes activity bar
-const AGENT_W = 250
+// ── Node dimensions for dagre layout ────────────────────────────────────────
+// dagre only needs consistent boxes to compute spacing; the rendered nodes can
+// be a different size. These must stay in rough agreement with the components.
+
+// Conversation mode
+const TURN_W = 300
+const TURN_H = 110
+const AGENT_W = 230
 const AGENT_H = 80
+
+// Pipeline mode
+const PIPELINE_AGENT_W = 280
+const PIPELINE_AGENT_H = 130
+const PHANTOM_W = 12
+const PHANTOM_H = 12
+const ORCH_WORK_W = 200
+const ORCH_WORK_H = 48
+
+// Shared
 const START_W = 200
 const START_H = 56
-const END_W   = 200
-const END_H   = 56
+const END_W = 200
+const END_H = 56
 
-const EDGE_COLOR = '#3a4d68'
+// ── Colours ─────────────────────────────────────────────────────────────────
+const DARK_EDGE = '#3a4d68'
+const GOLD_PIPE = 'rgba(254,210,58,0.5)'
+const GOLD_ARROW = 'rgba(254,210,58,0.7)'
+const GOLD_RETURN = 'rgba(254,210,58,0.35)'
+const PHANTOM_BG = 'rgba(254,210,58,0.4)'
+
+const RETURN_LABEL_STYLE = { fill: '#9b9b9b', fontSize: 10, fontStyle: 'italic' as const }
 
 interface DagreInput {
   id: string
@@ -21,14 +42,62 @@ interface DagreInput {
   h: number
 }
 
+// ── Public API ──────────────────────────────────────────────────────────────
+
 export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
+  return session.is_orchestrator_mode ? buildPipelineGraph(session) : buildConversationGraph(session)
+}
+
+// ── Layout helper ─────────────────────────────────────────────────────────────
+
+/**
+ * Run dagre over the collected nodes/edges and rewrite each node's position to
+ * top-left coordinates (React Flow's convention).
+ */
+function layout(
+  nodes: Node[],
+  edges: Edge[],
+  dagreNodes: DagreInput[],
+  graphCfg: { rankdir: 'TB' | 'LR'; ranksep: number; nodesep: number },
+): void {
+  const g = new dagre.graphlib.Graph()
+  g.setGraph(graphCfg)
+  g.setDefaultEdgeLabel(() => ({}))
+
+  for (const dn of dagreNodes) {
+    g.setNode(dn.id, { width: dn.w, height: dn.h })
+  }
+  for (const e of edges) {
+    // Only lay out edges whose endpoints are real layout nodes.
+    g.setEdge(e.source, e.target)
+  }
+
+  dagre.layout(g)
+
+  const dims = new Map(dagreNodes.map((d) => [d.id, d]))
+  for (const node of nodes) {
+    const pos = g.node(node.id)
+    const dim = dims.get(node.id)
+    if (pos && dim) {
+      node.position = { x: pos.x - dim.w / 2, y: pos.y - dim.h / 2 }
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PIPELINE MODE
+// ════════════════════════════════════════════════════════════════════════════
+
+function buildPipelineGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = []
   const edges: Edge[] = []
   const dagreNodes: DagreInput[] = []
 
   const hasEnd = session.status !== 'running'
+  const pipeline = session.agent_pipeline
+  const lastStep = pipeline.length - 1
 
-  // 1. Start node.
+  // Start node.
   nodes.push({
     id: 'start',
     type: 'startNode',
@@ -37,8 +106,248 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
   })
   dagreNodes.push({ id: 'start', w: START_W, h: START_H })
 
-  // 2 + 3. Turn nodes and their agent spawns.
+  // Degenerate: no pipeline steps. Wire start straight to end (if finished).
+  if (pipeline.length === 0) {
+    if (hasEnd) {
+      nodes.push({
+        id: 'end',
+        type: 'endNode',
+        position: { x: 0, y: 0 },
+        data: { status: session.status, duration_ms: session.duration_ms },
+      })
+      dagreNodes.push({ id: 'end', w: END_W, h: END_H })
+      edges.push(darkEdge('start', 'end'))
+    }
+    layout(nodes, edges, dagreNodes, { rankdir: 'TB', ranksep: 100, nodesep: 60 })
+    return { nodes, edges }
+  }
+
+  // For each step, the agent node ids it contributes.
+  const stepAgentIds: string[][] = []
+
+  pipeline.forEach((step, stepIndex) => {
+    const ids: string[] = []
+
+    // Optional orchestrator-work node BEFORE this step when there's notable work.
+    let orchWorkId: string | null = null
+    if (step.orchestrator_work.length > 3) {
+      orchWorkId = `orchwork-${stepIndex}`
+      nodes.push({
+        id: orchWorkId,
+        type: 'orchestratorWorkNode',
+        position: { x: 0, y: 0 },
+        data: {
+          stepIndex,
+          toolCalls: step.orchestrator_work,
+          count: step.orchestrator_work.length,
+          primary: step.orchestrator_work[0],
+        },
+      })
+      dagreNodes.push({ id: orchWorkId, w: ORCH_WORK_W, h: ORCH_WORK_H })
+    }
+
+    step.agents.forEach((agent) => {
+      const id = `pagent-${agent.id}`
+      ids.push(id)
+      const agentName = cleanAgentName(agent.subagent_type)
+      nodes.push({
+        id,
+        type: 'pipelineAgentNode',
+        position: { x: 0, y: 0 },
+        data: {
+          toolCall: agent,
+          stepIndex,
+          stageLabel: step.stage_label,
+          isSelected: false,
+          isFirstInPipeline: stepIndex === 0,
+          isLastInPipeline: stepIndex === lastStep,
+          returnSummary: parseReturnSummary(agent.output_preview, agentName),
+        },
+      })
+      dagreNodes.push({ id, w: PIPELINE_AGENT_W, h: PIPELINE_AGENT_H })
+    })
+
+    // If an orchestrator-work node exists, chain it before the agents:
+    //   prevStep ── ... ──▶ orchWork ──▶ agents
+    // We record orchWork as the step's "entry" so the inter-step wiring below
+    // can target it. The work→agent edges are dark solid (internal plumbing).
+    if (orchWorkId) {
+      for (const aid of ids) {
+        edges.push(darkEdge(orchWorkId, aid))
+      }
+      // The step's incoming connections should land on the orchWork node, so we
+      // expose it as the step's single entry id while keeping agent ids for the
+      // OUTGOING side.
+      stepAgentIds.push(ids)
+      ;(step as AgentPipelineStep & { __entryId?: string }).__entryId = orchWorkId
+    } else {
+      stepAgentIds.push(ids)
+    }
+  })
+
+  // Helper: the ids that traffic should ENTER a step through.
+  const entryIds = (stepIndex: number): string[] => {
+    const entry = (pipeline[stepIndex] as AgentPipelineStep & { __entryId?: string }).__entryId
+    return entry ? [entry] : stepAgentIds[stepIndex]
+  }
+  // Helper: the ids that traffic LEAVES a step from (always the agent nodes).
+  const exitIds = (stepIndex: number): string[] => stepAgentIds[stepIndex]
+
+  // start → first step entry.
+  for (const id of entryIds(0)) {
+    edges.push(darkEdge('start', id))
+  }
+
+  // Wire step i → step i+1 with fork/join phantom nodes as needed.
+  for (let i = 0; i < lastStep; i++) {
+    const fromIds = exitIds(i)
+    const toIds = entryIds(i + 1)
+
+    const fromCount = fromIds.length
+    const toCount = toIds.length
+
+    if (fromCount === 1 && toCount > 1) {
+      // FORK: single agent → phantom → each parallel agent.
+      const phantomId = `phantom-fork-${i}`
+      pushPhantom(nodes, dagreNodes, phantomId)
+      const ret = returnLabelFor(pipeline[i])
+      edges.push(goldPipeEdge(fromIds[0], phantomId, ret))
+      for (const to of toIds) {
+        edges.push(goldPipeEdge(phantomId, to))
+      }
+    } else if (fromCount > 1 && toCount === 1) {
+      // JOIN: each parallel agent → phantom → next single agent.
+      const phantomId = `phantom-join-${i}`
+      pushPhantom(nodes, dagreNodes, phantomId)
+      for (let k = 0; k < fromIds.length; k++) {
+        edges.push(goldPipeEdge(fromIds[k], phantomId, returnLabelForAgent(pipeline[i], k)))
+      }
+      edges.push(goldPipeEdge(phantomId, toIds[0]))
+    } else {
+      // 1→1 or N→M: connect every exit to every entry directly.
+      for (let k = 0; k < fromIds.length; k++) {
+        const label = fromCount === 1 ? returnLabelFor(pipeline[i]) : returnLabelForAgent(pipeline[i], k)
+        for (const to of toIds) {
+          edges.push(goldPipeEdge(fromIds[k], to, label))
+        }
+      }
+    }
+  }
+
+  // Last step exits → end.
+  if (hasEnd) {
+    nodes.push({
+      id: 'end',
+      type: 'endNode',
+      position: { x: 0, y: 0 },
+      data: { status: session.status, duration_ms: session.duration_ms },
+    })
+    dagreNodes.push({ id: 'end', w: END_W, h: END_H })
+    for (const id of exitIds(lastStep)) {
+      edges.push(darkEdge(id, 'end'))
+    }
+  }
+
+  layout(nodes, edges, dagreNodes, { rankdir: 'TB', ranksep: 100, nodesep: 60 })
+  return { nodes, edges }
+}
+
+// Return-summary label for a single-agent step (uses its sole agent).
+function returnLabelFor(step: AgentPipelineStep): string {
+  const agent = step.agents[0]
+  if (!agent) return ''
+  return parseReturnSummary(agent.output_preview, cleanAgentName(agent.subagent_type))
+}
+
+// Return-summary label for a specific agent within a (parallel) step.
+function returnLabelForAgent(step: AgentPipelineStep, idx: number): string {
+  const agent = step.agents[idx]
+  if (!agent) return ''
+  return parseReturnSummary(agent.output_preview, cleanAgentName(agent.subagent_type))
+}
+
+function pushPhantom(nodes: Node[], dagreNodes: DagreInput[], id: string): void {
+  nodes.push({
+    id,
+    type: 'phantomNode',
+    position: { x: 0, y: 0 },
+    selectable: false,
+    draggable: false,
+    data: {},
+    style: {
+      width: 10,
+      height: 10,
+      background: PHANTOM_BG,
+      borderRadius: '50%',
+      border: 'none',
+    },
+  })
+  dagreNodes.push({ id, w: PHANTOM_W, h: PHANTOM_H })
+}
+
+function darkEdge(source: string, target: string): Edge {
+  return {
+    id: `e-${source}-${target}`,
+    source,
+    target,
+    type: 'smoothstep',
+    animated: false,
+    style: { stroke: DARK_EDGE, strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: DARK_EDGE,
+      width: 14,
+      height: 14,
+    },
+  }
+}
+
+function goldPipeEdge(source: string, target: string, label?: string): Edge {
+  const edge: Edge = {
+    id: `e-${source}-${target}`,
+    source,
+    target,
+    type: 'smoothstep',
+    animated: false,
+    style: { stroke: GOLD_PIPE, strokeWidth: 2, strokeDasharray: undefined },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: GOLD_ARROW,
+      width: 14,
+      height: 14,
+    },
+  }
+  if (label) {
+    edge.label = label
+    edge.labelStyle = RETURN_LABEL_STYLE
+    edge.labelBgStyle = { fill: 'transparent' }
+    edge.labelShowBg = false
+  }
+  return edge
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// CONVERSATION MODE
+// ════════════════════════════════════════════════════════════════════════════
+
+function buildConversationGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
+  const nodes: Node[] = []
+  const edges: Edge[] = []
+  const dagreNodes: DagreInput[] = []
+
+  const hasEnd = session.status !== 'running'
   const lastTurnIndex = session.turns.length - 1
+
+  // Start node.
+  nodes.push({
+    id: 'start',
+    type: 'startNode',
+    position: { x: 0, y: 0 },
+    data: { startedAt: session.started_at, cwd: session.cwd },
+  })
+  dagreNodes.push({ id: 'start', w: START_W, h: START_H })
+
+  // Turn nodes + their agent spawns.
   session.turns.forEach((turn, i) => {
     const turnId = `turn-${i}`
     nodes.push({
@@ -56,6 +365,7 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
 
     for (const spawn of turn.agent_spawns) {
       const agentId = `agent-${spawn.id}`
+      const agentName = cleanAgentName(spawn.subagent_type)
       nodes.push({
         id: agentId,
         type: 'agentNode',
@@ -64,13 +374,14 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
           toolCall: spawn,
           turnId: turn.id,
           isSelected: false,
+          returnSummary: parseReturnSummary(spawn.output_preview, agentName),
         },
       })
       dagreNodes.push({ id: agentId, w: AGENT_W, h: AGENT_H })
     }
   })
 
-  // 4. End node (only if the session has finished).
+  // End node.
   if (hasEnd) {
     nodes.push({
       id: 'end',
@@ -81,76 +392,105 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
     dagreNodes.push({ id: 'end', w: END_W, h: END_H })
   }
 
-  // ── Edges ────────────────────────────────────────────────────────────────────
-  const makeEdge = (source: string, target: string, animated: boolean, isAgentEdge = false): Edge => ({
+  // ── Edges ────────────────────────────────────────────────────────────────
+  if (session.turns.length > 0) {
+    edges.push(convEdge('start', 'turn-0', false))
+
+    session.turns.forEach((turn, i) => {
+      const turnId = `turn-${i}`
+      if (i < lastTurnIndex) {
+        edges.push(convEdge(turnId, `turn-${i + 1}`, false))
+      }
+      for (const spawn of turn.agent_spawns) {
+        const agentId = `agent-${spawn.id}`
+        // turn → agent (spawn edge)
+        edges.push(convAgentEdge(turnId, agentId, spawn.status === 'running'))
+        // agent → next turn (RETURN edge) — agent reports back to the
+        // orchestrator turn that reads its result.
+        if (i + 1 <= lastTurnIndex) {
+          edges.push(returnEdge(agentId, `turn-${i + 1}`, spawn))
+        }
+      }
+    })
+
+    if (hasEnd) {
+      edges.push(convEdge(`turn-${lastTurnIndex}`, 'end', false))
+    }
+  } else if (hasEnd) {
+    edges.push(convEdge('start', 'end', false))
+  }
+
+  layout(nodes, edges, dagreNodes, { rankdir: 'TB', ranksep: 90, nodesep: 55 })
+  return { nodes, edges }
+}
+
+function convEdge(source: string, target: string, animated: boolean): Edge {
+  return {
     id: `e-${source}-${target}`,
     source,
     target,
     type: 'smoothstep',
     animated,
     style: {
-      stroke: isAgentEdge ? 'rgba(254,210,58,0.45)' : EDGE_COLOR,
-      strokeWidth: isAgentEdge ? 2 : 2,
+      stroke: DARK_EDGE,
+      strokeWidth: 2,
       strokeDasharray: animated ? '6 4' : undefined,
     },
     markerEnd: {
       type: MarkerType.ArrowClosed,
-      color: isAgentEdge ? 'rgba(254,210,58,0.6)' : EDGE_COLOR,
+      color: DARK_EDGE,
       width: 14,
       height: 14,
     },
-  })
-
-  if (session.turns.length > 0) {
-    // start → turn-0
-    edges.push(makeEdge('start', 'turn-0', false))
-
-    // turn-i → turn-i+1 and turn-i → agent spawns
-    session.turns.forEach((turn, i) => {
-      const turnId = `turn-${i}`
-      if (i < lastTurnIndex) {
-        edges.push(makeEdge(turnId, `turn-${i + 1}`, false))
-      }
-      for (const spawn of turn.agent_spawns) {
-        edges.push(makeEdge(turnId, `agent-${spawn.id}`, spawn.status === 'running', true))
-      }
-    })
-
-    // last turn → end
-    if (hasEnd) {
-      edges.push(makeEdge(`turn-${lastTurnIndex}`, 'end', false))
-    }
-  } else if (hasEnd) {
-    // Degenerate session with no turns: start → end directly.
-    edges.push(makeEdge('start', 'end', false))
   }
+}
 
-  // ── Dagre layout ─────────────────────────────────────────────────────────────
-  const g = new dagre.graphlib.Graph()
-  g.setGraph({ rankdir: 'TB', ranksep: 90, nodesep: 55 })
-  g.setDefaultEdgeLabel(() => ({}))
-
-  for (const dn of dagreNodes) {
-    g.setNode(dn.id, { width: dn.w, height: dn.h })
+function convAgentEdge(source: string, target: string, animated: boolean): Edge {
+  return {
+    id: `e-${source}-${target}`,
+    source,
+    target,
+    type: 'smoothstep',
+    animated,
+    style: {
+      stroke: 'rgba(254,210,58,0.45)',
+      strokeWidth: 2,
+      strokeDasharray: animated ? '6 4' : undefined,
+    },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: 'rgba(254,210,58,0.6)',
+      width: 14,
+      height: 14,
+    },
   }
-  for (const e of edges) {
-    g.setEdge(e.source, e.target)
+}
+
+function returnEdge(source: string, target: string, spawn: ToolCall): Edge {
+  const label = parseReturnSummary(spawn.output_preview, cleanAgentName(spawn.subagent_type))
+  const edge: Edge = {
+    id: `e-return-${source}-${target}`,
+    source,
+    target,
+    type: 'smoothstep',
+    animated: false,
+    style: {
+      stroke: GOLD_RETURN,
+      strokeWidth: 1.5,
+      strokeDasharray: '4 3',
+    },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: GOLD_ARROW,
+      width: 10,
+      height: 10,
+    },
   }
-
-  dagre.layout(g)
-
-  const dims = new Map(dagreNodes.map((d) => [d.id, d]))
-  for (const node of nodes) {
-    const pos = g.node(node.id)
-    const dim = dims.get(node.id)
-    if (pos && dim) {
-      // dagre returns center coordinates; React Flow expects top-left.
-      node.position = {
-        x: pos.x - dim.w / 2,
-        y: pos.y - dim.h / 2,
-      }
-    }
+  if (label) {
+    edge.label = label
+    edge.labelStyle = RETURN_LABEL_STYLE
+    edge.labelBgStyle = { fill: 'transparent' }
+    edge.labelShowBg = false
   }
-
-  return { nodes, edges }
+  return edge
 }
