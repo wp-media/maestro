@@ -536,6 +536,20 @@ export function parseReturnSummary(output: string | null, agentName: string): st
     }
   }
 
+  if (!json && (trimmed.startsWith('{') || trimmed.startsWith('['))) {
+    // JSON was truncated (hook slices at 400 chars). Try regex extraction for key Maestro fields.
+    const rx = (key: string) => trimmed.match(new RegExp(`"${key}"\\s*:\\s*"([^"]+)"`))?.[1] ?? null
+    const effort   = rx('effort')
+    const risk     = rx('risk_level')
+    const verdict  = rx('verdict')
+    const prNum    = rx('pr_number') || trimmed.match(/"pr_number"\s*:\s*(\d+)/)?.[1]
+    const status   = rx('status')
+    if (effort && risk)  return `effort=${effort} · risk=${risk}`
+    if (verdict)         return verdict
+    if (prNum)           return `PR #${prNum} created`
+    if (status)          return status
+  }
+
   if (json) {
     // grooming-agent: {effort, risk_level, open_questions}
     if (json.effort && json.risk_level) {
