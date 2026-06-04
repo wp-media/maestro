@@ -52,6 +52,20 @@ export interface Session {
   turns: Turn[]
   total_tool_calls: number
   total_agent_spawns: number
+  agent_pipeline: AgentPipelineStep[]   // ordered pipeline steps
+  is_orchestrator_mode: boolean         // true → use pipeline graph, false → turn graph
+}
+
+// ── Agent pipeline (orchestrator-mode visualization) ─────────────────────────
+
+/** One step in the agent pipeline — may contain parallel agents */
+export interface AgentPipelineStep {
+  step_index: number
+  agents: ToolCall[]              // usually 1, >1 when parallel
+  is_parallel: boolean
+  // Non-agent tool calls that occurred BEFORE this step (after previous step ended)
+  orchestrator_work: ToolCall[]   // Bash, Read, Write, etc. between agents
+  stage_label: string | null      // Maestro pipeline stage: "Grooming", "Implementation", etc.
 }
 
 export interface SessionSummary {
@@ -82,11 +96,20 @@ export interface AgentNodeData {
   isSelected: boolean
 }
 
+export interface PipelineAgentNodeData {
+  toolCall: ToolCall
+  stepIndex: number
+  stageLabel: string | null
+  isSelected: boolean
+  isFirstInPipeline: boolean
+  isLastInPipeline: boolean
+}
+
 export interface StartNodeData { startedAt: number; cwd: string | null }
 export interface EndNodeData   { status: SessionStatus; duration_ms: number | null }
 
 // ── React Flow node/edge type discriminants ─────────────────────────────────
-export type PodiumNodeType = 'turnNode' | 'agentNode' | 'startNode' | 'endNode'
+export type PodiumNodeType = 'turnNode' | 'agentNode' | 'pipelineAgentNode' | 'startNode' | 'endNode'
 
 // ── Store shape ─────────────────────────────────────────────────────────────
 export interface AppState {
