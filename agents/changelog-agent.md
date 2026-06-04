@@ -139,7 +139,25 @@ Period covered: changes merged after <baseline-label> (<baseline-date>)
 
 - #NNNN -> #IIII
 - #NNNN -> N/A
+
+---
+
+## changelog.txt Draft
+
+= X.Y.Z =
+Release date: [Month D, YYYY — today's date]
+
+* New feature: [one concise sentence]
+* Enhancement: [one concise sentence]
+* Fix: [one concise sentence]
 ```
+
+Rules for the `changelog.txt Draft` block:
+- Include **only** New features, Improvements, and User-facing fixes — omit all Engineering/Chore entries entirely
+- Each bullet is a single concise sentence, shorter than the detailed entry above it
+- Preserve the category prefix (`New feature:`, `Enhancement:`, `Fix:`) at the start of each bullet
+- The version placeholder `X.Y.Z` must match the `Target version` in the header
+- The release date is today's date formatted as `Month D, YYYY` (e.g. `June 4, 2026`)
 
 ---
 
