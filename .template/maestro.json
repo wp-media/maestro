@@ -1,5 +1,5 @@
 {
-  "_note": "Maestro template — copy to .claude/maestro.json and fill in all required fields. Remove optional null fields if not applicable to your project.",
+  "_note": "Copy to .claude/maestro.json in your project and fill in all required fields. Remove optional null fields if not applicable.",
   "name": "<project-slug>",
   "repo": "wp-media/<project-slug>",
   "type": "wordpress-plugin",
@@ -40,7 +40,7 @@
     "Prefer minimal diffs and avoid unrelated formatting changes."
   ],
   "ai": {
-    "_note": "AI delivery pipeline configuration — read by Maestro agents at startup via jq.",
+    "_note": "Read by Maestro agents at session start.",
 
     "slug": "<project-slug>",
     "display_name": "<Human Readable Plugin Name>",

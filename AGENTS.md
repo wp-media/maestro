@@ -10,7 +10,7 @@ If a conflict exists, AGENTS.md prevails.
 
 This is the **Maestro base**. Each project copies this file and extends it with a
 **Project Overview** section and a **Session Learnings** section at the bottom.
-`sync-pipeline.sh` never overwrites `AGENTS.md`.
+The Maestro plugin never overwrites `AGENTS.md`.
 
 ---
 
