@@ -213,19 +213,16 @@ After writing, confirm:
 
 ---
 
-## Step 6 — Copy the knowledge graph builder
+## Step 6 — Build the initial knowledge graph
 
-Find the Maestro plugin cache directory and copy the graph builder script to the project:
-
-```bash
-find ~/.claude/plugins/cache/maestro -name "build-knowledge-graph.js" 2>/dev/null | head -1
-```
-
-If found, copy it to `bin/build-knowledge-graph.js` in the project (create `bin/` if needed). Then run an initial full build:
+Find and run the graph builder directly from the Maestro plugin cache — no file is copied to the project:
 
 ```bash
-node bin/build-knowledge-graph.js --full
+GRAPH_SCRIPT=$(find ~/.claude/plugins/cache/maestro -name "build-knowledge-graph.js" 2>/dev/null | sort -V | tail -1)
+[ -n "$GRAPH_SCRIPT" ] && node "$GRAPH_SCRIPT" --full
 ```
+
+The graph is written to `.claude/graph/dependency-graph.json`. Add that path to `.gitignore` — it is auto-generated and should not be committed.
 
 If the script is not found (plugin not installed), skip silently and note it in the summary.
 
