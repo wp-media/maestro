@@ -58,8 +58,9 @@ Exit 0 → already installed, tell the user and stop.
 node {INSTALL_PATH}
 ```
 
-Registers `SessionStart`, `PreToolUse`, `PostToolUse`, `SubagentStart`,
-`SubagentStop`, `SessionEnd` in `.claude/settings.json`.
+Registers `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`,
+`PostToolUseFailure`, `SubagentStart`, `SubagentStop`, `SessionEnd`
+in `.claude/settings.json`.
 
 **c. Optional: install globally** (all projects on this machine)
 

@@ -16,9 +16,11 @@ const HOOK_PATH = resolve(join(__dirname, 'hook.mjs'))
 
 const HOOK_EVENTS = [
   'SessionStart',
-  'PreToolUse',
-  'PostToolUse',
-  'SubagentStart',
+  'UserPromptSubmit',   // turn boundaries — groups tool calls into reasoning turns
+  'PreToolUse',         // every tool call start (Bash, Read, Write, Agent, …)
+  'PostToolUse',        // every tool call end
+  'PostToolUseFailure', // failed tool calls
+  'SubagentStart',      // sub-agent identity enrichment
   'SubagentStop',
   'SessionEnd',
 ]
