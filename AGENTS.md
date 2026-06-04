@@ -249,7 +249,7 @@ namespace boundaries), **read this file first**. It contains:
 - `nodes`: per-file namespace, declared symbols, and imports.
 - `symbol_index`: maps every fully-qualified PHP class/interface/trait/enum to its file.
 
-Run `node bin/build-knowledge-graph.js` to refresh after structural changes (`--full` to force rebuild).
+Run `node bin/build-knowledge-graph.js` to refresh after structural changes (`--full` to force full rebuild, `--dry-run` to preview without writing).
 
 ---
 

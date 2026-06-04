@@ -205,13 +205,33 @@ The file must follow this structure exactly:
 
 Omit `slack_threads_dir` if `slack_channel` is null. Set null fields explicitly to `null` rather than omitting them, so developers know the field exists.
 
+Omit `slack_threads_dir` if `slack_channel` is null. Set null fields explicitly to `null` rather than omitting them, so developers know the field exists.
+
 After writing, confirm:
 
 > `.claude/maestro.json` created. Run `/issue-workflow <number>` to start the pipeline on this project.
 
 ---
 
-## Step 6 — Remind about remaining setup
+## Step 6 — Copy the knowledge graph builder
+
+Find the Maestro plugin cache directory and copy the graph builder script to the project:
+
+```bash
+find ~/.claude/plugins/cache/maestro -name "build-knowledge-graph.js" 2>/dev/null | head -1
+```
+
+If found, copy it to `bin/build-knowledge-graph.js` in the project (create `bin/` if needed). Then run an initial full build:
+
+```bash
+node bin/build-knowledge-graph.js --full
+```
+
+If the script is not found (plugin not installed), skip silently and note it in the summary.
+
+---
+
+## Step 7 — Remind about remaining setup
 
 After writing the file, check whether each of these exists and remind the user about anything missing:
 
