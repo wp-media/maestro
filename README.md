@@ -111,41 +111,42 @@ maestro/
 ├── .claude-plugin/
 │   ├── plugin.json                          ← Claude Code plugin manifest
 │   └── marketplace.json                     ← Self-serve marketplace definition
+├── .claude/
+│   └── settings.json                        ← SessionStart hook (reads project maestro.json)
 │
 ├── .template/
 │   └── maestro.json                         ← Full config schema — copy to .claude/maestro.json
 │
-└── .claude/                                 ← Plugin content (agents + skills)
-    │
-    ├── agents/                              ← 9 fully config-driven agents
-    │   ├── grooming-agent.md
-    │   ├── challenger.md
-    │   ├── backend-agent.md
-    │   ├── frontend-agent.md
-    │   ├── lead-reviewer.md
-    │   ├── qa-engineer.md
-    │   ├── release-agent.md
-    │   ├── ticket-writer.md
-    │   └── e2e-qa-tester.md
-    │
-    ├── commands/                            ← Skills (slash commands)
-    │   ├── orchestrator.md
-    │   ├── orchestrator/
-    │   │   └── html-log-format.md
-    │   ├── dod.md
-    │   ├── docs.md
-    │   ├── e2e.md
-    │   ├── issue-workflow.md
-    │   ├── issue-workflow/
-    │   │   ├── refs/pr-template.md
-    │   │   └── scripts/
-    │   ├── knowledge-graph.md
-    │   └── wordpress-compliance.md
-    │
-    └── specs/phpcs/                         ← Recurring PHPCS fix patterns
-        ├── escaped-output.md
-        ├── nonce-verification-recommended.md
-        └── validated-sanitized-input.md
+├── agents/                                  ← 9 fully config-driven agents
+│   ├── grooming-agent.md
+│   ├── challenger.md
+│   ├── backend-agent.md
+│   ├── frontend-agent.md
+│   ├── lead-reviewer.md
+│   ├── qa-engineer.md
+│   ├── release-agent.md
+│   ├── ticket-writer.md
+│   └── e2e-qa-tester.md
+│
+├── commands/                                ← Skills (slash commands)
+│   ├── orchestrator.md
+│   ├── orchestrator/
+│   │   └── html-log-format.md
+│   ├── dod.md
+│   ├── docs.md
+│   ├── e2e.md
+│   ├── issue-workflow.md
+│   ├── issue-workflow/
+│   │   ├── refs/pr-template.md
+│   │   └── scripts/
+│   ├── knowledge-graph.md
+│   ├── onboard-project.md
+│   └── wordpress-compliance.md
+│
+└── specs/phpcs/                             ← Recurring PHPCS fix patterns
+    ├── escaped-output.md
+    ├── nonce-verification-recommended.md
+    └── validated-sanitized-input.md
 ```
 
 ---
