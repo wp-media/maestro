@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Podium — Maestro Agent Observer</title>
+<style>
+  /* ============================================================
+     Podium — Maestro agent observer, single-file dashboard
+     ============================================================ */
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c222b;
+    --border: #21262d;
+    --border-strong: #30363d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --muted-2: #8b949e;
+    --success: #3fb950;
+    --danger: #f85149;
+    --warning: #ffa657;
+    --accent: #4f7cff;
+
+    --c-grooming: #22c55e;
+    --c-challenger: #f59e0b;
+    --c-backend: #22d3ee;
+    --c-frontend: #22d3ee;
+    --c-lead: #4f7cff;
+    --c-qa: #f472b6;
+    --c-e2e: #f472b6;
+    --c-release: #a855f7;
+    --c-ticket: #94a3b8;
+    --c-orchestrator: #e6edf3;
+    --c-default: #7d8590;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+      Arial, "Inter", sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3d444d; }
+
+  /* ---------- Header ---------- */
+  header.topbar {
+    height: 52px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+  }
+  .brand .diamond { color: var(--accent); font-size: 16px; }
+  .topbar .spacer { flex: 1; }
+
+  .conn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 5px 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+  .conn .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted);
+  }
+  .conn.online .dot { background: var(--success); box-shadow: 0 0 0 0 rgba(63,185,80,.5); animation: pulse-green 2s infinite; }
+  .conn.online { color: var(--text); }
+  .conn.reconnecting .dot { background: var(--warning); animation: blink 1s infinite; }
+  .conn.reconnecting { color: var(--warning); }
+  .conn.offline .dot { background: var(--danger); }
+  .conn.offline { color: var(--danger); }
+
+  @keyframes pulse-green {
+    0%   { box-shadow: 0 0 0 0 rgba(63,185,80,.45); }
+    70%  { box-shadow: 0 0 0 6px rgba(63,185,80,0); }
+    100% { box-shadow: 0 0 0 0 rgba(63,185,80,0); }
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* ---------- Layout ---------- */
+  .layout {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  /* ---------- Sidebar ---------- */
+  aside.sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .sidebar-head {
+    padding: 14px 16px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-head .count {
+    font-weight: 600;
+    color: var(--muted-2);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10.5px;
+    letter-spacing: 0;
+  }
+  .run-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px 16px;
+  }
+
+  .issue-group { margin-bottom: 10px; }
+  .issue-group-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    padding: 7px 8px 4px;
+    font-weight: 600;
+  }
+
+  .run-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 9px;
+    border-radius: 7px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    margin-bottom: 1px;
+    transition: background .12s ease;
+  }
+  .run-row:hover { background: var(--surface-2); }
+  .run-row.selected {
+    background: var(--surface-2);
+    border-left-color: var(--accent);
+  }
+  .run-row .status-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted);
+    position: relative;
+  }
+  .run-row .status-dot.running { background: var(--success); animation: pulse-green 1.8s infinite; }
+  .run-row .status-dot.success { background: var(--success); }
+  .run-row .status-dot.failed,
+  .run-row .status-dot.escalated { background: var(--danger); }
+  .run-row .run-meta { flex: 1; min-width: 0; }
+  .run-row .run-title {
+    font-size: 12.5px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .run-row .run-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .empty-runs {
+    padding: 28px 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Main ---------- */
+  main.stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .pipeline-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Run header bar */
+  .run-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    min-height: 64px;
+  }
+  .run-header .rh-main { flex: 1; min-width: 0; }
+  .run-header .rh-title {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .run-header .rh-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .run-header .rh-sub code {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11.5px;
+    color: var(--muted-2);
+  }
+  .calib-tag {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  .status-badge .bdot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-badge.running { color: var(--success); border-color: rgba(63,185,80,.4); background: rgba(63,185,80,.08); }
+  .status-badge.running .bdot { background: var(--success); animation: pulse-green 1.6s infinite; }
+  .status-badge.success { color: var(--success); border-color: rgba(63,185,80,.4); background: rgba(63,185,80,.08); }
+  .status-badge.failed,
+  .status-badge.escalated { color: var(--danger); border-color: rgba(248,81,73,.4); background: rgba(248,81,73,.08); }
+  .status-badge.failed .bdot,
+  .status-badge.escalated .bdot { background: var(--danger); }
+  .status-badge.success .bdot { background: var(--success); }
+  .status-badge.idle { color: var(--muted); }
+
+  /* Pipeline canvas */
+  .pipeline-canvas {
+    flex: 1;
+    overflow: auto;
+    padding: 34px 26px 18px;
+    min-height: 0;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    min-height: min-content;
+  }
+
+  /* a "stage" = one chronological column (single node or parallel stack) */
+  .pstage {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+  }
+  .pstage.parallel { position: relative; }
+  .pstage.parallel::before {
+    content: "parallel";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .pstage.parallel {
+    border: 1px dashed var(--border-strong);
+    border-radius: 12px;
+    padding: 14px 12px;
+    background: rgba(255,255,255,.012);
+  }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    color: var(--border-strong);
+    align-self: center;
+  }
+  .connector svg { display: block; }
+
+  /* Agent node */
+  .node {
+    --node-color: var(--c-default);
+    position: relative;
+    min-width: 124px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--node-color);
+    border-radius: 9px;
+    padding: 11px 13px;
+    cursor: pointer;
+    transition: border-color .12s ease, transform .1s ease, box-shadow .12s ease;
+    user-select: none;
+  }
+  .node:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .node.selected {
+    box-shadow: 0 0 0 1px var(--node-color), 0 4px 14px rgba(0,0,0,.35);
+    border-color: var(--node-color);
+  }
+  .node.pending {
+    background: transparent;
+    border-style: dashed;
+    opacity: .55;
+    cursor: default;
+  }
+  .node.pending:hover { transform: none; }
+
+  .node .node-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 5px;
+  }
+  .node .node-icon {
+    font-size: 13px;
+    line-height: 1;
+    color: var(--node-color);
+    width: 14px;
+    text-align: center;
+  }
+  .node.running .node-icon { animation: spin-pulse 1.4s infinite; }
+  @keyframes spin-pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: .35; }
+  }
+  .node .node-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .node.pending .node-name { color: var(--muted); font-weight: 500; }
+  .node .node-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .node .node-dur {
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .node .node-state {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--muted);
+  }
+  .node.running .node-state { color: var(--success); }
+  .node.failed .node-state,
+  .node.blocked .node-state { color: var(--danger); }
+  .node.success .node-state { color: var(--muted-2); }
+
+  /* sub-agent */
+  .sub-wrap {
+    margin-top: 12px;
+    padding-left: 16px;
+    position: relative;
+  }
+  .sub-connector {
+    position: absolute;
+    left: 2px;
+    top: -6px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* Inline pipeline meta rows (routing / gate / escalation) */
+  .meta-strip {
+    padding: 6px 26px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 9px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted-2);
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--border-strong); }
+  .chip .chip-k { color: var(--muted); }
+  .chip.pass { color: var(--success); border-color: rgba(63,185,80,.35); }
+  .chip.warn { color: var(--warning); border-color: rgba(255,166,87,.35); }
+  .chip.fail { color: var(--danger); border-color: rgba(248,81,73,.35); }
+  .chip.escalation { color: var(--danger); border-color: rgba(248,81,73,.35); }
+  .chip.routing { color: var(--accent); border-color: rgba(79,124,255,.35); }
+
+  /* Timing track */
+  .timing-track {
+    border-top: 1px solid var(--border);
+    padding: 12px 26px 14px;
+    background: var(--surface);
+  }
+  .timing-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .timing-total { color: var(--muted-2); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .timing-bar {
+    display: flex;
+    height: 14px;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+  .timing-seg {
+    height: 100%;
+    min-width: 2px;
+    position: relative;
+  }
+  .timing-seg + .timing-seg { border-left: 1px solid rgba(13,17,23,.6); }
+  .timing-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .legend-sw { width: 9px; height: 9px; border-radius: 2px; }
+  .legend-dur { color: var(--muted-2); font-variant-numeric: tabular-nums; }
+
+  /* ---------- Detail panel ---------- */
+  .detail {
+    height: 0;
+    overflow: hidden;
+    border-top: 1px solid transparent;
+    background: var(--surface);
+    transition: height .22s ease, border-color .22s ease;
+    flex-shrink: 0;
+  }
+  .detail.open {
+    height: 230px;
+    border-top: 1px solid var(--border);
+  }
+  .detail-inner {
+    height: 100%;
+    overflow-y: auto;
+    padding: 16px 22px 18px;
+  }
+  .detail-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .detail-head .d-accent {
+    width: 10px; height: 10px; border-radius: 3px;
+    background: var(--c-default);
+  }
+  .detail-head .d-name { font-size: 15px; font-weight: 600; }
+  .detail-head .spacer { flex: 1; }
+  .detail-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .detail-close:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 24px;
+  }
+  .detail-section .ds-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .detail-section .ds-body {
+    font-size: 13px;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .detail-section .ds-body.muted { color: var(--muted); }
+  .detail-meta-row {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .detail-meta-row b { color: var(--text); font-weight: 500; }
+
+  /* ---------- Center overlay (loading / errors / empty) ---------- */
+  .overlay {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    color: var(--muted);
+    padding: 40px;
+  }
+  .overlay h2 { color: var(--text); font-size: 16px; font-weight: 600; margin: 0; }
+  .overlay p { margin: 0; max-width: 420px; font-size: 13px; line-height: 1.6; }
+  .overlay code {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--muted-2);
+  }
+  .spinner {
+    width: 30px; height: 30px;
+    border: 3px solid var(--border-strong);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+
+  .retry-btn {
+    margin-top: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .retry-btn:hover { border-color: var(--accent); }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="diamond">&#9670;</span> Podium</div>
+    <div class="spacer"></div>
+    <div id="conn" class="conn offline">
+      <span class="dot"></span>
+      <span id="connText">Disconnected</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <span>RUNS</span>
+        <span class="count" id="runCount">0</span>
+      </div>
+      <div class="run-list" id="runList">
+        <div class="empty-runs">Loading…</div>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <!-- Overlay shown when no run selected / loading / error -->
+      <div class="overlay" id="overlay">
+        <div class="spinner"></div>
+        <h2>Connecting to Podium…</h2>
+        <p>Looking for active pipeline runs.</p>
+      </div>
+
+      <!-- Pipeline view -->
+      <div class="pipeline-area hidden" id="pipelineArea">
+        <div class="run-header" id="runHeader"></div>
+        <div class="meta-strip" id="metaStrip"></div>
+        <div class="pipeline-canvas" id="pipelineCanvas"></div>
+        <div class="timing-track" id="timingTrack"></div>
+
+        <div class="detail" id="detail">
+          <div class="detail-inner" id="detailInner"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+<script>
+"use strict";
+(function () {
+  /* ----------------------------------------------------------
+     Constants
+     ---------------------------------------------------------- */
+  var AGENT_COLORS = {
+    "grooming-agent": "#22c55e",
+    "challenger": "#f59e0b",
+    "backend-agent": "#22d3ee",
+    "frontend-agent": "#22d3ee",
+    "lead-reviewer": "#4f7cff",
+    "qa-engineer": "#f472b6",
+    "e2e-qa-tester": "#f472b6",
+    "release-agent": "#a855f7",
+    "ticket-writer": "#94a3b8",
+    "orchestrator": "#e6edf3"
+  };
+  var DEFAULT_COLOR = "#7d8590";
+
+  var AGENT_SHORT = {
+    "grooming-agent": "grooming",
+    "challenger": "challenger",
+    "backend-agent": "backend",
+    "frontend-agent": "frontend",
+    "lead-reviewer": "review",
+    "qa-engineer": "qa",
+    "e2e-qa-tester": "e2e",
+    "release-agent": "release",
+    "ticket-writer": "ticket",
+    "orchestrator": "orchestrator"
+  };
+
+  var SUB_OF = { "e2e-qa-tester": "qa-engineer" };
+
+  var POLL_MS = 10000;
+  var RECONNECT_MS = 3000;
+
+  /* ----------------------------------------------------------
+     State
+     ---------------------------------------------------------- */
+  var state = {
+    runs: [],            // [{run_id, issue_id, issue_title, status, started_at, duration_ms, repo, branch, calibration}]
+    selectedRunId: null,
+    events: [],          // raw events for selected run
+    selectedAgentId: null,
+    selectedMeta: null,  // for routing/gate/escalation detail
+    connected: false
+  };
+
+  var es = null;             // EventSource
+  var reconnectTimer = null;
+  var pollTimer = null;
+  var selectionToken = 0;    // guards async fetches against rapid re-selection
+
+  /* ----------------------------------------------------------
+     DOM refs
+     ---------------------------------------------------------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var elConn = $("conn");
+  var elConnText = $("connText");
+  var elRunList = $("runList");
+  var elRunCount = $("runCount");
+  var elOverlay = $("overlay");
+  var elPipelineArea = $("pipelineArea");
+  var elRunHeader = $("runHeader");
+  var elMetaStrip = $("metaStrip");
+  var elCanvas = $("pipelineCanvas");
+  var elTiming = $("timingTrack");
+  var elDetail = $("detail");
+  var elDetailInner = $("detailInner");
+
+  /* ----------------------------------------------------------
+     Utilities
+     ---------------------------------------------------------- */
+  function colorFor(agent) { return AGENT_COLORS[agent] || DEFAULT_COLOR; }
+  function shortName(agent) { return AGENT_SHORT[agent] || (agent || "agent"); }
+
+  function esc(s) {
+    if (s === null || s === undefined) return "";
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function fmtTime(ms) {
+    if (!ms && ms !== 0) return "";
+    var d = new Date(ms);
+    if (isNaN(d.getTime())) return "";
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    return hh + ":" + mm;
+  }
+
+  function fmtFullTime(ms) {
+    if (!ms && ms !== 0) return "—";
+    var d = new Date(ms);
+    if (isNaN(d.getTime())) return "—";
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    var ss = String(d.getSeconds()).padStart(2, "0");
+    return hh + ":" + mm + ":" + ss;
+  }
+
+  function fmtDur(ms) {
+    if (ms === null || ms === undefined || isNaN(ms)) return "—";
+    if (ms < 1000) return ms + "ms";
+    var s = ms / 1000;
+    if (s < 60) return (s < 10 ? s.toFixed(1) : Math.round(s)) + "s";
+    var m = Math.floor(s / 60);
+    var rem = Math.round(s % 60);
+    return m + "m " + (rem < 10 ? "0" : "") + rem + "s";
+  }
+
+  function safeParse(line) {
+    try { return JSON.parse(line); } catch (e) { return null; }
+  }
+
+  /* ----------------------------------------------------------
+     Connection status
+     ---------------------------------------------------------- */
+  function setConn(status) {
+    // status: 'online' | 'reconnecting' | 'offline'
+    state.connected = (status === "online");
+    elConn.className = "conn " + status;
+    if (status === "online") elConnText.textContent = "Connected";
+    else if (status === "reconnecting") elConnText.textContent = "Reconnecting…";
+    else elConnText.textContent = "Disconnected";
+  }
+
+  /* ----------------------------------------------------------
+     Overlay helpers
+     ---------------------------------------------------------- */
+  function showOverlay(html) {
+    elOverlay.innerHTML = html;
+    elOverlay.classList.remove("hidden");
+    elPipelineArea.classList.add("hidden");
+  }
+  function showPipeline() {
+    elOverlay.classList.add("hidden");
+    elPipelineArea.classList.remove("hidden");
+  }
+
+  function overlayLoading(msg) {
+    showOverlay(
+      '<div class="spinner"></div>' +
+      '<h2>' + esc(msg || "Loading…") + '</h2>'
+    );
+  }
+  function overlayError() {
+    showOverlay(
+      '<h2>Cannot connect to ' + esc(window.location.origin) + '</h2>' +
+      '<p>Podium server is unreachable. Make sure it is running (<code>/podium start</code>), then retry.</p>' +
+      '<button class="retry-btn" id="retryBtn">Retry</button>'
+    );
+    var b = $("retryBtn");
+    if (b) b.addEventListener("click", loadRuns);
+  }
+  function overlayEmpty() {
+    showOverlay(
+      '<h2>No pipeline runs yet</h2>' +
+      '<p>Start a Maestro orchestrator run to see live activity here.</p>'
+    );
+  }
+
+  /* ----------------------------------------------------------
+     Networking
+     ---------------------------------------------------------- */
+  function api(path) { return window.location.origin + path; }
+
+  function loadRuns() {
+    fetch(api("/api/runs"), { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var runs = normalizeRuns(data);
+        state.runs = runs;
+        setConn(state.connected ? "online" : (es ? "online" : "online"));
+        // If we have never connected to SSE, just mark reachable.
+        if (!es) setConn("online");
+        renderSidebar();
+
+        if (!runs.length) {
+          if (!state.selectedRunId) overlayEmpty();
+          return;
+        }
+        // Auto-select most recent run on first load.
+        if (!state.selectedRunId) {
+          selectRun(runs[0].run_id);
+        }
+      })
+      .catch(function () {
+        if (!state.selectedRunId) overlayError();
+        // keep connection chip honest only if no live SSE
+        if (!es) setConn("offline");
+      });
+  }
+
+  function normalizeRuns(data) {
+    var arr = [];
+    if (Array.isArray(data)) arr = data;
+    else if (data && Array.isArray(data.runs)) arr = data.runs;
+    else if (data && typeof data === "object") arr = [data];
+
+    var out = [];
+    for (var i = 0; i < arr.length; i++) {
+      var r = arr[i];
+      if (!r || !r.run_id) continue;
+      out.push({
+        run_id: r.run_id,
+        issue_id: r.issue_id != null ? String(r.issue_id) : extractIssue(r.run_id),
+        issue_title: r.issue_title || "",
+        status: r.status || "running",
+        started_at: r.started_at != null ? r.started_at : (r.ts != null ? r.ts : startedFromId(r.run_id)),
+        duration_ms: r.duration_ms != null ? r.duration_ms : (r.total_duration_ms != null ? r.total_duration_ms : null),
+        repo: r.repo || "",
+        branch: r.branch || "",
+        calibration: r.calibration || ""
+      });
+    }
+    out.sort(function (a, b) { return (b.started_at || 0) - (a.started_at || 0); });
+    return out;
+  }
+
+  function extractIssue(runId) {
+    var m = /issue-(\d+)/.exec(runId || "");
+    return m ? m[1] : "?";
+  }
+  function startedFromId(runId) {
+    var m = /-(\d{10,})$/.exec(runId || "");
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function selectRun(runId) {
+    if (!runId) return;
+    state.selectedRunId = runId;
+    state.events = [];
+    state.selectedAgentId = null;
+    state.selectedMeta = null;
+    closeDetail();
+    renderSidebar();
+
+    var token = ++selectionToken;
+    closeSSE();
+    overlayLoading("Loading run…");
+
+    // 1. snapshot
+    fetch(api("/api/events?run_id=" + encodeURIComponent(runId) + "&snapshot=1"), { cache: "no-store" })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        var ct = r.headers.get("content-type") || "";
+        if (ct.indexOf("application/json") !== -1) return r.json();
+        return r.text();
+      })
+      .then(function (data) {
+        if (token !== selectionToken) return; // superseded
+        ingestSnapshot(data);
+        showPipeline();
+        renderRun();
+        openSSE(runId, token);
+      })
+      .catch(function () {
+        if (token !== selectionToken) return;
+        // No snapshot — still try the live stream.
+        showPipeline();
+        renderRun();
+        openSSE(runId, token);
+      });
+  }
+
+  function ingestSnapshot(data) {
+    var events = [];
+    if (Array.isArray(data)) {
+      events = data;
+    } else if (data && Array.isArray(data.events)) {
+      events = data.events;
+    } else if (typeof data === "string") {
+      var lines = data.split(/\r?\n/);
+      for (var i = 0; i < lines.length; i++) {
+        var ln = lines[i].trim();
+        if (!ln) continue;
+        var obj = safeParse(ln);
+        if (obj) events.push(obj);
+      }
+    } else if (data && typeof data === "object") {
+      events = [data];
+    }
+    for (var j = 0; j < events.length; j++) {
+      if (events[j] && typeof events[j] === "object") state.events.push(events[j]);
+    }
+  }
+
+  function openSSE(runId, token) {
+    if (typeof EventSource === "undefined") {
+      // No SSE support — fall back silently to polling-only.
+      setConn("online");
+      return;
+    }
+    var url = api("/api/events?run_id=" + encodeURIComponent(runId));
+    var src;
+    try {
+      src = new EventSource(url);
+    } catch (e) {
+      scheduleReconnect(runId, token);
+      return;
+    }
+    es = src;
+
+    src.addEventListener("open", function () {
+      if (token !== selectionToken) return;
+      setConn("online");
+    });
+
+    src.addEventListener("event", function (e) {
+      if (token !== selectionToken) return;
+      var obj = safeParse(e.data);
+      if (obj) { processEvent(obj); renderRun(); }
+    });
+
+    // Some servers emit default 'message' events.
+    src.addEventListener("message", function (e) {
+      if (token !== selectionToken) return;
+      var obj = safeParse(e.data);
+      if (obj) { processEvent(obj); renderRun(); }
+    });
+
+    src.addEventListener("ping", function () {
+      if (token !== selectionToken) return;
+      setConn("online");
+    });
+
+    src.addEventListener("error", function () {
+      if (token !== selectionToken) return;
+      // EventSource auto-reconnects, but if it's closed we handle it.
+      if (src.readyState === EventSource.CLOSED) {
+        setConn("reconnecting");
+        scheduleReconnect(runId, token);
+      } else {
+        setConn("reconnecting");
+      }
+    });
+  }
+
+  function scheduleReconnect(runId, token) {
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(function () {
+      if (token !== selectionToken) return;
+      closeSSE();
+      openSSE(runId, token);
+    }, RECONNECT_MS);
+  }
+
+  function closeSSE() {
+    if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+    if (es) {
+      try { es.close(); } catch (e) {}
+      es = null;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     Event processing
+     ---------------------------------------------------------- */
+  function processEvent(evt) {
+    if (!evt || typeof evt !== "object") return;
+    // Ignore events that don't belong to the selected run (when run_id present).
+    if (evt.run_id && state.selectedRunId && evt.run_id !== state.selectedRunId) return;
+
+    state.events.push(evt);
+
+    // run_end may also update the sidebar run record.
+    if (evt.type === "run_end") {
+      for (var i = 0; i < state.runs.length; i++) {
+        if (state.runs[i].run_id === evt.run_id) {
+          state.runs[i].status = evt.status || "success";
+          if (evt.total_duration_ms != null) state.runs[i].duration_ms = evt.total_duration_ms;
+        }
+      }
+      renderSidebar();
+    }
+    if (evt.type === "run_start") {
+      // Ensure sidebar knows about it.
+      var found = false;
+      for (var k = 0; k < state.runs.length; k++) {
+        if (state.runs[k].run_id === evt.run_id) { found = true; break; }
+      }
+      if (!found && evt.run_id) {
+        state.runs.unshift({
+          run_id: evt.run_id,
+          issue_id: evt.issue_id != null ? String(evt.issue_id) : extractIssue(evt.run_id),
+          issue_title: evt.issue_title || "",
+          status: "running",
+          started_at: evt.ts || Date.now(),
+          duration_ms: null,
+          repo: evt.repo || "",
+          branch: evt.branch || "",
+          calibration: evt.calibration || ""
+        });
+        renderSidebar();
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     Derive pipeline model from events
+     ---------------------------------------------------------- */
+  function buildModel() {
+    var ev = state.events;
+    var runStart = null, runEnd = null;
+    var agents = {};   // agent_id -> {agent_id, agent, parent, start, end, status, input, output, duration}
+    var order = [];    // agent_ids in start order
+    var metas = [];    // routing/gate/escalation events
+
+    for (var i = 0; i < ev.length; i++) {
+      var e = ev[i];
+      if (!e || !e.type) continue;
+      switch (e.type) {
+        case "run_start": runStart = e; break;
+        case "run_end": runEnd = e; break;
+        case "agent_start": {
+          var id = e.agent_id || (e.agent + "-" + i);
+          if (!agents[id]) { agents[id] = makeAgent(id); order.push(id); }
+          var a = agents[id];
+          a.agent = e.agent || a.agent;
+          a.parent = e.parent_agent_id || a.parent || null;
+          a.start = e.ts;
+          a.input = e.input_summary || a.input;
+          if (a.status === "pending") a.status = "running";
+          break;
+        }
+        case "agent_end": {
+          var id2 = e.agent_id || (e.agent + "-end-" + i);
+          if (!agents[id2]) { agents[id2] = makeAgent(id2); order.push(id2); }
+          var a2 = agents[id2];
+          a2.agent = e.agent || a2.agent;
+          a2.end = e.ts;
+          a2.status = e.status || "success";
+          a2.output = e.output_summary || a2.output;
+          a2.duration = (e.duration_ms != null) ? e.duration_ms
+            : (a2.start != null && e.ts != null ? e.ts - a2.start : a2.duration);
+          break;
+        }
+        case "routing":
+        case "gate":
+        case "escalation":
+          metas.push(e);
+          break;
+      }
+    }
+
+    // Fill computed durations for running agents (live)
+    var now = Date.now();
+    for (var id3 in agents) {
+      if (!agents.hasOwnProperty(id3)) continue;
+      var ag = agents[id3];
+      if (ag.duration == null && ag.start != null) {
+        ag.duration = (ag.end != null ? ag.end : now) - ag.start;
+      }
+    }
+
+    return {
+      runStart: runStart,
+      runEnd: runEnd,
+      agents: agents,
+      order: order,
+      metas: metas
+    };
+  }
+
+  function makeAgent(id) {
+    return {
+      agent_id: id, agent: "", parent: null,
+      start: null, end: null, status: "pending",
+      input: "", output: "", duration: null
+    };
+  }
+
+  /* Group top-level agents into chronological stages, detecting parallelism
+     by overlapping start/end windows. */
+  function buildStages(model) {
+    var tops = [];
+    for (var i = 0; i < model.order.length; i++) {
+      var ag = model.agents[model.order[i]];
+      if (ag.parent) continue; // sub-agents handled under parent
+      tops.push(ag);
+    }
+    tops.sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+
+    var stages = [];
+    for (var j = 0; j < tops.length; j++) {
+      var ag2 = tops[j];
+      var placed = false;
+      if (stages.length) {
+        var last = stages[stages.length - 1];
+        // overlap test against the stage's window
+        if (overlaps(ag2, last)) {
+          last.agents.push(ag2);
+          last.start = Math.min(last.start, ag2.start || last.start);
+          last.end = Math.max(last.end || 0, ag2.end || ag2.start || last.end || 0);
+          placed = true;
+        }
+      }
+      if (!placed) {
+        stages.push({
+          agents: [ag2],
+          start: ag2.start || 0,
+          end: ag2.end || ag2.start || 0
+        });
+      }
+    }
+    return stages;
+  }
+
+  function overlaps(ag, stage) {
+    if (ag.start == null) return false;
+    var aStart = ag.start;
+    var aEnd = ag.end != null ? ag.end : Date.now();
+    var sStart = stage.start;
+    var sEnd = stage.end != null ? stage.end : Date.now();
+    // Treat near-simultaneous starts as parallel even if windows are short.
+    if (Math.abs(aStart - sStart) < 1500) return true;
+    return aStart < sEnd && aEnd > sStart;
+  }
+
+  /* ----------------------------------------------------------
+     Rendering — sidebar
+     ---------------------------------------------------------- */
+  function renderSidebar() {
+    elRunCount.textContent = String(state.runs.length);
+
+    if (!state.runs.length) {
+      elRunList.innerHTML =
+        '<div class="empty-runs">No runs found.<br><br>' +
+        'Start a Maestro orchestrator run to see live activity.</div>';
+      return;
+    }
+
+    // Group by issue_id, groups ordered by most recent run.
+    var groups = {};
+    var groupOrder = [];
+    for (var i = 0; i < state.runs.length; i++) {
+      var r = state.runs[i];
+      var key = r.issue_id || "?";
+      if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
+      groups[key].push(r);
+    }
+    // groupOrder already follows runs[] which is sorted desc by started_at.
+
+    var html = "";
+    for (var g = 0; g < groupOrder.length; g++) {
+      var key2 = groupOrder[g];
+      var rows = groups[key2];
+      html += '<div class="issue-group">';
+      html += '<div class="issue-group-label">issue #' + esc(key2) + '</div>';
+      for (var k = 0; k < rows.length; k++) {
+        html += runRowHtml(rows[k]);
+      }
+      html += '</div>';
+    }
+    elRunList.innerHTML = html;
+
+    // Bind clicks
+    var rowEls = elRunList.querySelectorAll(".run-row");
+    for (var x = 0; x < rowEls.length; x++) {
+      rowEls[x].addEventListener("click", function () {
+        var rid = this.getAttribute("data-run");
+        if (rid && rid !== state.selectedRunId) selectRun(rid);
+      });
+    }
+  }
+
+  function runRowHtml(r) {
+    var running = r.status === "running" || r.status === "active";
+    var dotCls = running ? "running"
+      : (r.status === "success" ? "success"
+        : (r.status === "failed" || r.status === "escalated" ? "failed" : ""));
+    var glyph = running ? "" : (r.status === "success" ? "" : "");
+    var sub = "issue-" + esc(r.issue_id) + " &middot; " + esc(fmtTime(r.started_at));
+    if (!running && r.duration_ms != null) sub += " &middot; " + esc(fmtDur(r.duration_ms));
+    else if (running) sub += " &middot; running";
+
+    var title = r.issue_title ? esc(r.issue_title) : esc(r.run_id);
+    var selCls = (r.run_id === state.selectedRunId) ? " selected" : "";
+
+    return '<div class="run-row' + selCls + '" data-run="' + esc(r.run_id) + '">' +
+      '<span class="status-dot ' + dotCls + '"></span>' +
+      '<div class="run-meta">' +
+        '<div class="run-title">' + title + '</div>' +
+        '<div class="run-sub">' + sub + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ----------------------------------------------------------
+     Rendering — run header, pipeline, timing
+     ---------------------------------------------------------- */
+  function renderRun() {
+    var model = buildModel();
+    renderRunHeader(model);
+    renderMetaStrip(model);
+    renderPipeline(model);
+    renderTiming(model);
+    refreshDetail(model);
+  }
+
+  function runStatus(model) {
+    if (model.runEnd) return model.runEnd.status || "success";
+    return "running";
+  }
+
+  function renderRunHeader(model) {
+    var rs = model.runStart;
+    var rid = state.selectedRunId || "";
+    var title = (rs && rs.issue_title) ? rs.issue_title : rid;
+    var repo = rs && rs.repo ? rs.repo : "";
+    var branch = rs && rs.branch ? rs.branch : "";
+    var calib = rs && rs.calibration ? rs.calibration : "";
+
+    // fallback from sidebar record
+    if ((!repo || !branch || !title) && state.runs.length) {
+      for (var i = 0; i < state.runs.length; i++) {
+        if (state.runs[i].run_id === rid) {
+          var sr = state.runs[i];
+          if (!title || title === rid) title = sr.issue_title || rid;
+          if (!repo) repo = sr.repo;
+          if (!branch) branch = sr.branch;
+          if (!calib) calib = sr.calibration;
+          break;
+        }
+      }
+    }
+
+    var st = runStatus(model);
+    var badge;
+    if (st === "running") {
+      badge = '<span class="status-badge running"><span class="bdot"></span>RUNNING</span>';
+    } else if (st === "success") {
+      var dur = model.runEnd && model.runEnd.total_duration_ms != null
+        ? fmtDur(model.runEnd.total_duration_ms)
+        : fmtDur(totalSpan(model));
+      badge = '<span class="status-badge success"><span class="bdot"></span>DONE &middot; ' + esc(dur) + '</span>';
+    } else {
+      var lbl = st === "escalated" ? "ESCALATED" : "FAILED";
+      badge = '<span class="status-badge failed"><span class="bdot"></span>' + esc(lbl) + '</span>';
+    }
+
+    var sub = "";
+    if (repo) sub += '<span><code>' + esc(repo) + '</code></span>';
+    if (branch) sub += '<span><code>' + esc(branch) + '</code></span>';
+    if (calib) sub += '<span class="calib-tag">' + esc(calib.replace(/_/g, " ")) + '</span>';
+
+    elRunHeader.innerHTML =
+      '<div class="rh-main">' +
+        '<div class="rh-title">' + esc(title) + '</div>' +
+        (sub ? '<div class="rh-sub">' + sub + '</div>' : '') +
+      '</div>' +
+      badge;
+  }
+
+  function totalSpan(model) {
+    var starts = [], ends = [];
+    for (var id in model.agents) {
+      if (!model.agents.hasOwnProperty(id)) continue;
+      var a = model.agents[id];
+      if (a.start != null) starts.push(a.start);
+      ends.push(a.end != null ? a.end : Date.now());
+    }
+    if (model.runStart) starts.push(model.runStart.ts);
+    if (model.runEnd) ends.push(model.runEnd.ts);
+    if (!starts.length) return 0;
+    return Math.max.apply(null, ends) - Math.min.apply(null, starts);
+  }
+
+  function renderMetaStrip(model) {
+    if (!model.metas.length) { elMetaStrip.innerHTML = ""; return; }
+    var html = "";
+    for (var i = 0; i < model.metas.length; i++) {
+      var m = model.metas[i];
+      if (m.type === "routing") {
+        html += '<span class="chip routing" data-meta="' + i + '">' +
+          '<span class="chip-k">route</span>' + esc(m.decision || "") + '</span>';
+      } else if (m.type === "gate") {
+        var cls = m.status === "pass" ? "pass" : (m.status === "warn" ? "warn" : "fail");
+        html += '<span class="chip ' + cls + '" data-meta="' + i + '">' +
+          '<span class="chip-k">gate</span>' + esc(m.gate || "") + ' &middot; ' + esc(m.summary || m.status || "") + '</span>';
+      } else if (m.type === "escalation") {
+        html += '<span class="chip escalation" data-meta="' + i + '">' +
+          '<span class="chip-k">escalation</span>' + esc(m.agent || "") +
+          (m.loop_count != null ? ' &middot; loop ' + esc(m.loop_count) : '') + '</span>';
+      }
+    }
+    elMetaStrip.innerHTML = html;
+    var chips = elMetaStrip.querySelectorAll(".chip");
+    for (var c = 0; c < chips.length; c++) {
+      chips[c].addEventListener("click", function () {
+        var idx = parseInt(this.getAttribute("data-meta"), 10);
+        openMetaDetail(model.metas[idx]);
+      });
+    }
+  }
+
+  function renderPipeline(model) {
+    var stages = buildStages(model);
+
+    if (!stages.length) {
+      elCanvas.innerHTML =
+        '<div style="color:var(--muted);font-size:13px;padding:8px 0;">' +
+        (runStatus(model) === "running"
+          ? 'Waiting for the first agent to start…'
+          : 'No agent activity recorded for this run.') +
+        '</div>';
+      return;
+    }
+
+    var html = '<div class="pipeline-flow">';
+    for (var s = 0; s < stages.length; s++) {
+      if (s > 0) html += connectorHtml();
+      html += stageHtml(stages[s], model);
+    }
+    html += '</div>';
+    elCanvas.innerHTML = html;
+
+    // bind node clicks
+    var nodes = elCanvas.querySelectorAll(".node:not(.pending)");
+    for (var n = 0; n < nodes.length; n++) {
+      nodes[n].addEventListener("click", function () {
+        var aid = this.getAttribute("data-agent");
+        if (aid) openAgentDetail(aid);
+      });
+    }
+  }
+
+  function connectorHtml() {
+    return '<div class="connector">' +
+      '<svg width="40" height="14" viewBox="0 0 40 14">' +
+      '<line x1="0" y1="7" x2="32" y2="7" stroke="currentColor" stroke-width="1.5"/>' +
+      '<path d="M30 3 L38 7 L30 11" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '</svg></div>';
+  }
+
+  function stageHtml(stage, model) {
+    var parallel = stage.agents.length > 1;
+    var cls = "pstage" + (parallel ? " parallel" : "");
+    var html = '<div class="' + cls + '">';
+    for (var i = 0; i < stage.agents.length; i++) {
+      html += nodeWithSubsHtml(stage.agents[i], model);
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function nodeWithSubsHtml(agent, model) {
+    var html = nodeHtml(agent);
+    // sub-agents
+    var subs = [];
+    for (var id in model.agents) {
+      if (!model.agents.hasOwnProperty(id)) continue;
+      var a = model.agents[id];
+      if (a.parent && a.parent === agent.agent_id) subs.push(a);
+    }
+    if (subs.length) {
+      subs.sort(function (x, y) { return (x.start || 0) - (y.start || 0); });
+      html += '<div class="sub-wrap">';
+      for (var s = 0; s < subs.length; s++) {
+        html += '<span class="sub-connector">&#9492;</span>' + nodeHtml(subs[s]);
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  function nodeHtml(agent) {
+    var color = colorFor(agent.agent);
+    var status = agent.status || "pending";
+    var icon, stateLabel;
+    if (status === "running") { icon = "&#9670;"; stateLabel = "running"; }
+    else if (status === "success") { icon = "&#10003;"; stateLabel = "done"; }
+    else if (status === "failed") { icon = "&#10007;"; stateLabel = "failed"; }
+    else if (status === "blocked") { icon = "&#10007;"; stateLabel = "blocked"; }
+    else { icon = "&#9675;"; stateLabel = "pending"; }
+
+    var dur = (agent.duration != null) ? fmtDur(agent.duration) : "";
+    var selCls = (agent.agent_id === state.selectedAgentId) ? " selected" : "";
+
+    return '<div class="node ' + esc(status) + selCls + '" data-agent="' + esc(agent.agent_id) + '" ' +
+      'style="--node-color:' + color + '">' +
+      '<div class="node-top">' +
+        '<span class="node-icon">' + icon + '</span>' +
+        '<span class="node-name">' + esc(shortName(agent.agent)) + '</span>' +
+      '</div>' +
+      '<div class="node-foot">' +
+        '<span class="node-state">' + stateLabel + '</span>' +
+        '<span class="node-dur">' + esc(dur) + '</span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function renderTiming(model) {
+    var items = [];
+    for (var i = 0; i < model.order.length; i++) {
+      var a = model.agents[model.order[i]];
+      if (a.duration != null && a.duration > 0 && a.start != null) {
+        items.push(a);
+      }
+    }
+    items.sort(function (x, y) { return (x.start || 0) - (y.start || 0); });
+
+    if (!items.length) {
+      elTiming.innerHTML =
+        '<div class="timing-head"><span>TIMELINE</span>' +
+        '<span class="timing-total">—</span></div>' +
+        '<div class="timing-bar"></div>';
+      return;
+    }
+
+    var sum = 0;
+    for (var k = 0; k < items.length; k++) sum += items[k].duration;
+    if (sum <= 0) sum = 1;
+
+    var total = model.runEnd && model.runEnd.total_duration_ms != null
+      ? model.runEnd.total_duration_ms
+      : totalSpan(model);
+
+    var bar = "";
+    var legend = "";
+    for (var j = 0; j < items.length; j++) {
+      var a2 = items[j];
+      var color = colorFor(a2.agent);
+      var pct = (a2.duration / sum) * 100;
+      bar += '<div class="timing-seg" title="' + esc(shortName(a2.agent)) + ' · ' + esc(fmtDur(a2.duration)) + '" ' +
+        'style="width:' + pct.toFixed(3) + '%;background:' + color + '"></div>';
+      legend += '<span class="legend-item">' +
+        '<span class="legend-sw" style="background:' + color + '"></span>' +
+        esc(shortName(a2.agent)) +
+        ' <span class="legend-dur">' + esc(fmtDur(a2.duration)) + '</span></span>';
+    }
+
+    elTiming.innerHTML =
+      '<div class="timing-head"><span>TIMELINE</span>' +
+      '<span class="timing-total">total ' + esc(fmtDur(total)) + '</span></div>' +
+      '<div class="timing-bar">' + bar + '</div>' +
+      '<div class="timing-legend">' + legend + '</div>';
+  }
+
+  /* ----------------------------------------------------------
+     Detail panel
+     ---------------------------------------------------------- */
+  function openAgentDetail(agentId) {
+    state.selectedAgentId = agentId;
+    state.selectedMeta = null;
+    renderRun(); // refresh node selection state + detail
+    elDetail.classList.add("open");
+  }
+
+  function openMetaDetail(meta) {
+    state.selectedMeta = meta;
+    state.selectedAgentId = null;
+    renderMetaDetail(meta);
+    elDetail.classList.add("open");
+    // clear node selection highlight
+    var sel = elCanvas.querySelector(".node.selected");
+    if (sel) sel.classList.remove("selected");
+  }
+
+  function closeDetail() {
+    state.selectedAgentId = null;
+    state.selectedMeta = null;
+    elDetail.classList.remove("open");
+  }
+
+  // Called on each renderRun to keep an open agent detail fresh (live updates).
+  function refreshDetail(model) {
+    if (state.selectedMeta) return; // meta details are static snapshots
+    if (!state.selectedAgentId) return;
+    var a = model.agents[state.selectedAgentId];
+    if (!a) return;
+    renderAgentDetail(a);
+  }
+
+  function renderAgentDetail(a) {
+    var color = colorFor(a.agent);
+    var status = a.status || "pending";
+    var badgeCls = status === "running" ? "running"
+      : status === "success" ? "success"
+      : (status === "failed" || status === "blocked") ? "failed" : "idle";
+    var badgeText = status === "running" ? "RUNNING"
+      : status === "success" ? "SUCCESS"
+      : status === "failed" ? "FAILED"
+      : status === "blocked" ? "BLOCKED" : "PENDING";
+
+    var outBody = a.output
+      ? '<div class="ds-body">' + esc(a.output) + '</div>'
+      : '<div class="ds-body muted">' + (status === "running" ? "In progress…" : "No output recorded.") + '</div>';
+
+    elDetailInner.innerHTML =
+      '<div class="detail-head">' +
+        '<span class="d-accent" style="background:' + color + '"></span>' +
+        '<span class="d-name">' + esc(a.agent || a.agent_id) + '</span>' +
+        '<span class="status-badge ' + badgeCls + '"><span class="bdot"></span>' + badgeText + '</span>' +
+        '<span class="spacer"></span>' +
+        '<button class="detail-close" id="detailClose">&#10005;</button>' +
+      '</div>' +
+      '<div class="detail-grid">' +
+        '<div class="detail-section">' +
+          '<div class="ds-label">Input</div>' +
+          (a.input
+            ? '<div class="ds-body">' + esc(a.input) + '</div>'
+            : '<div class="ds-body muted">No input summary.</div>') +
+        '</div>' +
+        '<div class="detail-section">' +
+          '<div class="ds-label">Output</div>' + outBody +
+        '</div>' +
+      '</div>' +
+      '<div class="detail-meta-row">' +
+        '<span>Duration: <b>' + esc(a.duration != null ? fmtDur(a.duration) : "—") + '</b></span>' +
+        '<span>Started: <b>' + esc(fmtFullTime(a.start)) + '</b></span>' +
+        '<span>Ended: <b>' + esc(a.end != null ? fmtFullTime(a.end) : "—") + '</b></span>' +
+        '<span>ID: <b>' + esc(a.agent_id) + '</b></span>' +
+      '</div>';
+
+    bindClose();
+  }
+
+  function renderMetaDetail(m) {
+    var title, accent = DEFAULT_COLOR, body = "";
+    if (m.type === "routing") {
+      title = "Routing decision";
+      accent = "#4f7cff";
+      body =
+        '<div class="detail-section"><div class="ds-label">Decision</div>' +
+          '<div class="ds-body">' + esc(m.decision || "—") + '</div></div>' +
+        '<div class="detail-section"><div class="ds-label">Reasoning</div>' +
+          '<div class="ds-body' + (m.reasoning ? '' : ' muted') + '">' + esc(m.reasoning || "No reasoning provided.") + '</div></div>';
+    } else if (m.type === "gate") {
+      title = "Gate: " + (m.gate || "");
+      accent = m.status === "pass" ? "#3fb950" : (m.status === "warn" ? "#ffa657" : "#f85149");
+      body =
+        '<div class="detail-section"><div class="ds-label">Status</div>' +
+          '<div class="ds-body">' + esc((m.status || "").toUpperCase()) + '</div></div>' +
+        '<div class="detail-section"><div class="ds-label">Summary</div>' +
+          '<div class="ds-body' + (m.summary ? '' : ' muted') + '">' + esc(m.summary || "—") + '</div></div>';
+    } else if (m.type === "escalation") {
+      title = "Escalation";
+      accent = "#f85149";
+      body =
+        '<div class="detail-section"><div class="ds-label">Agent</div>' +
+          '<div class="ds-body">' + esc(m.agent || "—") + '</div></div>' +
+        '<div class="detail-section"><div class="ds-label">Reason</div>' +
+          '<div class="ds-body' + (m.reason ? '' : ' muted') + '">' + esc(m.reason || "—") + '</div></div>';
+    } else {
+      title = m.type || "Event";
+      body = '<div class="detail-section"><div class="ds-body muted">' + esc(JSON.stringify(m)) + '</div></div>';
+    }
+
+    var foot = '<div class="detail-meta-row"><span>Time: <b>' + esc(fmtFullTime(m.ts)) + '</b></span>';
+    if (m.loop_count != null) foot += '<span>Loop: <b>' + esc(m.loop_count) + '</b></span>';
+    foot += '</div>';
+
+    elDetailInner.innerHTML =
+      '<div class="detail-head">' +
+        '<span class="d-accent" style="background:' + accent + '"></span>' +
+        '<span class="d-name">' + esc(title) + '</span>' +
+        '<span class="spacer"></span>' +
+        '<button class="detail-close" id="detailClose">&#10005;</button>' +
+      '</div>' +
+      '<div class="detail-grid">' + body + '</div>' +
+      foot;
+
+    bindClose();
+  }
+
+  function bindClose() {
+    var b = $("detailClose");
+    if (b) b.addEventListener("click", closeDetail);
+  }
+
+  /* ----------------------------------------------------------
+     Live ticking — keep running durations fresh
+     ---------------------------------------------------------- */
+  function tick() {
+    // Only re-render if the selected run is still running (cheap guard).
+    if (!state.selectedRunId) return;
+    var hasRunning = false;
+    for (var i = 0; i < state.events.length; i++) {
+      if (state.events[i].type === "run_end") { hasRunning = false; break; }
+    }
+    // determine running by checking model quickly
+    var model = buildModel();
+    if (runStatus(model) === "running") {
+      renderRun();
+    }
+  }
+
+  /* ----------------------------------------------------------
+     Boot
+     ---------------------------------------------------------- */
+  function init() {
+    overlayLoading("Connecting to Podium…");
+    loadRuns();
+
+    // Poll for new runs.
+    pollTimer = setInterval(loadRuns, POLL_MS);
+
+    // Tick live durations every second.
+    setInterval(tick, 1000);
+
+    // Keyboard: Esc closes detail.
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeDetail();
+    });
+
+    window.addEventListener("beforeunload", function () {
+      closeSSE();
+      if (pollTimer) clearInterval(pollTimer);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
