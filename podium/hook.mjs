@@ -2,12 +2,15 @@
 // podium/hook.mjs
 // Zero-token Claude Code hook for Podium.
 //
-// Registered in .claude/settings.json for:
-//   SessionStart, PreToolUse (Agent/Workflow), PostToolUse (Agent/Workflow),
-//   SubagentStart, SubagentStop, SessionEnd
-//
-// Reads the hook payload from stdin, appends one JSONL line to:
+// Registered in .claude/settings.json for ALL hook events.
+// Captures every tool call + session lifecycle, writing one JSONL line to:
 //   {TEMP_ROOT}/podium/{session_id}/events.jsonl
+//
+// Events written:
+//   session_start / session_end        — session lifecycle
+//   turn_start                         — new user prompt (UserPromptSubmit)
+//   tool_start / tool_end              — every tool use (Bash, Read, Write, Agent…)
+//   subagent_meta / subagent_stop      — sub-agent identity enrichment
 //
 // Hard exit deadline: 1 500 ms (well inside Claude Code's 2 s kill timeout).
 
@@ -17,6 +20,53 @@ import { join } from 'node:path'
 // ── Safety deadline ───────────────────────────────────────────────────────────
 const DEADLINE = setTimeout(() => process.exit(0), 1_500)
 DEADLINE.unref()
+
+// ── Tool input summarisers — keep payloads small ──────────────────────────────
+// Returns a short human-readable label for a tool call.
+function summariseTool(tool_name, tool_input) {
+  if (!tool_input) return null
+  switch (tool_name) {
+    case 'Bash':
+      return typeof tool_input.command === 'string'
+        ? tool_input.command.slice(0, 120)
+        : null
+    case 'Read':
+      return tool_input.file_path ?? null
+    case 'Write':
+      return tool_input.file_path ?? null
+    case 'Edit':
+      return tool_input.file_path ?? null
+    case 'Glob':
+      return tool_input.pattern ?? null
+    case 'Grep':
+      return `${tool_input.pattern ?? ''}${tool_input.path ? ' in ' + tool_input.path : ''}`
+    case 'Agent':
+    case 'Workflow':
+      return tool_input.description ?? tool_input.prompt?.slice(0, 100) ?? null
+    case 'WebFetch':
+      return tool_input.url ?? null
+    case 'WebSearch':
+      return tool_input.query ?? null
+    default:
+      // Generic: first string value found in input
+      for (const v of Object.values(tool_input)) {
+        if (typeof v === 'string' && v.length > 0) return v.slice(0, 120)
+      }
+      return null
+  }
+}
+
+// Tool category — used by the graph layer to group and colour nodes
+function categoryOf(tool_name) {
+  const MAP = {
+    Bash: 'shell',
+    Read: 'read', Write: 'write', Edit: 'write', NotebookEdit: 'write',
+    Glob: 'read', Grep: 'read',
+    Agent: 'agent', Workflow: 'agent', Task: 'agent',
+    WebFetch: 'web', WebSearch: 'web',
+  }
+  return MAP[tool_name] ?? 'other'
+}
 
 // ── Read stdin ────────────────────────────────────────────────────────────────
 let raw = ''
@@ -46,19 +96,6 @@ function run(input) {
 
   if (!hook_event_name || !session_id) return
 
-  // Filter: only track these events
-  const TRACKED_EVENTS = new Set([
-    'SessionStart', 'SessionEnd',
-    'PreToolUse', 'PostToolUse',
-    'SubagentStart', 'SubagentStop',
-  ])
-  if (!TRACKED_EVENTS.has(hook_event_name)) return
-
-  // For tool-use events: only track Agent and Workflow spawns
-  if (hook_event_name === 'PreToolUse' || hook_event_name === 'PostToolUse') {
-    if (tool_name !== 'Agent' && tool_name !== 'Workflow') return
-  }
-
   // ── Resolve TEMP_ROOT ───────────────────────────────────────────────────────
   const projectRoot = cwd || process.cwd()
   let tempRoot = join(projectRoot, '.maestro')
@@ -69,7 +106,7 @@ function run(input) {
     if (typeof cfg?.ai?.temp_root === 'string' && cfg.ai.temp_root.length > 0) {
       tempRoot = join(projectRoot, cfg.ai.temp_root)
     }
-  } catch { /* not a Maestro project or no config — use default */ }
+  } catch { /* not a Maestro project — use default */ }
 
   // ── Ensure session directory ────────────────────────────────────────────────
   const sessionDir = join(tempRoot, 'podium', session_id)
@@ -80,78 +117,97 @@ function run(input) {
   const ts = Date.now()
   let event = null
 
-  if (hook_event_name === 'SessionStart') {
-    event = {
-      ts,
-      type: 'session_start',
-      session_id,
-      cwd: projectRoot,
-      model: p.model ?? null,
+  switch (hook_event_name) {
+
+    case 'SessionStart':
+      event = { ts, type: 'session_start', session_id, cwd: projectRoot, model: p.model ?? null }
+      break
+
+    case 'SessionEnd':
+      event = { ts, type: 'session_end', session_id }
+      break
+
+    case 'UserPromptSubmit':
+      // Marks the start of a new reasoning "turn" — used by graph layer to group tool calls
+      event = {
+        ts,
+        type: 'turn_start',
+        session_id,
+        // First 200 chars of the user message — enough to label the turn in the graph
+        prompt_preview: typeof p.message === 'string'
+          ? p.message.slice(0, 200)
+          : (typeof p.prompt === 'string' ? p.prompt.slice(0, 200) : null),
+      }
+      break
+
+    case 'PreToolUse':
+      event = {
+        ts,
+        type: 'tool_start',
+        session_id,
+        tool_name,
+        tool_use_id: tool_use_id ?? null,
+        category: categoryOf(tool_name),
+        summary: summariseTool(tool_name, tool_input),
+        // Extra context for agent spawns
+        ...(tool_name === 'Agent' || tool_name === 'Workflow' ? {
+          subagent_type: tool_input?.subagent_type ?? null,
+          model: tool_input?.model ?? null,
+        } : {}),
+      }
+      break
+
+    case 'PostToolUse': {
+      // Keep output small — just enough to know what happened
+      const out = typeof tool_response === 'string'
+        ? tool_response.slice(0, 300)
+        : (tool_response != null ? JSON.stringify(tool_response).slice(0, 300) : null)
+      event = {
+        ts,
+        type: 'tool_end',
+        session_id,
+        tool_name,
+        tool_use_id: tool_use_id ?? null,
+        category: categoryOf(tool_name),
+        status: 'success',
+        output_preview: out,
+      }
+      break
     }
 
-  } else if (hook_event_name === 'SessionEnd') {
-    event = {
-      ts,
-      type: 'session_end',
-      session_id,
+    case 'PostToolUseFailure': {
+      const err = typeof p.error === 'string' ? p.error.slice(0, 300) : null
+      event = {
+        ts,
+        type: 'tool_end',
+        session_id,
+        tool_name,
+        tool_use_id: tool_use_id ?? null,
+        category: categoryOf(tool_name),
+        status: 'failed',
+        error: err,
+      }
+      break
     }
 
-  } else if (hook_event_name === 'PreToolUse') {
-    // Agent or Workflow spawn — start marker
-    const description = tool_input?.description ?? null
-    const subagent_type = tool_input?.subagent_type ?? null
-    const model = tool_input?.model ?? null
-    // Cheap summary of prompt: first 300 chars (never the full prompt — too large)
-    const prompt_preview = typeof tool_input?.prompt === 'string'
-      ? tool_input.prompt.slice(0, 300)
-      : null
+    case 'SubagentStart':
+      // Fired in the parent session when a sub-agent's session begins
+      event = {
+        ts,
+        type: 'subagent_meta',
+        session_id,
+        agent_id: p.agent_id ?? null,
+        name: p.name ?? null,
+        agent_type: p.agent_type ?? null,
+      }
+      break
 
-    event = {
-      ts,
-      type: 'agent_start',
-      session_id,
-      tool_name,
-      tool_use_id: tool_use_id ?? null,
-      description,
-      subagent_type,
-      model,
-      prompt_preview,
-    }
+    case 'SubagentStop':
+      event = { ts, type: 'subagent_stop', session_id, agent_id: p.agent_id ?? null }
+      break
 
-  } else if (hook_event_name === 'PostToolUse') {
-    // Agent or Workflow finished
-    const responseText = typeof tool_response === 'string'
-      ? tool_response
-      : (tool_response != null ? JSON.stringify(tool_response) : null)
-
-    event = {
-      ts,
-      type: 'agent_end',
-      session_id,
-      tool_name,
-      tool_use_id: tool_use_id ?? null,
-      status: 'success',
-      output_preview: responseText ? responseText.slice(0, 400) : null,
-    }
-
-  } else if (hook_event_name === 'SubagentStart') {
-    // Sub-agent session started — gives us agent name and type to enrich the agent_start
-    event = {
-      ts,
-      type: 'subagent_meta',
-      session_id,
-      agent_id: p.agent_id ?? null,
-      name: p.name ?? null,
-      agent_type: p.agent_type ?? null,
-    }
-
-  } else if (hook_event_name === 'SubagentStop') {
-    event = {
-      ts,
-      type: 'subagent_stop',
-      session_id,
-      agent_id: p.agent_id ?? null,
-    }
+    default:
+      return // ignore everything else
   }
 
   // ── Append to JSONL ─────────────────────────────────────────────────────────
