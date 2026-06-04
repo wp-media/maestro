@@ -56,25 +56,64 @@ Return JSON:
 
 ### Agent: wordpress
 
-**Goal:** understand how the plugin integrates with WordPress.
+**Goal:** understand how the plugin integrates with WordPress, and map edition boundaries if applicable.
 
 Read:
-- PHP files in `src/` (or `inc/`, `classes/` if `src/` doesn't exist) — look for REST routes, admin menus, capabilities
+- PHP files in `src/` and `inc/` (or `classes/` if neither exist) — look for REST routes, admin menus, capabilities
+- The main plugin bootstrap file (root-level `.php` with `Plugin Name:`)
 - Do not read `vendor/` or `tests/`
 
 Specifically look for:
-- `register_rest_route(` calls → extract namespace string from first argument
-- `add_menu_page(` / `add_options_page(` / `add_submenu_page(` calls → extract page slug (last positional argument)
-- `current_user_can(` calls → extract capability strings (ignore generic ones: `manage_options`, `activate_plugins`, `edit_posts`)
-- Directory names or conditional constants suggesting a free/pro split: `IS_PRO`, `is_pro()`, directories named `pro/` or `free/`, separate composer packages
+
+**REST routes:**
+- `register_rest_route(` calls → extract namespace string from first argument → build `rest_namespace` as `/wp-json/<namespace>/`
+
+**Admin settings:**
+- `add_menu_page(` / `add_options_page(` / `add_submenu_page(` calls → extract page slug (last positional argument before callback) → build `settings_path`
+
+**Capabilities:**
+- `current_user_can(` calls → extract capability strings
+- Ignore generic WordPress capabilities: `manage_options`, `activate_plugins`, `edit_posts`, `manage_network`, `administrator`
+- Keep only plugin-specific ones
+
+**Edition split — directory and code signals:**
+```bash
+find . -maxdepth 3 -type d \( -name "pro" -o -name "free" -o -name "Pro" -o -name "Free" \) 2>/dev/null | grep -v vendor | grep -v node_modules
+grep -rEl "IS_PRO|is_pro\(\)|BACKWPUP_PRO|WP_ROCKET_PRO|IMAGIFY_PRO" --include="*.php" . 2>/dev/null | grep -v vendor | head -5
+```
+
+If a free/pro split is confirmed, map the edition paths by examining:
+- Which directories contain only PRO classes/features (look for `Pro/` subdirectories, `pro/` root directories, conditional `IS_PRO` guards)
+- Which files/directories are shared (the main bootstrap, `src/`, `inc/` minus Pro subdirs)
+- Read the main plugin file to see how PRO is conditionally loaded
+
+Build a detailed `editions` object:
+```json
+{
+  "editions": {
+    "free": {
+      "paths": ["<main>.php", "inc/", "src/", "views/", "components/"],
+      "notes": ["Shared core and FREE features.", "FREE must not reference PRO namespaces."]
+    },
+    "pro": {
+      "paths": ["inc/Pro/", "pro/"],
+      "notes": ["PRO features extend FREE via composition.", "No feature flags inside shared services."]
+    }
+  },
+  "ai_editions_signal": ["free", "pro"]
+}
+```
+
+If no split is found, return `"editions": null, "ai_editions_signal": null`.
 
 Return JSON:
 ```json
 {
-  "rest_namespace": "/wp-json/<namespace>/<version>/" ,
+  "rest_namespace": "/wp-json/<namespace>/",
   "settings_path": "/wp-admin/admin.php?page=<slug>",
   "capabilities": ["<capability-1>"],
-  "editions": ["free", "pro"]
+  "editions": { "free": { "paths": [], "notes": [] }, "pro": { "paths": [], "notes": [] } },
+  "ai_editions_signal": ["free", "pro"]
 }
 ```
 
@@ -170,7 +209,8 @@ Here's everything I found — confirm or correct anything, and tell me the Slack
 │ namespace           │ WPMedia\BackWPup                     │ composer.json                      │
 │ architecture_skill  │ backwpup-architecture                │ .claude/skills/ (existing)         │
 │ frontend_skill      │ backwpup-frontend-architecture       │ .claude/skills/ (existing)         │
-│ editions            │ ["free", "pro"]                      │ IS_PRO constant + -pro suffix      │
+│ editions.free.paths │ backwpup.php, inc/, src/, views/     │ bootstrap + shared dirs            │
+│ editions.pro.paths  │ inc/Pro/, pro/                       │ Pro/ subdir + pro/ root dir        │
 │ rest_namespace      │ null                                 │ no register_rest_route() found     │
 │ capabilities        │ ["backwpup"]                         │ current_user_can() calls           │
 │ e2e.settings_path   │ /wp-admin/admin.php?page=backwpup    │ add_menu_page() slug               │
@@ -201,6 +241,20 @@ Construct the full `maestro.json` from confirmed values. Write it to `.claude/ma
     "plugin_bootstrap": "<main-file>.php",
     "uninstall": "uninstall.php"
   },
+
+  // Only include editions block if a free/pro split was confirmed.
+  // Remove entirely for single-edition plugins.
+  "editions": {
+    "free": {
+      "paths": ["<main>.php", "inc/", "src/"],
+      "notes": ["Shared core and FREE features.", "FREE must not reference PRO namespaces."]
+    },
+    "pro": {
+      "paths": ["inc/Pro/", "pro/"],
+      "notes": ["PRO features extend FREE via composition."]
+    }
+  },
+
   "areas": [...],
   "tooling": {...},
   "notes": [
@@ -241,7 +295,11 @@ Construct the full `maestro.json` from confirmed values. Write it to `.claude/ma
 }
 ```
 
-Set `slack_threads_dir` to `.TemporaryItems/Issues/<slug>/slack-threads` if `slack_channel` is set, otherwise omit it. Set all null fields explicitly to `null`.
+Rules:
+- Include the root-level `editions` block only if a free/pro split was confirmed. Omit it entirely for single-edition plugins.
+- `ai.editions` is the signal array `["free","pro"]` or `null` — it mirrors whether the root `editions` block is present.
+- Set `slack_threads_dir` to `.TemporaryItems/Issues/<slug>/slack-threads` if `slack_channel` is set, otherwise omit it.
+- Set all null fields explicitly to `null`.
 
 ---
 
