@@ -51,7 +51,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
    (empty file). This signals file ownership to any concurrently running agent.
 
    > Note: When executing the bash command, expand `{TEMP_ROOT}` to the value read from
-   > `repo-map.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
+   > `.claude/maestro.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
 
 ---
 

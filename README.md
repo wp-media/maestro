@@ -117,16 +117,19 @@ maestro/
 ├── .template/
 │   └── maestro.json                         ← Full config schema — copy to .claude/maestro.json
 │
-├── agents/                                  ← 9 fully config-driven agents
+├── agents/                                  ← 12 fully config-driven agents
 │   ├── grooming-agent.md
 │   ├── challenger.md
 │   ├── backend-agent.md
 │   ├── frontend-agent.md
 │   ├── lead-reviewer.md
 │   ├── qa-engineer.md
+│   ├── e2e-qa-tester.md
 │   ├── release-agent.md
-│   ├── ticket-writer.md
-│   └── e2e-qa-tester.md
+│   ├── pr-agent.md
+│   ├── test-writer.md
+│   ├── changelog-agent.md
+│   └── ticket-writer.md
 │
 ├── commands/                                ← Skills (slash commands)
 │   ├── orchestrator.md
@@ -141,6 +144,10 @@ maestro/
 │   │   └── scripts/
 │   ├── knowledge-graph.md
 │   ├── onboard-project.md
+│   ├── po-changelog.md
+│   ├── pr.md
+│   ├── sprint-planner.md
+│   ├── test.md
 │   └── wordpress-compliance.md
 │
 └── specs/phpcs/                             ← Recurring PHPCS fix patterns
@@ -214,10 +221,11 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
 
   "e2e": {
     "local_url":     "http://localhost:8888",
-    "boot_cmd":      "bash bin/dev-up.sh",
+    "boot_cmd":      null,
     "settings_path": "/wp-admin/options-general.php?page=wprocket",
     "ci_integration": false
   }
+  // boot_cmd is set to an absolute path by /onboard-project
 }
 ```
 </details>
@@ -238,15 +246,16 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
   "text_domain": "backwpup",
   "namespace":   "BackWPup",
 
-  "push_agent": "release-agent",
   "editions":   ["free", "pro"],
 
   "e2e": {
     "local_url":     "http://localhost:8888",
-    "boot_cmd":      "bash bin/dev-up.sh",
+    "boot_cmd":      null,
+    "seed_cmd":      "bash .maestro/bin/dev-seed.sh",
     "settings_path": "/wp-admin/admin.php?page=backwpup",
     "ci_integration": false
   }
+  // boot_cmd is set to an absolute path by /onboard-project
 }
 ```
 </details>
@@ -263,7 +272,7 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
 
 | Command | When to use |
 |---|---|
-| `/onboard-project` | **Start here for new projects.** Creates `.claude/maestro.json` from the codebase |
+| `/onboard-project` | **Start here for new projects.** Creates `.claude/maestro.json` and scaffolds dev scripts |
 | `/issue-workflow` | Start the delivery pipeline from a GitHub issue number |
 | `/orchestrator` | Jump straight into routing if the issue is already loaded |
 | `/dod` | Run the Definition of Done checklist on the current branch |
@@ -271,6 +280,10 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
 | `/wordpress-compliance` | Check a change against WordPress.org rules |
 | `/e2e` | Run E2E smoke tests manually |
 | `/docs` | Update developer documentation |
+| `/po-changelog` | Generate a PO-ready grouped changelog from merged PRs |
+| `/pr` | Generate a PR description for the current branch |
+| `/sprint-planner` | Plan and estimate issues for a sprint |
+| `/test` | Write PHPUnit tests for PHP source files |
 
 Autonomy flags:
 - `--sequential` — run everything one-at-a-time
@@ -302,6 +315,9 @@ Every engineer using the plugin picks up the update automatically on their next 
 | `qa-engineer` | Tests the PR against acceptance criteria |
 | `e2e-qa-tester` | Browser QA via Playwright MCP |
 | `release-agent` | Pushes branch, creates draft PR, labels |
+| `pr-agent` | Generates PR descriptions for the current branch |
+| `test-writer` | Writes PHPUnit tests for PHP source files |
+| `changelog-agent` | Generates PO-ready changelogs from merged PRs |
 | `ticket-writer` | Creates well-formed GitHub issues for follow-ups |
 
 ---

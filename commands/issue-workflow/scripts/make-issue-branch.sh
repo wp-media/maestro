@@ -24,13 +24,16 @@ BASE_REF="${4:-}"
 SLUG="$(printf '%s' "$TITLE" \
   | tr '[:upper:]' '[:lower:]' \
   | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' \
-  | cut -d- -f1-4)"
+  | cut -d- -f1-4 \
+  | sed 's/-*$//')"
 
 # Branch naming convention: <prefix>/<issue>-<slug>
 BRANCH="${PREFIX}/${ISSUE_NUMBER}-${SLUG}"
 
-# Create and switch to the branch.
-if [[ -n "$BASE_REF" ]]; then
+# Create and switch to the branch (idempotent — safe if branch already exists).
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+  git checkout "$BRANCH"
+elif [[ -n "$BASE_REF" ]]; then
   git checkout -b "$BRANCH" "$BASE_REF"
 else
   git checkout -b "$BRANCH"

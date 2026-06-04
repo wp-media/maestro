@@ -134,8 +134,7 @@ For details, read:
 - `.claude/agents/e2e-qa-tester.md` — browser flow execution, spec authoring, screenshot publishing
 
 The extended tier writes Playwright specs to `.e2e-temp/` (gitignored, never committed)
-and screenshots to `.e2e-screenshots/`. Screenshots are temporarily committed to obtain
-a SHA-based raw URL, then removed in a follow-up commit.
+and screenshots to `.e2e-screenshots/`. Screenshots are published to a public GitHub Gist to get permanent, publicly accessible raw URLs — no commits to the PR branch.
 
 ---
 

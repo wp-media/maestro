@@ -34,6 +34,11 @@ Before any step, read `.claude/maestro.json` and extract:
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
 
+## Inputs
+- The issue number and implementation spec path
+- The PR number or PR URL (used in Steps 5–6; resolve with `gh pr list --head $(git branch --show-current) --json number -q '.[0].number'` if not provided)
+- The base branch the issue branch was created from (e.g. `origin/develop`, `origin/feature/mcp`)
+
 ## Your process
 
 ### Step 1 — Gather context

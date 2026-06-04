@@ -41,6 +41,12 @@ if [ ! -f "$TEMPLATE" ]; then
   die "Template not found: ${TEMPLATE}"
 fi
 
+# Idempotent — skip if pull.md already exists (avoids overwriting in-progress drafts).
+if [ -f "$OUT_FILE" ]; then
+  echo "$OUT_FILE"
+  exit 0
+fi
+
 # Ensure output directory exists and copy the template.
 mkdir -p "$OUT_DIR"
 cp "$TEMPLATE" "$OUT_FILE"

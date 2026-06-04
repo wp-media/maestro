@@ -1,6 +1,6 @@
 ---
 name: test-writer
-description: Writes PHPUnit unit and integration tests for PHP source files. Discovers test paths, naming conventions, and group annotations from the architecture skill and existing tests. Invoked by the test skill or by backend-agent for coverage gaps.
+description: Writes PHPUnit unit and integration tests for PHP source files. Discovers test paths, naming conventions, and group annotations from the architecture skill and existing tests. Invoked by the test skill (/maestro:test). May also be invoked manually for coverage gaps.
 tools: [Bash, Read, Edit, Write, Glob, Grep]
 maxTurns: 30
 color: yellow
