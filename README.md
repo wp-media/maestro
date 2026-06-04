@@ -152,39 +152,30 @@ maestro/
 
 ## Onboarding a New Project
 
-### 1. Copy the config template
+### 1. Run the onboarding skill
 
-```bash
-cp maestro/.template/maestro.json <project>/.claude/maestro.json
+Open the project in Claude and run:
+
+```
+/onboard-project
 ```
 
-### 2. Fill in the config
+Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you.
 
-Every field the agents need to know about your project — slug, repo, namespace, text domain, E2E setup. See the template for the full schema.
-
-```jsonc
-{
-  "ai": {
-    "slug":         "wp-rocket",
-    "display_name": "WP Rocket",
-    "repo":         "wp-media/wp-rocket",
-    // ...
-  }
-}
-```
-
-### 3. Write your architecture skill
+### 2. Write your architecture skill
 
 ```bash
 # .claude/commands/<slug>-architecture.md
 # Define your DI patterns, module structure, static analysis rules.
 ```
 
-### 4. Write your `AGENTS.md`
+The grooming agent reads this before every implementation. It's the most important project-specific file.
+
+### 3. Write your `AGENTS.md`
 
 Start from Maestro's base (`AGENTS.md` in this repo). Add a **Project Overview** section and leave room for **Session Learnings** at the bottom.
 
-### 5. Run the pipeline
+### 4. Run the pipeline
 
 ```
 /issue-workflow 42
@@ -271,7 +262,8 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
 
 | Command | When to use |
 |---|---|
-| `/issue-workflow` | **Start here.** Fetches the issue, runs the full pipeline |
+| `/onboard-project` | **Start here for new projects.** Creates `.claude/maestro.json` from the codebase |
+| `/issue-workflow` | Start the delivery pipeline from a GitHub issue number |
 | `/orchestrator` | Jump straight into routing if the issue is already loaded |
 | `/dod` | Run the Definition of Done checklist on the current branch |
 | `/knowledge-graph` | Explore codebase dependencies |
