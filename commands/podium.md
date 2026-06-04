@@ -1,177 +1,238 @@
 ---
 name: podium
 description: >
-  Start, inspect, or stop the Podium agent observer — a local dashboard that
-  visualises every agent the orchestrator spawns, in real time, at zero token
-  cost (powered by Claude Code hooks). Use this skill when asked to "open
-  podium", "start podium", "watch agents", "monitor pipeline", "show agent
-  tree", or to check "/podium status". Invoke with `/podium` or
-  `/podium start` to launch, `/podium status` to inspect, `/podium install`
-  to wire up hooks, or `/podium stop` to shut it down.
+  Manage the Podium agent observer — a real-time dashboard that visualises
+  every agent the orchestrator spawns at zero token cost (Claude Code hooks).
+  Use when asked to "open podium", "start podium", "watch agents", "monitor
+  pipeline", "show agent tree", "stop podium", or "podium status".
+  Subcommands: setup · start · stop · restart · status · logs · uninstall.
+  Bare `/podium` is an alias for `/podium start`.
 ---
 
 ## How Podium works
 
 Podium captures every `Agent` and `Workflow` tool invocation through Claude
-Code hooks — **no tokens consumed, no orchestrator changes needed**. The hook
-script (`podium/hook.mjs`) receives each event from the harness, appends a
-JSON line to `{TEMP_ROOT}/podium/{session_id}/events.jsonl`, and exits in
-under 1 second. The dashboard server (`podium/server.mjs`) tails those files
-and streams updates to the browser via SSE.
+Code hooks — **zero tokens, zero orchestrator changes**. The hook script
+(`podium/hook.mjs`) fires on every agent spawn, appends one JSON line to
+`{TEMP_ROOT}/podium/{session_id}/events.jsonl`, and exits in under 1 s.
+The server tails those files and streams them to the browser via SSE.
 
 ## Config loading
 
-Read `.claude/maestro.json` and extract:
+Read `.claude/maestro.json`:
 
 | Variable | JSON path | Default |
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `PORT` | `.ai.podium.port` | `7337` |
 
-## Resolve the Maestro plugin root
+## Resolve Maestro plugin root
 
-The server lives at `{maestro_plugin_root}/podium/server.mjs` and the
-installer at `{maestro_plugin_root}/podium/install.mjs`.
+This skill is at `{root}/commands/podium.md`. The plugin root is one level up.
 
-To find `maestro_plugin_root`, try in order:
-1. Look for `podium/server.mjs` relative to this skill's own parent dir
-   (skill is at `{root}/commands/podium.md` → root is one level up).
-2. Look in `~/.claude/plugins/maestro/`.
+```
+SERVER_PATH  = {root}/podium/server.mjs
+INSTALL_PATH = {root}/podium/install.mjs
+LOG_FILE     = {TEMP_ROOT}/podium/server.log
+```
 
-Set `SERVER_PATH={maestro_plugin_root}/podium/server.mjs`  
-Set `INSTALL_PATH={maestro_plugin_root}/podium/install.mjs`
+Fallback: look for `podium/server.mjs` in `~/.claude/plugins/maestro/`.
 
 ---
 
-## `/podium` or `/podium start`
+## `/podium setup`
 
-**a. Check if hooks are installed**
+First-time wiring of Claude Code hooks. Run once per project (or globally).
+
+**a. Check if already set up**
 
 ```bash
 node {INSTALL_PATH} --check
 ```
 
-If exit code is `1` (not installed), run step b first. Otherwise skip to step c.
+Exit 0 → already installed, tell the user and stop.
 
-**b. Install hooks** (first-time setup only)
-
-```bash
-node {INSTALL_PATH}
-```
-
-This registers Podium in the project's `.claude/settings.json` for the hooks:
-`SessionStart`, `PreToolUse`, `PostToolUse`, `SubagentStart`, `SubagentStop`,
-`SessionEnd`. Tell the user: "Hooks registered — **restart Claude Code** to
-activate Podium, then run `/podium` again."
-
-**c. Check if server is already running**
-
-```bash
-curl -s http://localhost:7337/health
-```
-
-If HTTP 200 → server is up, skip to step e.
-
-**d. Start the server in the background**
-
-```bash
-node {SERVER_PATH} --temp-root {TEMP_ROOT} &
-```
-
-Wait 1 s, verify:
-
-```bash
-curl -s http://localhost:7337/health
-```
-
-If still unreachable, report: "Podium failed to start — check that Node.js is
-installed and that `{SERVER_PATH}` exists."
-
-**e. List current sessions**
-
-```bash
-curl -s http://localhost:7337/api/runs
-```
-
-Parse the JSON array and show:
-- Total session count
-- Most recent 5 sessions: short session ID, status, agent list, duration
-
-**f. Print the URL**
-
-```
-◆ Podium is running → http://localhost:7337
-```
-
----
-
-## `/podium status`
-
-```bash
-curl -s http://localhost:7337/health
-```
-
-If not 200: "Podium is not running. Run `/podium start` to launch it."
-
-Otherwise show:
-- Port, TEMP_ROOT, uptime
-- Run `curl -s http://localhost:7337/api/runs` and display a summary table
-
-Also check hooks:
-
-```bash
-node {INSTALL_PATH} --check
-```
-
-Report whether hooks are installed and remind the user to restart if they
-were just installed.
-
----
-
-## `/podium install`
-
-Run the installer explicitly (useful after pulling Maestro into a new project):
+**b. Register hooks**
 
 ```bash
 node {INSTALL_PATH}
 ```
 
-Report the result. If hooks were already present, say so. Remind the user to
-restart Claude Code.
+Registers `SessionStart`, `PreToolUse`, `PostToolUse`, `SubagentStart`,
+`SubagentStop`, `SessionEnd` in `.claude/settings.json`.
 
-To install globally (all projects on this machine):
+**c. Optional: install globally** (all projects on this machine)
 
 ```bash
 node {INSTALL_PATH} --global
+```
+
+**d. Confirm**
+
+Print:
+```
+✓ Podium hooks registered in .claude/settings.json
+  → Restart Claude Code to activate, then run /podium start
+```
+
+---
+
+## `/podium start`
+
+Start the dashboard server (hooks must be set up first).
+
+**a. Warn if hooks are missing**
+
+```bash
+node {INSTALL_PATH} --check
+```
+
+If exit 1: print a gentle warning — "Hooks not set up. Run `/podium setup`
+first, then restart Claude Code." — but continue anyway (server still useful
+for browsing past runs).
+
+**b. Check if already running**
+
+```bash
+curl -s --max-time 2 http://localhost:{PORT}/health
+```
+
+HTTP 200 → already up, skip to step d.
+
+**c. Start server in background, log to file**
+
+```bash
+node {SERVER_PATH} --temp-root {TEMP_ROOT} --port {PORT} >> {LOG_FILE} 2>&1 &
+```
+
+Wait 1.5 s, then verify:
+
+```bash
+curl -s --max-time 2 http://localhost:{PORT}/health
+```
+
+If still unreachable: "Podium failed to start. Check `{LOG_FILE}` for errors."
+
+**d. Show current sessions**
+
+```bash
+curl -s http://localhost:{PORT}/api/runs
+```
+
+Print a compact summary (last 5 sessions: status dot, short ID, agents, duration).
+
+**e. Print URL**
+
+```
+◆ Podium running → http://localhost:{PORT}
 ```
 
 ---
 
 ## `/podium stop`
 
-Find and kill the Podium server process:
-
 ```bash
-lsof -ti:7337
+lsof -ti:{PORT}
 ```
 
-If no output: "Podium is not running."
+No output → "Podium is not running."
 
 Otherwise:
 
 ```bash
-kill $(lsof -ti:7337)
+kill $(lsof -ti:{PORT})
 ```
 
-Confirm: "Podium stopped."
+Confirm: "◆ Podium stopped."
 
 ---
 
-## Notes for the user
+## `/podium restart`
 
-- The hooks write events **only for the current project** — they detect the
-  `TEMP_ROOT` from `.claude/maestro.json` in the session's `cwd`.
-- Sessions appear in the sidebar as soon as they start. Refresh the sidebar
-  (top-left) to pick up new sessions.
-- Podium is read-only — it never modifies your code or configuration.
-- Token cost: **zero**. The hook script exits before Claude Code processes
-  its next message.
+Run `/podium stop`, wait 1 s, then run `/podium start`.
+
+---
+
+## `/podium status`
+
+Full health snapshot.
+
+```bash
+curl -s --max-time 2 http://localhost:{PORT}/health
+```
+
+**If not running:** "Podium is not running. Run `/podium start` to launch it."
+
+**If running,** show:
+- Server: port · TEMP\_ROOT · uptime
+- Hooks: run `node {INSTALL_PATH} --check` → installed / not installed
+- Sessions: `curl -s http://localhost:{PORT}/api/runs` → table of all runs
+
+```
+◆ Podium status
+  Server  http://localhost:7337  uptime 4m 12s
+  Hooks   ✓ installed (.claude/settings.json)
+  
+  Sessions (3)
+  ─────────────────────────────────────────────────
+  ● issue-42   running   grooming · backend · qa     —
+  ✓ issue-41   2m 14s    grooming · backend · qa     done
+  ✗ issue-39   failed    grooming                    escalated
+```
+
+---
+
+## `/podium logs`
+
+Tail the server log file:
+
+```bash
+tail -n 50 {LOG_FILE}
+```
+
+If the file doesn't exist: "No log file found. Has Podium been started yet?"
+
+---
+
+## `/podium uninstall`
+
+Remove hooks from settings.json:
+
+```bash
+node {INSTALL_PATH} --uninstall
+```
+
+Confirm: "◆ Podium hooks removed. Restart Claude Code to apply."
+
+Does **not** stop a running server — run `/podium stop` first if needed.
+
+---
+
+## `/podium` (bare)
+
+Alias for `/podium start`.
+
+---
+
+## Quick-reference
+
+| Command | What it does |
+|---|---|
+| `/podium setup` | Register Claude Code hooks (once per project) |
+| `/podium start` | Start the dashboard server |
+| `/podium stop` | Stop the server |
+| `/podium restart` | Stop then start |
+| `/podium status` | Health + hooks + session list |
+| `/podium logs` | Tail server log |
+| `/podium uninstall` | Remove hooks from settings.json |
+
+---
+
+## Notes
+
+- Hooks fire **per-project**: the hook reads `cwd` from the harness event and
+  resolves TEMP\_ROOT from `.claude/maestro.json` in that directory.
+- Token cost: **zero**. The hook exits before Claude Code processes its next
+  turn.
+- Podium is read-only — it never modifies code or project files.
+- Sessions appear in the sidebar automatically; refresh with the ↺ button.
