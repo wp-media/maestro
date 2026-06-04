@@ -8,12 +8,7 @@
     {
       "name": "maestro",
       "description": "AI delivery pipeline for wp-media WordPress plugins.",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wp-media/maestro.git",
-        "path": ".",
-        "ref": "main"
-      }
+      "source": "./"
     }
   ]
 }
