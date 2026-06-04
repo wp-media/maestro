@@ -1,6 +1,8 @@
 # Onboard Project
 
-Creates `.claude/maestro.json` for the current project. Does a deep codebase analysis to pre-fill every field it can, then presents a single confirmation table — the user only corrects what's wrong and provides what truly can't be found in code.
+Creates `.claude/maestro.json` for the current project by running a team of parallel analysis agents, then presenting a single pre-filled confirmation table.
+
+The user only corrects what's wrong and provides what truly can't be found in code (`slack_channel`).
 
 ---
 
@@ -8,160 +10,184 @@ Creates `.claude/maestro.json` for the current project. Does a deep codebase ana
 
 ```bash
 ls .claude/maestro.json 2>/dev/null
+ls .aiassistant/config/repo-map.json 2>/dev/null
 ```
 
-If it exists, show its current contents and ask:
+If `maestro.json` already exists, show its contents and ask:
 > `.claude/maestro.json` already exists. Overwrite it, or update only missing/null fields?
 
 Stop until the user responds. If they say stop, exit cleanly.
 
----
-
-## Step 2 — Check for legacy config
-
-```bash
-ls .aiassistant/config/repo-map.json 2>/dev/null
-```
-
-If found, read it and use its values as the starting point — port all non-null values directly.
+If a legacy `.aiassistant/config/repo-map.json` exists, read it now — use its values as the starting point for the analysis. Port all non-null values directly.
 
 ---
 
-## Step 3 — Deep discovery
+## Step 2 — Deep analysis
 
-Run **all** of these in parallel. Collect everything. Make no assumptions yet — just gather raw data.
+Spawn four agents in parallel. If parallel execution is not available, run them sequentially. Each agent reads the project files and returns a JSON object with its findings.
 
-### Identity
+---
 
-```bash
-git remote get-url origin 2>/dev/null
-grep -rl "Plugin Name:" --include="*.php" . 2>/dev/null | grep -v vendor | head -5
+### Agent: identity
+
+**Goal:** establish the project's identity and PHP structure.
+
+Read:
+- `git remote get-url origin`
+- The main plugin PHP file (the one with `Plugin Name:` in its header — search root-level `.php` files, excluding `vendor/`)
+- `composer.json` in full
+- `README.md` or `README.txt` if present
+
+Return JSON:
+```json
+{
+  "repo": "wp-media/<repo-name>",
+  "slug": "<repo-name>",
+  "display_name": "<Plugin Name from header>",
+  "description": "<Description from header or README first paragraph>",
+  "text_domain": "<Text Domain from header>",
+  "namespace": "<Root PHP namespace from composer autoload.psr-4>",
+  "entrypoint": "<main-plugin-file>.php",
+  "has_uninstall": true
+}
 ```
 
-From the main plugin file:
-```bash
-grep -E "Plugin Name:|Text Domain:|Description:|Version:" <main-plugin-file>
+---
+
+### Agent: wordpress
+
+**Goal:** understand how the plugin integrates with WordPress.
+
+Read:
+- PHP files in `src/` (or `inc/`, `classes/` if `src/` doesn't exist) — look for REST routes, admin menus, capabilities
+- Do not read `vendor/` or `tests/`
+
+Specifically look for:
+- `register_rest_route(` calls → extract namespace string from first argument
+- `add_menu_page(` / `add_options_page(` / `add_submenu_page(` calls → extract page slug (last positional argument)
+- `current_user_can(` calls → extract capability strings (ignore generic ones: `manage_options`, `activate_plugins`, `edit_posts`)
+- Directory names or conditional constants suggesting a free/pro split: `IS_PRO`, `is_pro()`, directories named `pro/` or `free/`, separate composer packages
+
+Return JSON:
+```json
+{
+  "rest_namespace": "/wp-json/<namespace>/<version>/" ,
+  "settings_path": "/wp-admin/admin.php?page=<slug>",
+  "capabilities": ["<capability-1>"],
+  "editions": ["free", "pro"]
+}
 ```
 
-From composer.json:
-```bash
-cat composer.json 2>/dev/null
-```
+Use `null` for any field where no clear evidence was found.
 
-### Existing architecture skills
+---
 
-```bash
-ls .claude/skills/ 2>/dev/null
-ls .claude/commands/ 2>/dev/null
-```
+### Agent: devops
 
-Look for directories or files matching `*architecture*` or `*frontend*`. If found, use those exact names for `architecture_skill` and `frontend_skill`.
+**Goal:** understand the local development and testing setup.
 
-### Editions split
-
-```bash
-find . -maxdepth 3 -type d \( -name "pro" -o -name "free" \) 2>/dev/null | grep -v vendor | grep -v node_modules
-grep -rE "is_pro|edition|free_version|pro_version|BACKWPUP_PRO" --include="*.php" -l 2>/dev/null | grep -v vendor | head -5
-```
-
-Also look at the repo name — a `-pro` suffix strongly suggests a free/pro split.
-
-If evidence of a free/pro split is found, propose `["free", "pro"]`. Otherwise `null`.
-
-### REST API namespace
-
-```bash
-grep -rh "register_rest_route\s*(" --include="*.php" . 2>/dev/null | grep -v vendor | head -10
-```
-
-Extract the namespace from the first argument of `register_rest_route()` calls (e.g. `'backwpup/v1'` → `rest_namespace: "/wp-json/backwpup/v1/"`). If none found, `null`.
-
-### WordPress capabilities
-
-```bash
-grep -rh "current_user_can\s*(" --include="*.php" . 2>/dev/null | grep -v vendor | grep -v test | head -20
-grep -rh "add_menu_page\|add_options_page\|add_submenu_page" --include="*.php" . 2>/dev/null | grep -v vendor | head -10
-```
-
-Extract unique capability strings from `current_user_can()` calls. Ignore generic ones (`manage_options`, `administrator`). Keep plugin-specific ones.
-
-### Admin settings path
-
-```bash
-grep -rh "add_menu_page\|add_options_page\|add_submenu_page" --include="*.php" . 2>/dev/null | grep -v vendor | head -10
-```
-
-Extract the page slug (last argument of `add_menu_page` / `add_options_page`). Build `e2e.settings_path` as `/wp-admin/admin.php?page=<slug>` or `/wp-admin/options-general.php?page=<slug>` depending on the function used.
-
-### Dev environment commands
-
-```bash
-ls bin/ 2>/dev/null
-cat Makefile 2>/dev/null | grep -E "^[a-z][a-z-]+:" | head -20
-cat package.json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); [print(k,':',v) for k,v in d.get('scripts',{}).items()]" 2>/dev/null
-```
+Read:
+- `package.json` (full)
+- `Makefile` (if present)
+- `composer.json` scripts section
+- `bin/` directory listing + content of any `dev-*.sh`, `test-*.sh`, `seed-*.sh` files found there
+- `.github/workflows/` — look for E2E or Playwright jobs
+- Any `docker-compose.yml` or `Dockerfile` at the root
 
 Identify:
-- `e2e.boot_cmd`: look for `dev-up`, `dev:up`, `start`, `docker-compose up` patterns in `bin/`, `Makefile`, or `package.json` scripts
-- `e2e.seed_cmd`: look for `seed`, `fixtures`, `dev-seed` patterns
-- `e2e.test_cmd`: look for `e2e`, `playwright`, `cypress`, `test:e2e` patterns
+- **boot_cmd**: command that starts the local WordPress environment (docker-compose up, `bash bin/dev-up.sh`, `npm run dev`, make target, etc.)
+- **seed_cmd**: command that seeds test data (if any)
+- **test_cmd**: command that runs E2E tests (playwright, cypress, codecept — check `package.json` scripts and Makefile)
+- **ci_integration**: are E2E spec files committed to the repo? (`git ls-files "*.spec.ts" "*.spec.js" | grep -v node_modules`)
 
-### E2E CI integration
-
-```bash
-find . -path "*/tests/e2e/*.spec.*" -o -path "*/e2e/*.spec.*" 2>/dev/null | grep -v node_modules | head -5
-git ls-files "*.spec.ts" "*.spec.js" "*.spec.php" 2>/dev/null | grep -v node_modules | head -5
-```
-
-If committed spec files exist → `ci_integration: true`. Otherwise `false`.
-
-### Directory structure and tooling
-
-```bash
-ls -d src/ tests/ assets/ vendor/ inc/ classes/ 2>/dev/null
-ls phpcs.xml phpcs.xml.dist phpstan.neon phpstan.neon.dist package.json 2>/dev/null
-ls uninstall.php 2>/dev/null
+Return JSON:
+```json
+{
+  "boot_cmd": "bash bin/dev-up.sh",
+  "seed_cmd": null,
+  "test_cmd": "npm run test:e2e",
+  "ci_integration": false
+}
 ```
 
 ---
 
-## Step 4 — Present full pre-filled table for confirmation
+### Agent: structure
 
-Show **every field** with its discovered value and source. Mark fields that need input with `?`. Present as a single table — do not ask questions yet.
+**Goal:** understand the project's current Claude setup and directory layout.
 
+Read:
+- `.claude/` directory listing (full tree)
+- `AGENTS.md` if present
+- `.gitignore`
+
+Identify:
+- Existing architecture skill: look for a directory or file matching `*architecture*` in `.claude/skills/` or `.claude/commands/`
+- Existing frontend skill: same search for `*frontend*`
+- Whether `AGENTS.md` is the Maestro base (contains "This is the **Maestro base**") or has been extended
+- Source directories: which of `src/`, `inc/`, `classes/`, `app/` exist
+- Asset directories: which of `assets/`, `_dev/`, `resources/` exist
+- Whether `vendor/` and `tests/` exist
+
+Return JSON:
+```json
+{
+  "architecture_skill": "backwpup-architecture",
+  "frontend_skill": "backwpup-frontend-architecture",
+  "agents_md_extended": false,
+  "areas": [
+    { "path": "src/", "role": "namespaced-php", "notes": "Modern PSR-4 codebase." },
+    { "path": "tests/", "role": "tests", "notes": "PHPUnit unit and integration tests." },
+    { "path": "assets/", "role": "built-assets", "notes": "Compiled JS/CSS for production." },
+    { "path": "vendor/", "role": "third-party", "notes": "Composer dependencies (do not edit)." }
+  ],
+  "tooling": {
+    "composer": "composer.json",
+    "phpcs": "phpcs.xml",
+    "phpstan": "phpstan.neon.dist",
+    "node": "package.json"
+  }
+}
 ```
-┌─────────────────────┬──────────────────────────────────┬───────────────────────────────────┐
-│ Field               │ Value                            │ Source                            │
-├─────────────────────┼──────────────────────────────────┼───────────────────────────────────┤
-│ slug                │ backwpup-pro                     │ git remote                        │
-│ display_name        │ BackWPup Pro                     │ plugin header                     │
-│ repo                │ wp-media/backwpup-pro            │ git remote                        │
-│ text_domain         │ backwpup                         │ plugin header                     │
-│ namespace           │ WPMedia\BackWPup                 │ composer.json                     │
-│ architecture_skill  │ backwpup-architecture            │ .claude/skills/ (existing)        │
-│ frontend_skill      │ backwpup-frontend-architecture   │ .claude/skills/ (existing)        │
-│ editions            │ ["free", "pro"]                  │ -pro suffix + is_pro() found      │
-│ rest_namespace      │ null                             │ no register_rest_route() found    │
-│ capabilities        │ ["backwpup"]                     │ current_user_can() calls          │
-│ e2e.settings_path   │ /wp-admin/admin.php?page=backwpup│ add_menu_page() slug              │
-│ e2e.boot_cmd        │ bash bin/dev-up.sh               │ bin/dev-up.sh found               │
-│ e2e.seed_cmd        │ null                             │ no seed script found              │
-│ e2e.test_cmd        │ null                             │ no e2e script found               │
-│ e2e.ci_integration  │ false                            │ no committed spec files           │
-├─────────────────────┼──────────────────────────────────┼───────────────────────────────────┤
-│ slack_channel       │ ?                                │ cannot be discovered from code    │
-└─────────────────────┴──────────────────────────────────┴───────────────────────────────────┘
-```
-
-Then ask in a **single message**:
-1. Does everything above look correct? Call out anything to change.
-2. What is the Slack channel ID? (or `null` to skip)
-
-Wait for the response before proceeding.
 
 ---
 
-## Step 5 — Write the file
+## Step 3 — Synthesize and confirm
+
+Merge all agent findings. For any conflict between agents, prefer the more specific finding with evidence.
+
+Present the full table in a single message:
+
+```
+Here's everything I found — confirm or correct anything, and tell me the Slack channel ID (or null).
+
+┌─────────────────────┬──────────────────────────────────────┬────────────────────────────────────┐
+│ Field               │ Value                                │ Source                             │
+├─────────────────────┼──────────────────────────────────────┼────────────────────────────────────┤
+│ slug                │ backwpup-pro                         │ git remote                         │
+│ display_name        │ BackWPup Pro                         │ plugin header                      │
+│ text_domain         │ backwpup                             │ plugin header                      │
+│ namespace           │ WPMedia\BackWPup                     │ composer.json                      │
+│ architecture_skill  │ backwpup-architecture                │ .claude/skills/ (existing)         │
+│ frontend_skill      │ backwpup-frontend-architecture       │ .claude/skills/ (existing)         │
+│ editions            │ ["free", "pro"]                      │ IS_PRO constant + -pro suffix      │
+│ rest_namespace      │ null                                 │ no register_rest_route() found     │
+│ capabilities        │ ["backwpup"]                         │ current_user_can() calls           │
+│ e2e.settings_path   │ /wp-admin/admin.php?page=backwpup    │ add_menu_page() slug               │
+│ e2e.boot_cmd        │ bash bin/dev-up.sh                   │ bin/dev-up.sh found                │
+│ e2e.seed_cmd        │ null                                 │ no seed script found               │
+│ e2e.test_cmd        │ npm run test:e2e                     │ package.json scripts               │
+│ e2e.ci_integration  │ false                                │ no committed spec files            │
+├─────────────────────┼──────────────────────────────────────┼────────────────────────────────────┤
+│ slack_channel       │ ?                                    │ cannot be found in code            │
+└─────────────────────┴──────────────────────────────────────┴────────────────────────────────────┘
+```
+
+Wait for the user's response before proceeding.
+
+---
+
+## Step 4 — Write the file
 
 Construct the full `maestro.json` from confirmed values. Write it to `.claude/maestro.json`.
 
@@ -215,11 +241,11 @@ Construct the full `maestro.json` from confirmed values. Write it to `.claude/ma
 }
 ```
 
-Set `slack_threads_dir` to `.TemporaryItems/Issues/<slug>/slack-threads` if `slack_channel` is set, otherwise omit it. Set null fields explicitly to `null`.
+Set `slack_threads_dir` to `.TemporaryItems/Issues/<slug>/slack-threads` if `slack_channel` is set, otherwise omit it. Set all null fields explicitly to `null`.
 
 ---
 
-## Step 6 — Build the initial knowledge graph
+## Step 5 — Build the initial knowledge graph
 
 Run the graph builder directly from the Maestro plugin cache — no file is copied to the project:
 
@@ -228,19 +254,20 @@ GRAPH_SCRIPT=$(find ~/.claude/plugins/cache/maestro -name "build-knowledge-graph
 [ -n "$GRAPH_SCRIPT" ] && node "$GRAPH_SCRIPT" --full
 ```
 
-The graph is written to `.claude/graph/dependency-graph.json`. Add that path to `.gitignore` — it is auto-generated and should not be committed.
+The graph is written to `.claude/graph/dependency-graph.json`. Add that path to `.gitignore` if not already there.
 
 ---
 
-## Step 7 — Remind about remaining setup
+## Step 6 — Remind about remaining setup
+
+Check what's missing and surface it:
 
 ```bash
 ls .claude/skills/<slug>-architecture/ 2>/dev/null
-ls AGENTS.md 2>/dev/null
 ```
 
 If the architecture skill directory is missing:
 > Next: create `.claude/skills/<slug>-architecture/SKILL.md` — define your DI patterns, module structure, and static analysis rules. The grooming agent reads this before every implementation.
 
-If `AGENTS.md` is missing or still contains the Maestro base placeholder text:
+If `AGENTS.md` was not yet extended (from agent: structure findings):
 > Next: extend `AGENTS.md` with a **Project Overview** section describing this project's architecture.
