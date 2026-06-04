@@ -14,7 +14,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -224,7 +224,7 @@ URLs — always include them in the `### Screenshots` section. If no screenshots
 frontend PR, the report is incomplete; state the reason explicitly (e.g. "boot failed —
 exit 1, see Environment Boot table").
 
-Emit the event to `.../orchestrator-events.jsonl`. 
+Emit the event to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`. 
 
 Post the comment using:
 
@@ -325,8 +325,8 @@ Before returning, you MUST write the JSON result to disk:
 > Expand `{TEMP_ROOT}` to the value read from `repo-map.json` before executing.
 
 ```bash
-mkdir -p "$TEMP_ROOT/issue-${ISSUE_ID}/contracts"
-cat > "$TEMP_ROOT/issue-${ISSUE_ID}/contracts/qa-result.json" <<'EOF'
+mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/contracts"
+cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/qa-result.json" <<'EOF'
 {
   "overall": "...",
   "strategies_used": [...],

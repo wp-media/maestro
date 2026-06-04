@@ -17,7 +17,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -94,7 +94,7 @@ The project lives on GitHub. Always use `gh` for issue operations. The canonical
    }
    ```
 
-   Emit to `{TEMP_ROOT}/orchestrator-events.jsonl`. Emit and continue.
+   Emit to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`. Emit and continue.
 
 7a. Create the issue with the AI-generated notice at the top of the body:
    ```bash

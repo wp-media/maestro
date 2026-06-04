@@ -24,7 +24,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -44,7 +44,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 - Branch name
 - Base branch (e.g. `origin/develop`)
 - Acceptance criteria list (for the PR body)
-- Spec path (`{TEMP_ROOT}/issues/<N>-spec.md`)
+- Spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - `CURRENT_MODEL` — the model name to use in `Co-Authored-By` trailers (e.g. `Claude Haiku 4.5`)
 
 ---
@@ -104,7 +104,7 @@ attempt force-push without explicit instruction.
 bash .claude/commands/issue-workflow/scripts/init-pr-draft.sh <N>
 ```
 
-This creates `{TEMP_ROOT}/pull/<N>.md` from the template.
+This creates `{TEMP_ROOT}/issues/<N>/pull.md` from the template.
 
 ---
 
@@ -151,7 +151,7 @@ and `<details>` tags for long technical content.
 ```bash
 gh pr create \
   --title "Closes #<N>: <short descriptive title>" \
-  --body "$(cat $TEMP_ROOT/pull/<N>.md)" \
+  --body "$(cat $TEMP_ROOT/issues/<N>/pull.md)" \
   --base <base_branch> \
   --draft
 ```

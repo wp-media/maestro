@@ -58,7 +58,7 @@ Run each check in order. Report **PASS**, **WARN**, or **FAIL** with specific ev
 ### Check 1 — Manual validation confirmed
 
 Look at the PR/MR description:
-- In Layer 1: read the local draft at `{TEMP_ROOT}/pull/<N>.md`
+- In Layer 1: read the local draft at `{TEMP_ROOT}/issues/<N>/pull.md`
 - In Layer 2: fetch from GitHub: `gh pr view <PR_NUMBER> --json body -q .body`
 
 Look at the "What was tested" section. It must contain **concrete scenarios** — not "N/A", not "tested locally".
@@ -124,7 +124,7 @@ cat .github/PULL_REQUEST_TEMPLATE.md 2>/dev/null
 template exists — same content.)
 
 Then fetch the PR body:
-- Layer 1: read `{TEMP_ROOT}/pull/<N>.md`
+- Layer 1: read `{TEMP_ROOT}/issues/<N>/pull.md`
 - Layer 2: `gh pr view <PR_NUMBER> --json body -q .body`
 
 Check that all required sections from the template are present and non-empty:
@@ -212,7 +212,7 @@ done
 
 **Layer 1 only** (in Layer 2, file scope is not tracked — this check is skipped with status `N/A`).
 
-The orchestrator writes `file_scope` for each implementation task in `{TEMP_ROOT}/issue-<N>/tasks.json`. Read your task entry and extract the declared scope.
+The orchestrator writes `file_scope` for each implementation task in `{TEMP_ROOT}/issues/<N>/tasks.json`. Read your task entry and extract the declared scope.
 
 List every file changed on the branch:
 ```bash
@@ -296,12 +296,12 @@ any issues that were not flagged in layer 1.
 
 **Result file (L2 only):** When running Layer 2 (orchestrator gate), write the JSON result to:
 ```
-{TEMP_ROOT}/issue-<N>/contracts/dod-l2-result.json
+{TEMP_ROOT}/issues/<N>/contracts/dod-l2-result.json
 ```
 
 ```bash
-mkdir -p "{TEMP_ROOT}/issue-${ISSUE_ID}/contracts"
-cat > "{TEMP_ROOT}/issue-${ISSUE_ID}/contracts/dod-l2-result.json" <<'EOF'
+mkdir -p "{TEMP_ROOT}/issues/${ISSUE_ID}/contracts"
+cat > "{TEMP_ROOT}/issues/${ISSUE_ID}/contracts/dod-l2-result.json" <<'EOF'
 {
   "overall": "PASS|WARN|FAIL",
   "checks": [...],

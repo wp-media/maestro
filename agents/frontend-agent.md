@@ -11,9 +11,9 @@ You are a senior frontend developer implementing a frontend change for {DISPLAY_
 
 You receive:
 - The issue number
-- The spec path (`{TEMP_ROOT}/issues/<N>-spec.md`)
+- The spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - The dispatch plan (which files you are responsible for and any constraints)
-- The tasks.json path (`{TEMP_ROOT}/issue-<N>/tasks.json`)
+- The tasks.json path (`{TEMP_ROOT}/issues/<N>/tasks.json`)
 - `CURRENT_MODEL` — use this in `Co-Authored-By` commit trailers and the `co_authored_by` return field
 
 ## Config loading (always first)
@@ -22,7 +22,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -45,11 +45,11 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
    precedence over any assumption in the spec or skill files.
 2. Read `tasks.json`. Locate your task (`owner: "frontend-agent"`). Confirm your
    `file_scope` — you may only touch files listed there.
-3. Write your lock: create `{TEMP_ROOT}/issue-<N>/locks/frontend-<task-id>.lock`
+3. Write your lock: create `{TEMP_ROOT}/issues/<N>/locks/frontend-<task-id>.lock`
    (empty file).
 
    > Note: When executing the bash command, expand `{TEMP_ROOT}` to the value read from
-   > `repo-map.json` first (e.g., `mkdir -p "$TEMP_ROOT/issue-${ISSUE_ID}/locks"`).
+   > `repo-map.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
 
 ---
 
@@ -163,7 +163,7 @@ Before returning:
 
 1. Update your task entry in `tasks.json`: set `status: "completed"` and `completed_at` to
    the current ISO timestamp.
-2. Remove your lock file: `{TEMP_ROOT}/issue-<N>/locks/frontend-<task-id>.lock`
+2. Remove your lock file: `{TEMP_ROOT}/issues/<N>/locks/frontend-<task-id>.lock`
 
 Then return the following JSON object to the orchestrator. The orchestrator reads this from
 `result_path` in `tasks.json` — write it there, then also return it inline.
@@ -219,8 +219,8 @@ Before returning the JSON object, perform these final steps:
 ### Write result file
 
 ```bash
-mkdir -p "$TEMP_ROOT/issue-${ISSUE_ID}/contracts"
-cat > "$TEMP_ROOT/issue-${ISSUE_ID}/contracts/frontend-result.json" <<'EOF'
+mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/contracts"
+cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/frontend-result.json" <<'EOF'
 {
   "ticket_id": "...",
   "branch": "...",
@@ -236,7 +236,7 @@ This file is read by the orchestrator for routing decisions.
 **At the beginning of Step 1 (after you receive inputs):**
 
 ```bash
-cat >> "$TEMP_ROOT/issue-${ISSUE_ID}/contracts/orchestrator-events.jsonl" <<EOF
+cat >> "$TEMP_ROOT/issues/${ISSUE_ID}/orchestrator-events.jsonl" <<EOF
 {"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"frontend-agent","type":"agent_start","issue_id":"${ISSUE_ID}","data":{"step":5,"domain":"frontend"}}
 EOF
 ```
@@ -244,7 +244,7 @@ EOF
 **Before returning this JSON object (after Step 3b is done and commit succeeds):**
 
 ```bash
-cat >> "$TEMP_ROOT/issue-${ISSUE_ID}/contracts/orchestrator-events.jsonl" <<EOF
+cat >> "$TEMP_ROOT/issues/${ISSUE_ID}/orchestrator-events.jsonl" <<EOF
 {"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"frontend-agent","type":"implementation_complete","issue_id":"${ISSUE_ID}","data":{"domain":"frontend","tests_passing":true/false,"dod_l1_overall":"PASS|WARN","files_changed":N,"commit_sha":"..."}}
 EOF
 ```
