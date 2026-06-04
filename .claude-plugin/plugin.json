@@ -1,7 +1,7 @@
 {
   "name": "maestro",
   "displayName": "Maestro",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "AI delivery pipeline for wp-media WordPress plugins — agents, skills, and orchestration logic shared across WP Rocket, BackWPup, and Imagify.",
   "agents": ".claude/agents",
   "commands": ".claude/commands",
