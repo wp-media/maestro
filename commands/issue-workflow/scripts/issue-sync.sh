@@ -48,8 +48,8 @@ OWNER="${REPO%%/*}"
 REPO_NAME="${REPO#*/}"
 
 # Output location for the issue snapshot.
-OUT_DIR="${ROOT_DIR}/${TEMP_ROOT}/issues"
-OUT_FILE="${OUT_DIR}/${ISSUE_NUMBER}.md"
+OUT_DIR="${ROOT_DIR}/${TEMP_ROOT}/issues/${ISSUE_NUMBER}"
+OUT_FILE="${OUT_DIR}/issue.md"
 
 # Related issue sync controls.
 SYNC_RELATED="${MAESTRO_SYNC_RELATED:-1}"
@@ -124,7 +124,7 @@ extract_task_issue_numbers() {
   ' <<< "$body"
 }
 
-# Ensure the output directory exists.
+# Ensure the output directory exists (including per-issue subdirectory).
 mkdir -p "$OUT_DIR"
 
 # Fetch issue data and render a structured Markdown file.

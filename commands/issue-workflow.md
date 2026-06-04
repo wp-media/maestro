@@ -44,17 +44,17 @@ Use shell commands as the primary approach. The GitHub MCP (`mcp_github_*`) may 
 
 1. **Extract** the issue number from the user's message.
 
-2. **Fetch the issue** — run `bash .claude/commands/issue-workflow/scripts/issue-sync.sh <N>` (or use the MCP equivalent). Read the resulting file at `{TEMP_ROOT}/issues/<N>.md`.
+2. **Fetch the issue** — run `bash .claude/commands/issue-workflow/scripts/issue-sync.sh <N>` (or use the MCP equivalent). Read the resulting file at `{TEMP_ROOT}/issues/<N>/issue.md`.
 
-3. **Check for parent epics** — if `Parent Epic (GitHub)` or `Parent Epics (Task List)` has entries, sync each parent with `issue-sync.sh <epic-N>` and read those files for context.
+3. **Check for parent epics** — if `Parent Epic (GitHub)` or `Parent Epics (Task List)` has entries, sync each parent with `issue-sync.sh <epic-N>` and read those files at `{TEMP_ROOT}/issues/<epic-N>/issue.md` for context.
 
 4. **Check if this is an Epic** — if the issue has label `epics`, Issue Type `EPIC`, or has sub-issues listed, ask the user: "Work the epic as a whole, or a specific sub-issue?" If a sub-issue is chosen, sync it and proceed with the epic context in mind.
 
 5. **Determine base branch** — default is `origin/develop` unless the user specified otherwise.
 
 6. **Invoke the `orchestrator` skill inline** (do not spawn it as a sub-agent — it runs in this conversation context so it can read the user's intent for escalation calibration):
-   > Inputs: issue number `N`, issue file `{TEMP_ROOT}/issues/<N>.md`, base branch
+   > Inputs: issue number `N`, issue file `{TEMP_ROOT}/issues/<N>/issue.md`, base branch
 
 The orchestrator skill manages everything from here: calibration → grooming → spec review → dispatch → implementation → lead review → push & PR → CI → QA → finalize. It spawns the specialist agents (`grooming-agent`, `challenger`, `backend-agent`, `frontend-agent`, `release-agent`, `lead-reviewer`, `qa-engineer`, `ticket-writer`) as isolated sub-agents, but the orchestrator itself stays inline so it can surface decisions back to the user naturally.
 
-Monitor progress at `{TEMP_ROOT}/issue-<N>-workflow-log.html`.
+Monitor progress at `{TEMP_ROOT}/issues/<N>/workflow-log.html`.

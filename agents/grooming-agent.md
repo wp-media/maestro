@@ -12,7 +12,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -55,7 +55,7 @@ Log your reasoning depth choice in the return JSON: `effort_used: "LOW|MEDIUM|HI
 1. Read `AGENTS.md` at the repo root. **Section 13 (Session Learnings) takes precedence**
    over any default assumption — if it documents a pattern to avoid or enforce, your spec
    must reflect that.
-2. Read the issue file at `{TEMP_ROOT}/issues/<N>.md`.
+2. Read the issue file at `{TEMP_ROOT}/issues/<N>/issue.md`.
    If a parent epic file exists (noted in the issue), read it too for context.
 
 Extract:
@@ -136,7 +136,7 @@ If `EDITIONS` is non-null, note the edition split in the Affected Files table an
 
 ### Step 4 — Write the spec
 
-Write the implementation spec to `{TEMP_ROOT}/issues/<N>-spec.md`.
+Write the implementation spec to `{TEMP_ROOT}/issues/<N>/spec.md`.
 
 ```markdown
 ## Implementation Spec — Issue #<N>: <title>

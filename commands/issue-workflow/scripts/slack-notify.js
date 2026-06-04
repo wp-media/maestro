@@ -16,7 +16,7 @@ const CHANNEL_ID  = _ai.slack_channel || '';
 const REPO        = _ai.repo || '';
 const THREADS_DIR = _ai.slack_threads_dir
   ? path.join(process.cwd(), ..._ai.slack_threads_dir.split('/'))
-  : path.join(process.cwd(), ...(_ai.temp_root || '.TemporaryItems/Issues/pipeline').split('/'), 'slack-threads');
+  : path.join(process.cwd(), ...(_ai.temp_root || '.maestro').split('/'), 'slack-threads');
 
 setTimeout(() => process.exit(0), 9000);
 

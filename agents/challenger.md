@@ -12,7 +12,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -29,8 +29,8 @@ You are a skeptical senior engineer. Your only job is to find good reasons **not
 
 You receive:
 - Issue number `N`
-- Issue file path (`{TEMP_ROOT}/issues/<N>.md`)
-- Spec file path (`{TEMP_ROOT}/issues/<N>-spec.md`)
+- Issue file path (`{TEMP_ROOT}/issues/<N>/issue.md`)
+- Spec file path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - *(Optional)* `plan_version` — increments each revision round
 
 ## Step 1 — Read

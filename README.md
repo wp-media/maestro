@@ -196,7 +196,7 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
   "slug":         "wp-rocket",
   "display_name": "WP Rocket",
   "repo":         "wp-media/wp-rocket",
-  "temp_root":    ".TemporaryItems/Issues/wp-rocket",
+  "temp_root":    ".maestro",
 
   "architecture_skill":  "wp-rocket-architecture",
   "frontend_skill":      "wp-rocket-frontend-architecture",
@@ -210,7 +210,7 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
   "editions":   null,
 
   "slack_channel":     "C0B680PH44T",
-  "slack_threads_dir": ".TemporaryItems/Issues/wp-rocket/slack-threads",
+  "slack_threads_dir": ".maestro/slack-threads",
 
   "e2e": {
     "local_url":     "http://localhost:8888",
@@ -230,7 +230,7 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
   "slug":         "backwpup",
   "display_name": "BackWPup",
   "repo":         "wp-media/backwpup-pro",
-  "temp_root":    ".TemporaryItems/Issues/backwpup",
+  "temp_root":    ".maestro",
 
   "architecture_skill": "backwpup-architecture",
   "frontend_skill":     null,

@@ -19,7 +19,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -38,7 +38,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 ### Step 1 — Gather context
 
-1. Read the implementation spec: `{TEMP_ROOT}/issues/<N>-spec.md`
+1. Read the implementation spec: `{TEMP_ROOT}/issues/<N>/spec.md`
 2. Get the list of changed files:
    ```bash
    git diff <base-branch> --name-only
@@ -223,7 +223,7 @@ gh pr comment <PR_NUMBER> --body "$(cat <<'EOF'
 }
 ```
 
-Emit all events to `.../orchestrator-events.jsonl`. Do NOT wait for a response to complete — emit and return immediately.
+Emit all events to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`. Do NOT wait for a response to complete — emit and return immediately.
 
 If verdict is PASS and there are no blockers, the comment body is just:
 
@@ -279,8 +279,8 @@ Before returning, you MUST write the JSON result to disk:
 > Expand `{TEMP_ROOT}` to the value read from `repo-map.json` before executing.
 
 ```bash
-mkdir -p "$TEMP_ROOT/issue-${ISSUE_ID}/contracts"
-cat > "$TEMP_ROOT/issue-${ISSUE_ID}/contracts/lead-review-result.json" <<'EOF'
+mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/contracts"
+cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/lead-review-result.json" <<'EOF'
 {
   "pr_url": "...",
   "verdict": "...",

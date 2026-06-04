@@ -15,7 +15,7 @@ Read `.claude/maestro.json` at startup and extract these values. Pass them expli
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.TemporaryItems/Issues/wp-rocket` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -154,7 +154,7 @@ user can see what mode you picked.
 
 ## Run log
 
-Path: `{TEMP_ROOT}/issue-<N>-workflow-log.html`
+Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
 
 - **Create** the log at startup with just the header and an empty event list.
 - **Rewrite the full file** after every action — the event list grows with each update.
@@ -178,11 +178,16 @@ from the contract files.
 
 Each pipeline run creates an isolated working directory for coordination artifacts:
 
-**Run root:** `{TEMP_ROOT}/issue-<N>/`
+**Run root:** `{TEMP_ROOT}/issues/<N>/`
 
 ```
-issue-<N>/
+issues/<N>/
+├── issue.md                 # issue snapshot (written by issue-sync.sh)
+├── spec.md                  # implementation spec (written by grooming-agent)
+├── pull.md                  # PR draft (written by init-pr-draft.sh / release-agent)
+├── workflow-log.html        # live HTML run log (written by orchestrator)
 ├── tasks.json               # shared task ledger — read/written by all agents
+├── orchestrator-events.jsonl  # event stream — written by all agents
 ├── contracts/
 │   ├── backend-api.json     # written by backend-agent (Step 3c): hooks, option_keys, rest_endpoints
 │   ├── backend-result.json  # written by backend-agent (Step 5): full implementation result
@@ -209,7 +214,7 @@ issue-<N>/
       "depends_on": [],
       "file_scope": ["inc/Engine/...", "tests/Unit/..."],
       "worktree": null,
-      "result_path": "{TEMP_ROOT}/issue-<N>/contracts/backend-result.json",
+      "result_path": "{TEMP_ROOT}/issues/<N>/contracts/backend-result.json",
       "started_at": null,
       "completed_at": null,
       "blocked_reason": null
@@ -222,7 +227,7 @@ issue-<N>/
       "depends_on": [],
       "file_scope": ["assets/src/...", "views/..."],
       "worktree": null,
-      "result_path": "{TEMP_ROOT}/issue-<N>/contracts/frontend-result.json",
+      "result_path": "{TEMP_ROOT}/issues/<N>/contracts/frontend-result.json",
       "started_at": null,
       "completed_at": null,
       "blocked_reason": null
@@ -382,7 +387,7 @@ fields — prose is for human readability only.
 
 ### Step 1 — Issue read *(always)*
 
-Read the issue file at `{TEMP_ROOT}/issues/<N>.md` (produced by
+Read the issue file at `{TEMP_ROOT}/issues/<N>/issue.md` (produced by
 `issue-workflow` or `issue-sync.sh`). Extract title and acceptance criteria:
 
 1. Look for `Acceptance Criteria`, `Definition of Done`, or `DoD` section
@@ -402,7 +407,7 @@ Create the initial HTML log (empty event list). Log a ROUTING DECISION event:
 Invoke `grooming-agent`:
 > Inputs: issue `#N`, issue file path, base branch
 
-Spec written to `{TEMP_ROOT}/issues/<N>-spec.md`. Agent also returns
+Spec written to `{TEMP_ROOT}/issues/<N>/spec.md`. Agent also returns
 JSON. Log an AGENT event with the grooming JSON summary.
 
 ---
@@ -522,7 +527,7 @@ In all other modes, suppress mid-flow surfacing — save for the final report.
 ### Step 3b — CHALLENGER loop *(conditional)*
 
 If triggered:
-> Invoke `challenger`. Inputs: issue #N, issue file, spec path, `plan_version` (starts at 1)
+> Invoke `challenger`. Inputs: issue #N, issue file `{TEMP_ROOT}/issues/<N>/issue.md`, spec path `{TEMP_ROOT}/issues/<N>/spec.md`, `plan_version` (starts at 1)
 
 Route on `verdict`:
 - **APPROVED** → proceed. Log AGENT event.
@@ -551,8 +556,8 @@ Log AGENT event.
 Create the run directory and write the initial `tasks.json`:
 
 ```bash
-mkdir -p {TEMP_ROOT}/issue-<N>/contracts
-mkdir -p {TEMP_ROOT}/issue-<N>/locks
+mkdir -p {TEMP_ROOT}/issues/<N>/contracts
+mkdir -p {TEMP_ROOT}/issues/<N>/locks
 ```
 
 Populate `file_scope` for each task from `grooming.development_steps[*].files`:
@@ -605,8 +610,8 @@ Before spawning, mark each in-scope task `in-progress` in `tasks.json` and recor
 
 Create git worktrees for isolation:
 ```bash
-git worktree add {TEMP_ROOT}/issue-<N>/worktrees/backend <branch>
-git worktree add {TEMP_ROOT}/issue-<N>/worktrees/frontend <branch>
+git worktree add {TEMP_ROOT}/issues/<N>/worktrees/backend <branch>
+git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
 ```
 
 Update each task's `worktree` field in `tasks.json`.
@@ -651,7 +656,7 @@ commit SHA.
 After all implementation agents have committed:
 
 Invoke `release-agent`:
-> Inputs: issue #N, branch name, base branch, acceptance criteria, spec path
+> Inputs: issue #N, branch name, base branch, acceptance criteria, spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 
 It verifies the `Co-Authored-By: <model-name>` trailer on every commit on the branch (the
 exact trailer varies by model — this is a grep pattern check), pushes the branch, and
@@ -875,7 +880,7 @@ All agents also receive `CURRENT_MODEL` and `session_learnings` (section 13 of `
 | `backend-agent` | Issue object + spec path + dispatch plan |
 | `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (sequential mode only) |
 | `release-agent` | Issue #, branch name, base branch, acceptance criteria, spec path |
-| `lead-reviewer` | PR URL + spec path + acceptance criteria + `session_learnings` |
+| `lead-reviewer` | PR URL + spec path (`{TEMP_ROOT}/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
 | `qa-engineer` | PR number + acceptance criteria + base branch |
 | `ticket-writer` (nth_followup) | Single NTH feedback item (not full context) |
 

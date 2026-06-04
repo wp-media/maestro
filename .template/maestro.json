@@ -170,7 +170,7 @@
     "slug": "<project-slug>",
     "display_name": "<Human Readable Plugin Name>",
     "repo": "wp-media/<project-slug>",
-    "temp_root": ".TemporaryItems/Issues/<project-slug>",
+    "temp_root": ".maestro",
 
     "architecture_skill": "<project-slug>-architecture",
     "frontend_skill": "<project-slug>-frontend-architecture",
