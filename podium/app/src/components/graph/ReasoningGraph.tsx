@@ -40,25 +40,27 @@ const MINIMAP_CATEGORY_COLOR: Record<ToolCategory, string> = {
  */
 const NODE_ANIMATIONS = `
 @keyframes podium-fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes podium-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.45; transform: scale(0.82); }
+  50%      { opacity: 0.4; transform: scale(0.78); }
 }
-@keyframes podium-agent-glow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(254,210,58,0.25), 0 0 10px rgba(254,210,58,0.18); }
-  50%      { box-shadow: 0 0 0 2px rgba(254,210,58,0.55), 0 0 20px rgba(254,210,58,0.40); }
+
+/* Subtle hover lift — apply to the outer wrapper div */
+.react-flow__node:hover > div {
+  transform: translateY(-2px);
+  transition: transform .15s ease;
 }
-.podium-turn-node:hover {
-  background: var(--surface-3, #243048) !important;
-  backdrop-filter: blur(6px);
-  transform: translateY(-1px);
+
+/* Animated edge dashes for running agents */
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 6;
+  animation: dash 1s linear infinite;
 }
-.podium-agent-node:hover {
-  backdrop-filter: blur(6px);
-  transform: translateY(-1px);
+@keyframes dash {
+  to { stroke-dashoffset: -24; }
 }
 `
 
@@ -120,7 +122,7 @@ function ReasoningGraphInner() {
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
       >
-        <Background color="#2e3243" gap={24} size={1} />
+        <Background color="#243048" gap={28} size={1.2} variant={'dots' as any} />
         <Controls
           style={{ background: 'var(--surface-2, #1c2433)', border: '1px solid var(--border, #2e3243)' }}
         />
