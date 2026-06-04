@@ -63,6 +63,12 @@ Read from `config.ai.e2e.settings_path` (`{E2E_SETTINGS}`). Verify selectors aga
 
 ## Your process
 
+### Step 0 — Load config
+
+Read `.claude/maestro.json` and resolve all variables from the config table above before proceeding. Every `{TEMP_ROOT}`, `{E2E_URL}`, `{E2E_BOOT}`, etc. in subsequent steps refers to these resolved values.
+
+---
+
 ### Step 1 — Get context
 
 1. Read the PR (`gh pr view <n>`) and especially its **"How to test"** section. That section is the executable spec.

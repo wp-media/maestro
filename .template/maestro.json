@@ -176,10 +176,12 @@
     "frontend_skill": "<project-slug>-frontend-architecture",
 
     "text_domain": "<text-domain>",
+    "_namespace_note": "Root PHP namespace for the plugin (e.g. WP_Rocket, WPMedia\\BackWPup). Used for documentation and architecture skills; not yet read programmatically.",
     "namespace": "<PHP\\Namespace\\Root>",
 
     "rest_namespace": null,
 
+    "_push_agent_note": "Reserved for future use — identifies the agent responsible for pushing and creating PRs. Not yet read by any command.",
     "push_agent": "release-agent",
 
     "_editions_note": "Signal only. Set to [\"free\",\"pro\"] when the plugin has editions. The detailed path mapping lives in the root-level editions block above.",

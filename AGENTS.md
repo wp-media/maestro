@@ -222,7 +222,7 @@ The `qa-engineer` sub-agent validates PRs automatically as part of the issue wor
 It reads the PR spec, selects a validation strategy (API / Browser / Analysis), and produces
 a structured test report.
 
-Agent definition: `.claude/agents/qa-engineer.md`.
+Agent definition: `agents/qa-engineer.md` in the Maestro plugin.
 
 The local WordPress environment at `http://localhost:8888` (admin / password) is used for
 browser validation via Playwright MCP.

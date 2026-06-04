@@ -65,7 +65,8 @@ function resolveScanDirs(config) {
 			case 'third-party':
 				// Never scan vendor/third-party directories
 				break;
-			case 'built-assets':
+			case 'compiled-assets':
+		case 'built-assets': // legacy alias
 				assetDirs.push(p);
 				break;
 			default:

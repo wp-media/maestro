@@ -7,12 +7,13 @@ set -euo pipefail
 SEED="${1:-}"
 
 # Resolve plugin slug from maestro.json (node is a guaranteed Maestro dependency).
-PLUGIN_SLUG=$(node -e "const c=require(process.cwd()+'/.claude/maestro.json');console.log(c.ai.slug)" 2>/dev/null || true)
-
-if [[ -z "${PLUGIN_SLUG:-}" ]]; then
-  echo "Error: could not read ai.slug from .claude/maestro.json — run from the project root." >&2
+if [[ ! -f ".claude/maestro.json" ]]; then
+  echo "Error: .claude/maestro.json not found — run from the project root." >&2
   exit 1
 fi
+
+PLUGIN_SLUG=$(node -e "const c=require(process.cwd()+'/.claude/maestro.json');console.log(c.ai.slug)")
+E2E_URL=$(node -e "const c=require(process.cwd()+'/.claude/maestro.json');console.log(c.ai.e2e&&c.ai.e2e.local_url||'http://localhost:8888')")
 
 echo "Starting wp-env..."
 npx @wordpress/env start
@@ -24,5 +25,5 @@ if [[ "$SEED" != "--no-seed" ]] && [[ -f ".maestro/bin/dev-seed.sh" ]]; then
   bash .maestro/bin/dev-seed.sh
 fi
 
-echo "Done. WordPress is available at http://localhost:8888"
-echo "Admin: http://localhost:8888/wp-admin  (admin / password)"
+echo "Done. WordPress is available at ${E2E_URL}"
+echo "Admin: ${E2E_URL}/wp-admin  (admin / password)"

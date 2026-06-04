@@ -42,7 +42,7 @@ esc_attr__( 'Plugin Settings', '{TEXT_DOMAIN}' )
 
 ## Custom capabilities
 
-If `.ai.capabilities` in repo-map.json is non-empty, always use those capabilities
+If `.ai.capabilities` in `.claude/maestro.json` is non-empty, always use those capabilities
 (not `manage_options`) for capability checks. The PHPCS config should allow them
 without warnings.
 

@@ -38,7 +38,7 @@ if ! gh auth status -h github.com >/dev/null 2>&1; then
   die "GitHub CLI is not authenticated. Run \"gh auth login\"."
 fi
 
-# Read project identity from repo-map.json
+# Read project identity from .claude/maestro.json
 CONFIG_FILE="${ROOT_DIR}/.claude/maestro.json"
 [ -f "$CONFIG_FILE" ] || die "No .claude/maestro.json found at ${ROOT_DIR}."
 REPO="$(jq -r '.ai.repo' "$CONFIG_FILE")"
@@ -130,7 +130,7 @@ mkdir -p "$OUT_DIR"
 # Fetch issue data and render a structured Markdown file.
 if ! ISSUE_JSON="$(gh issue view "$ISSUE_NUMBER" \
   --repo "$REPO" \
-  --json number,title,body,comments,state,labels,assignees,url 2> >(cat >&2))"; then
+  --json number,title,body,comments,state,labels,assignees,url)"; then
   die "Failed to fetch issue #${ISSUE_NUMBER} from ${REPO}."
 fi
 
@@ -437,7 +437,7 @@ if [ "$SYNC_RELATED" = "1" ] && [ "${#RELATED_ISSUE_NUMBERS[@]}" -gt 0 ]; then
       continue
     fi
     mark_seen_issue "$related"
-    if ! MAESTRO_SYNC_RELATED=0 MAESTRO_SYNC_SEEN="$SEEN_ISSUES" "$0" "$related" >/dev/null; then
+    if ! MAESTRO_SYNC_RELATED=0 MAESTRO_SYNC_SEEN="$SEEN_ISSUES" "${BASH_SOURCE[0]}" "$related" >/dev/null; then
       echo "Warning: failed to sync issue #${related}" >&2
     fi
   done

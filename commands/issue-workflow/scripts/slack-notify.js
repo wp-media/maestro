@@ -18,10 +18,10 @@ const THREADS_DIR = _ai.slack_threads_dir
   ? path.join(process.cwd(), ..._ai.slack_threads_dir.split('/'))
   : path.join(process.cwd(), ...(_ai.temp_root || '.maestro').split('/'), 'slack-threads');
 
-setTimeout(() => process.exit(0), 9000);
+const exitTimer = setTimeout(() => process.exit(0), 15000);
 
 if (!SLACK_TOKEN || !CHANNEL_ID) {
-  process.stderr.write('slack-notify: SLACK_BOT_TOKEN not set or slack_channel not configured in repo-map.json\n');
+  process.stderr.write('slack-notify: SLACK_BOT_TOKEN not set or slack_channel not configured in .claude/maestro.json\n');
   process.exit(0);
 }
 
@@ -30,6 +30,7 @@ process.stdin.setEncoding('utf8');
 process.stdin.on('data', c => { raw += c; });
 process.stdin.on('end', async () => {
   try { await run(raw); } catch (e) { process.stderr.write(`slack-notify error: ${e.message}\n`); }
+  clearTimeout(exitTimer);
   process.exit(0);
 });
 
@@ -194,8 +195,8 @@ function buildPipelineSummary(body, issueNum, issueUrl, commentUrl) {
     },
     { type: 'divider' },
     {
-      type: 'markdown',
-      text: tableLines.join('\n') + `\n\n**Follow-up:** ${followup}`
+      type: 'section',
+      text: { type: 'mrkdwn', text: tableLines.join('\n') + `\n\n*Follow-up:* ${followup}` }
     },
     { type: 'divider' },
   ];
@@ -229,7 +230,7 @@ function buildStageCard(icon, label, body, num, ghUrl, commentUrl, isIssue, deta
 
   // Add a rich detail block if we know how to extract meaningful structure from this comment type
   const detail = detailFn ? detailFn(body) : null;
-  if (detail) blocks.push({ type: 'markdown', text: detail });
+  if (detail) blocks.push({ type: 'section', text: { type: 'mrkdwn', text: detail } });
 
   blocks.push({
     type: 'context',

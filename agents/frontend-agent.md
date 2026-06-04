@@ -44,12 +44,13 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 1. Read `AGENTS.md` at the repo root in full. Section 13 (Session Learnings) takes
    precedence over any assumption in the spec or skill files.
 2. Read `tasks.json`. Locate your task (`owner: "frontend-agent"`). Confirm your
-   `file_scope` — you may only touch files listed there.
+   `file_scope` — treat it as the primary scope, not a hard lock. You may touch additional
+   files required by the implementation; report any additions in `notes` on return.
 3. Write your lock: create `{TEMP_ROOT}/issues/<N>/locks/frontend-<task-id>.lock`
    (empty file).
 
    > Note: When executing the bash command, expand `{TEMP_ROOT}` to the value read from
-   > `repo-map.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
+   > `.claude/maestro.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
 
 ---
 
