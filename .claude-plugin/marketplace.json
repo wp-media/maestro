@@ -1,4 +1,9 @@
 {
+  "name": "maestro",
+  "owner": {
+    "name": "wp-media",
+    "url": "https://github.com/wp-media"
+  },
   "plugins": [
     {
       "name": "maestro",
