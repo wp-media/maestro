@@ -9,7 +9,7 @@
       "name": "maestro",
       "description": "AI delivery pipeline for wp-media WordPress plugins.",
       "source": {
-        "source": "github",
+        "type": "directory",
         "path": "."
       }
     }
