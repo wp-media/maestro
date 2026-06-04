@@ -31,12 +31,12 @@ Read `.claude/maestro.json`:
 This skill is at `{root}/commands/podium.md`. The plugin root is one level up.
 
 ```
-SERVER_PATH  = {root}/podium/server.mjs
+SERVER_PATH  = {root}/podium/app/server/index.mjs
 INSTALL_PATH = {root}/podium/install.mjs
 LOG_FILE     = {TEMP_ROOT}/podium/server.log
 ```
 
-Fallback: look for `podium/server.mjs` in `~/.claude/plugins/maestro/`.
+Fallback: look for `podium/app/server/index.mjs` in `~/.claude/plugins/maestro/`.
 
 ---
 
@@ -105,6 +105,8 @@ HTTP 200 → already up, skip to step d.
 ```bash
 node {SERVER_PATH} --temp-root {TEMP_ROOT} --port {PORT} >> {LOG_FILE} 2>&1 &
 ```
+
+> For dev mode (auto-reload): `cd {root}/podium/app && npm run dev`
 
 Wait 1.5 s, then verify:
 
@@ -237,3 +239,5 @@ Alias for `/podium start`.
   turn.
 - Podium is read-only — it never modifies code or project files.
 - Sessions appear in the sidebar automatically; refresh with the ↺ button.
+- The React app requires Node 18+. Run `npm install` in `podium/app/` before first use.
+- For production with Docker: `cd podium && docker-compose up -d`
