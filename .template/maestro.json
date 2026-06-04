@@ -1,5 +1,5 @@
 {
-  "_note": "Copy to .claude/maestro.json in your project and fill in all required fields. Remove optional null fields if not applicable.",
+  "_note": "Copy to .claude/maestro.json in your project and fill in all required fields. Remove optional null fields if not applicable. Remove the editions block entirely if the plugin has no free/pro split.",
   "name": "<project-slug>",
   "repo": "wp-media/<project-slug>",
   "type": "wordpress-plugin",
@@ -8,6 +8,32 @@
     "plugin_bootstrap": "<main-file>.php",
     "uninstall": "uninstall.php"
   },
+
+  "_editions_note": "Only present for plugins with a free/pro split. Agents use this to scope work to the correct edition. Remove entirely for single-edition plugins.",
+  "editions": {
+    "free": {
+      "paths": [
+        "<main-file>.php",
+        "inc/",
+        "src/"
+      ],
+      "notes": [
+        "Shared core and FREE features live here.",
+        "FREE must not reference PRO namespaces or classes."
+      ]
+    },
+    "pro": {
+      "paths": [
+        "inc/Pro/",
+        "pro/"
+      ],
+      "notes": [
+        "PRO features extend FREE via composition.",
+        "No feature flags inside shared services."
+      ]
+    }
+  },
+
   "areas": [
     {
       "path": "src/",
@@ -57,6 +83,7 @@
 
     "push_agent": "release-agent",
 
+    "_editions_note": "Signal only — set to [\"free\",\"pro\"] when the plugin has editions. The detailed path mapping lives in the root-level editions block above.",
     "editions": null,
 
     "capabilities": [],
