@@ -2,124 +2,108 @@ import { memo } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import type { EndNodeData, StartNodeData } from '../../types'
 
-/** Format a unix-ms timestamp as HH:MM (24h, local time). */
 function formatClock(ts: number): string {
   const d = new Date(ts)
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  return `${hh}:${mm}`
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 
-/** Human-friendly short duration (e.g. 920ms, 3.4s, 1m 12s). */
 function formatDuration(ms: number | null): string {
   if (ms == null) return ''
   if (ms < 1000) return `${Math.round(ms)}ms`
   const s = ms / 1000
   if (s < 60) return `${s.toFixed(s < 10 ? 1 : 0)}s`
   const m = Math.floor(s / 60)
-  const rem = Math.round(s % 60)
-  return `${m}m ${rem}s`
+  return `${m}m ${Math.round(s % 60)}s`
 }
 
-const pillBase: React.CSSProperties = {
-  width: 160,
-  height: 40,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 6,
-  padding: '0 14px',
-  borderRadius: 999,
-  fontSize: 12,
-  fontWeight: 600,
-  color: 'var(--text, #f0f4fc)',
-  background: 'linear-gradient(135deg, #151921, #1c2433)',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-  animation: 'podium-fade-in 220ms ease-out both',
-  boxSizing: 'border-box',
-  whiteSpace: 'nowrap',
+function basename(p: string | null): string | null {
+  if (!p) return null
+  return p.replace(/[\\/]+$/, '').split(/[\\/]/).pop() || p
 }
 
-function StartNodeComponent({ data }: NodeProps<StartNodeData>) {
+function StartNodeInner({ data }: NodeProps<StartNodeData>) {
+  const dir = basename(data.cwd)
+
   return (
-    <div
-      className="podium-start-node"
-      style={{ ...pillBase, border: '1px solid var(--border, #2e3243)' }}
-      title={data.cwd ?? undefined}
-    >
-      <span style={{ color: '#fed23a' }} aria-hidden>
-        ◆
-      </span>
-      <span>Session started</span>
-      <span style={{ color: 'var(--text-muted, #9b9b9b)', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-        {formatClock(data.startedAt)}
-      </span>
+    <div style={{
+      display: 'inline-flex', flexDirection: 'column',
+      alignItems: 'center', gap: 4,
+      padding: '8px 18px',
+      borderRadius: 999,
+      background: 'linear-gradient(135deg,#1a2436,#232f45)',
+      border: '1px solid #2e3243',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.4)',
+      color: 'var(--text,#f0f4fc)',
+      fontSize: 12, fontWeight: 600,
+      animation: 'podium-fade-in 200ms ease-out both',
+      boxSizing: 'border-box',
+      minWidth: 160,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ color: '#fed23a', fontSize: 14 }}>◆</span>
+        <span>Session started</span>
+        <span style={{ color: '#9b9b9b', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+          {formatClock(data.startedAt)}
+        </span>
+      </div>
+      {dir && (
+        <div style={{ fontSize: 10, color: '#5a6f8c', fontWeight: 400, letterSpacing: '0.02em' }}>
+          {dir}
+        </div>
+      )}
       <Handle
-        type="source"
-        position={Position.Bottom}
-        style={{ background: '#5a6f8c', width: 8, height: 8, border: 'none' }}
+        type="source" position={Position.Bottom}
+        style={{ background: '#2e3243', width: 8, height: 8, border: 'none' }}
       />
     </div>
   )
 }
 
-function EndNodeComponent({ data }: NodeProps<EndNodeData>) {
+function EndNodeInner({ data }: NodeProps<EndNodeData>) {
   const isRunning = data.status === 'running'
-  const isFailed = data.status === 'failed'
-
-  const borderColor = isRunning
-    ? 'var(--border-light, #3a4d68)'
-    : isFailed
-    ? '#ef4444'
-    : '#22c55e'
-  const dotColor = isRunning ? '#22c55e' : isFailed ? '#ef4444' : '#22c55e'
-  const emoji = isRunning ? '' : isFailed ? '✕' : '✓'
+  const isFailed  = data.status === 'failed'
+  const color = isFailed ? '#ef4444' : '#22c55e'
 
   return (
-    <div
-      className="podium-end-node"
-      style={{
-        ...pillBase,
-        border: `1px solid ${borderColor}`,
-        boxShadow: isRunning
-          ? pillBase.boxShadow
-          : `0 0 0 1px ${borderColor}33, 0 2px 8px rgba(0,0,0,0.4)`,
-      }}
-    >
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+      padding: '8px 18px',
+      borderRadius: 999,
+      background: isRunning
+        ? 'linear-gradient(135deg,#1a2436,#232f45)'
+        : isFailed
+        ? 'rgba(239,68,68,0.08)'
+        : 'rgba(34,197,94,0.08)',
+      border: `1px solid ${isRunning ? '#2e3243' : color + '55'}`,
+      boxShadow: isRunning
+        ? '0 2px 10px rgba(0,0,0,0.4)'
+        : `0 0 12px ${color}22, 0 2px 10px rgba(0,0,0,0.4)`,
+      color: 'var(--text,#f0f4fc)',
+      fontSize: 12, fontWeight: 600,
+      animation: 'podium-fade-in 200ms ease-out both',
+      boxSizing: 'border-box',
+      minWidth: 160,
+    }}>
       <Handle
-        type="target"
-        position={Position.Top}
-        style={{ background: borderColor, width: 8, height: 8, border: 'none' }}
+        type="target" position={Position.Top}
+        style={{ background: '#2e3243', width: 8, height: 8, border: 'none' }}
       />
+
       {isRunning ? (
         <>
-          <span
-            aria-hidden
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              background: dotColor,
-              boxShadow: `0 0 6px ${dotColor}`,
-              animation: 'podium-pulse 1.4s ease-in-out infinite',
-            }}
-          />
+          <span style={{
+            width: 7, height: 7, borderRadius: '50%',
+            background: '#22c55e', boxShadow: '0 0 6px #22c55e',
+            animation: 'podium-pulse 1.4s ease-in-out infinite',
+          }} />
           <span>Running</span>
         </>
       ) : (
         <>
-          <span style={{ color: isFailed ? '#ef4444' : '#22c55e' }} aria-hidden>
-            {emoji}
-          </span>
-          <span>Done</span>
+          <span style={{ color, fontSize: 13 }}>{isFailed ? '✕' : '✓'}</span>
+          <span style={{ color: isFailed ? '#ef4444' : 'var(--text,#f0f4fc)' }}>Done</span>
           {data.duration_ms != null && (
-            <span
-              style={{
-                color: 'var(--text-muted, #9b9b9b)',
-                fontWeight: 500,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
+            <span style={{ color: '#9b9b9b', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
               · {formatDuration(data.duration_ms)}
             </span>
           )}
@@ -129,5 +113,5 @@ function EndNodeComponent({ data }: NodeProps<EndNodeData>) {
   )
 }
 
-export const StartNode = memo(StartNodeComponent)
-export const EndNode = memo(EndNodeComponent)
+export const StartNode = memo(StartNodeInner)
+export const EndNode   = memo(EndNodeInner)

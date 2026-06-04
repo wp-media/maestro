@@ -4,16 +4,16 @@ import { Session } from '../types'
 
 // Node dimensions used purely for dagre layout. Real nodes can render larger;
 // dagre only needs consistent boxes to compute spacing.
-const TURN_W = 260
-const TURN_H = 88
-const AGENT_W = 220
-const AGENT_H = 72
+const TURN_W  = 300   // matches new 280px node + breathing room
+const TURN_H  = 110  // taller — now includes activity bar
+const AGENT_W = 250
+const AGENT_H = 80
 const START_W = 200
-const START_H = 64
-const END_W = 200
-const END_H = 64
+const START_H = 56
+const END_W   = 200
+const END_H   = 56
 
-const EDGE_COLOR = '#2e3243'
+const EDGE_COLOR = '#3a4d68'
 
 interface DagreInput {
   id: string
@@ -82,14 +82,23 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
   }
 
   // ── Edges ────────────────────────────────────────────────────────────────────
-  const makeEdge = (source: string, target: string, animated: boolean): Edge => ({
+  const makeEdge = (source: string, target: string, animated: boolean, isAgentEdge = false): Edge => ({
     id: `e-${source}-${target}`,
     source,
     target,
     type: 'smoothstep',
     animated,
-    style: { stroke: EDGE_COLOR, strokeWidth: 2 },
-    markerEnd: { type: MarkerType.ArrowClosed, color: EDGE_COLOR },
+    style: {
+      stroke: isAgentEdge ? 'rgba(254,210,58,0.45)' : EDGE_COLOR,
+      strokeWidth: isAgentEdge ? 2 : 2,
+      strokeDasharray: animated ? '6 4' : undefined,
+    },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: isAgentEdge ? 'rgba(254,210,58,0.6)' : EDGE_COLOR,
+      width: 14,
+      height: 14,
+    },
   })
 
   if (session.turns.length > 0) {
@@ -103,7 +112,7 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
         edges.push(makeEdge(turnId, `turn-${i + 1}`, false))
       }
       for (const spawn of turn.agent_spawns) {
-        edges.push(makeEdge(turnId, `agent-${spawn.id}`, spawn.status === 'running'))
+        edges.push(makeEdge(turnId, `agent-${spawn.id}`, spawn.status === 'running', true))
       }
     })
 
@@ -118,7 +127,7 @@ export function buildGraph(session: Session): { nodes: Node[]; edges: Edge[] } {
 
   // ── Dagre layout ─────────────────────────────────────────────────────────────
   const g = new dagre.graphlib.Graph()
-  g.setGraph({ rankdir: 'TB', ranksep: 80, nodesep: 40 })
+  g.setGraph({ rankdir: 'TB', ranksep: 90, nodesep: 55 })
   g.setDefaultEdgeLabel(() => ({}))
 
   for (const dn of dagreNodes) {
