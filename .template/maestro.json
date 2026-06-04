@@ -1,5 +1,5 @@
 {
-  "_note": "Copy to .claude/maestro.json in your project and fill in all required fields. Remove optional null fields if not applicable. Remove the editions block entirely if the plugin has no free/pro split.",
+  "_note": "Copy to .claude/maestro.json and fill in all fields. Remove the editions block entirely if the plugin has no free/pro split. Remove null tooling entries that don't apply.",
   "name": "<project-slug>",
   "repo": "wp-media/<project-slug>",
   "type": "wordpress-plugin",
@@ -9,13 +9,17 @@
     "uninstall": "uninstall.php"
   },
 
-  "_editions_note": "Only present for plugins with a free/pro split. Agents use this to scope work to the correct edition. Remove entirely for single-edition plugins.",
+  "_editions_note": "Only present for plugins with a free/pro split. Remove entirely for single-edition plugins.",
   "editions": {
     "free": {
       "paths": [
         "<main-file>.php",
         "inc/",
-        "src/"
+        "src/",
+        "views/",
+        "components/",
+        "parts/",
+        "pages/"
       ],
       "notes": [
         "Shared core and FREE features live here.",
@@ -41,30 +45,125 @@
       "notes": "Modern PSR-4 codebase."
     },
     {
+      "path": "inc/",
+      "role": "legacy-php",
+      "notes": "Non-namespaced classes and admin pages."
+    },
+    {
+      "path": "inc/Pro/",
+      "role": "legacy-php-pro",
+      "notes": "PRO-only legacy classes."
+    },
+    {
+      "path": "classes/",
+      "role": "legacy-php",
+      "notes": "Legacy class files."
+    },
+    {
+      "path": "views/",
+      "role": "templates",
+      "notes": "PHP templates for admin and frontend."
+    },
+    {
+      "path": "components/",
+      "role": "template-components",
+      "notes": "Reusable PHP view/UI components."
+    },
+    {
+      "path": "parts/",
+      "role": "template-parts",
+      "notes": "Template partials."
+    },
+    {
+      "path": "pages/",
+      "role": "template-pages",
+      "notes": "Page templates."
+    },
+    {
+      "path": "pro/",
+      "role": "pro-only",
+      "notes": "PRO-only features and templates."
+    },
+    {
+      "path": "assets/",
+      "role": "compiled-assets",
+      "notes": "Compiled CSS/JS. Do not edit directly."
+    },
+    {
+      "path": "dist/",
+      "role": "compiled-assets",
+      "notes": "Compiled output. Do not edit directly."
+    },
+    {
+      "path": "resources/",
+      "role": "source-assets",
+      "notes": "Source SCSS/JS for compilation."
+    },
+    {
+      "path": "_dev/",
+      "role": "source-assets",
+      "notes": "Source assets for compilation."
+    },
+    {
+      "path": "languages/",
+      "role": "i18n",
+      "notes": "Translation files (.pot, .po, .mo)."
+    },
+    {
+      "path": "packages/",
+      "role": "local-packages",
+      "notes": "Local Composer packages."
+    },
+    {
+      "path": "bin/",
+      "role": "tooling",
+      "notes": "Shell scripts and CLI helpers."
+    },
+    {
+      "path": "tasks/",
+      "role": "tooling",
+      "notes": "Build and project task scripts."
+    },
+    {
+      "path": "config/",
+      "role": "config",
+      "notes": "Build and tooling configuration."
+    },
+    {
       "path": "tests/",
       "role": "tests",
       "notes": "PHPUnit unit and integration tests."
     },
     {
-      "path": "assets/",
-      "role": "built-assets",
-      "notes": "Compiled JS/CSS for production."
-    },
-    {
       "path": "vendor/",
       "role": "third-party",
-      "notes": "Composer dependencies (do not edit)."
+      "notes": "Composer dependencies. Do not edit."
+    },
+    {
+      "path": "node_modules/",
+      "role": "third-party",
+      "notes": "NPM dependencies. Do not edit."
     }
   ],
+
   "tooling": {
     "composer": "composer.json",
     "phpcs": "phpcs.xml",
     "phpstan": "phpstan.neon.dist",
-    "node": "package.json"
+    "node": "package.json",
+    "gulp": "gulpfile.ts",
+    "tailwind": "tailwind.config.js",
+    "webpack": "webpack.config.js",
+    "vite": "vite.config.js",
+    "jest": "jest.config.js",
+    "playwright": "playwright.config.ts"
   },
+
   "notes": [
-    "Prefer minimal diffs and avoid unrelated formatting changes."
+    "Prefer minimal diffs and avoid unrelated formatting changes.",
+    "Do not edit generated output in dist/ or assets/ unless explicitly requested."
   ],
+
   "ai": {
     "_note": "Read by Maestro agents at session start.",
 
@@ -83,7 +182,7 @@
 
     "push_agent": "release-agent",
 
-    "_editions_note": "Signal only — set to [\"free\",\"pro\"] when the plugin has editions. The detailed path mapping lives in the root-level editions block above.",
+    "_editions_note": "Signal only. Set to [\"free\",\"pro\"] when the plugin has editions. The detailed path mapping lives in the root-level editions block above.",
     "editions": null,
 
     "capabilities": [],
