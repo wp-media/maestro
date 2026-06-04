@@ -153,20 +153,64 @@ Return JSON:
 
 ### Agent: structure
 
-**Goal:** understand the project's current Claude setup and directory layout.
+**Goal:** understand the project's current Claude setup, map every directory, and detect all tooling. Include everything that exists — more is better.
 
 Read:
 - `.claude/` directory listing (full tree)
 - `AGENTS.md` if present
 - `.gitignore`
+- Root directory listing
 
-Identify:
-- Existing architecture skill: look for a directory or file matching `*architecture*` in `.claude/skills/` or `.claude/commands/`
-- Existing frontend skill: same search for `*frontend*`
-- Whether `AGENTS.md` is the Maestro base (contains "This is the **Maestro base**") or has been extended
-- Source directories: which of `src/`, `inc/`, `classes/`, `app/` exist
-- Asset directories: which of `assets/`, `_dev/`, `resources/` exist
-- Whether `vendor/` and `tests/` exist
+Run:
+```bash
+# All first-level directories
+find . -maxdepth 1 -type d | sort
+
+# Tooling files
+ls composer.json package.json phpcs.xml phpcs.xml.dist phpstan.neon phpstan.neon.dist \
+   phpstan-baseline.neon gulpfile.ts gulpfile.js gulpfile.mjs \
+   tailwind.config.js tailwind.config.ts \
+   webpack.config.js webpack.config.ts \
+   vite.config.js vite.config.ts \
+   jest.config.js jest.config.ts \
+   playwright.config.ts playwright.config.js \
+   Makefile 2>/dev/null
+
+# Claude skills
+ls .claude/skills/ .claude/commands/ 2>/dev/null
+```
+
+**Areas** — include every directory that exists and is meaningful. For each:
+- `src/` → `namespaced-php`
+- `inc/` → `legacy-php`
+- `inc/Pro/` → `legacy-php-pro` (if exists)
+- `classes/` → `legacy-php`
+- `views/` → `templates`
+- `components/` → `template-components`
+- `parts/` → `template-parts`
+- `pages/` → `template-pages`
+- `pro/` → `pro-only`
+- `assets/` → `compiled-assets`
+- `dist/` → `compiled-assets`
+- `resources/` → `source-assets`
+- `_dev/` → `source-assets`
+- `languages/` → `i18n`
+- `packages/` → `local-packages`
+- `bin/` → `tooling`
+- `tasks/` → `tooling`
+- `config/` → `config`
+- `tests/` → `tests`
+- `vendor/` → `third-party`
+- `node_modules/` → `third-party`
+
+For notes on each area, read a few files to describe what's actually there (e.g. "PSR-4 codebase; subdirs: API, Admin, Backup…"). Be specific — agents use these notes to navigate.
+
+**Tooling** — include every tool file that exists. Do not omit tools just because they're less common.
+
+**Existing Claude skills:**
+- Architecture skill → exact directory name in `.claude/skills/` matching `*architecture*`
+- Frontend skill → exact directory name matching `*frontend*`
+- `agents_md_extended` → `false` if AGENTS.md contains the Maestro placeholder text, `true` if extended
 
 Return JSON:
 ```json
@@ -175,16 +219,25 @@ Return JSON:
   "frontend_skill": "backwpup-frontend-architecture",
   "agents_md_extended": false,
   "areas": [
-    { "path": "src/", "role": "namespaced-php", "notes": "Modern PSR-4 codebase." },
-    { "path": "tests/", "role": "tests", "notes": "PHPUnit unit and integration tests." },
-    { "path": "assets/", "role": "built-assets", "notes": "Compiled JS/CSS for production." },
-    { "path": "vendor/", "role": "third-party", "notes": "Composer dependencies (do not edit)." }
+    { "path": "src/", "role": "namespaced-php", "notes": "PSR-4 codebase; subdirs: API, Admin, Backup, Jobs, License." },
+    { "path": "inc/", "role": "legacy-php", "notes": "Non-namespaced classes, admin pages, job types." },
+    { "path": "inc/Pro/", "role": "legacy-php-pro", "notes": "PRO-only legacy classes." },
+    { "path": "views/", "role": "templates", "notes": "PHP templates for admin and restore UI." },
+    { "path": "components/", "role": "template-components", "notes": "Reusable UI components." },
+    { "path": "assets/", "role": "compiled-assets", "notes": "Compiled CSS/JS. Git-ignored output." },
+    { "path": "resources/", "role": "source-assets", "notes": "SCSS source; subdirs: scss/components, scss/core." },
+    { "path": "languages/", "role": "i18n", "notes": "Translation files." },
+    { "path": "tests/", "role": "tests", "notes": "PHPUnit tests in tests/php/." },
+    { "path": "vendor/", "role": "third-party", "notes": "Composer dependencies. Do not edit." },
+    { "path": "node_modules/", "role": "third-party", "notes": "NPM dependencies. Do not edit." }
   ],
   "tooling": {
     "composer": "composer.json",
     "phpcs": "phpcs.xml",
     "phpstan": "phpstan.neon.dist",
-    "node": "package.json"
+    "node": "package.json",
+    "gulp": "gulpfile.ts",
+    "tailwind": "tailwind.config.js"
   }
 }
 ```
