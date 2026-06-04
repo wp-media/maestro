@@ -191,9 +191,10 @@
     "slack_threads_dir": null,
 
     "e2e": {
+      "_note": "boot_cmd is set by onboard-project to the resolved Maestro bin path. seed_cmd points to the project-specific seed script in .maestro/bin/.",
       "local_url": "http://localhost:8888",
-      "boot_cmd": "bash bin/dev-up.sh",
-      "seed_cmd": null,
+      "boot_cmd": null,
+      "seed_cmd": "bash .maestro/bin/dev-seed.sh",
       "test_cmd": null,
       "settings_path": "/wp-admin/options-general.php?page=<plugin-page>",
       "ci_integration": false

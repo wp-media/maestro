@@ -109,7 +109,7 @@ Path: `{TEMP_ROOT}/changelog/changelog-next-version-po-YYYY-MM-DD.md`
 
 If the file already exists, append `-v2`, `-v3`, etc.
 
-```markdown
+````markdown
 ## Proposed Changelog for Next Release (PO Draft)
 
 Target version: X.Y.Z (to confirm)
@@ -144,6 +144,7 @@ Period covered: changes merged after <baseline-label> (<baseline-date>)
 
 ## changelog.txt Draft
 
+```
 = X.Y.Z =
 Release date: [Month D, YYYY — today's date]
 
@@ -151,6 +152,7 @@ Release date: [Month D, YYYY — today's date]
 * Enhancement: [one concise sentence]
 * Fix: [one concise sentence]
 ```
+````
 
 Rules for the `changelog.txt Draft` block:
 - Include **only** New features, Improvements, and User-facing fixes — omit all Engineering/Chore entries entirely

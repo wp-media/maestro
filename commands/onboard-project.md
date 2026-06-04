@@ -333,7 +333,98 @@ Add `.claude/graph/` to `.gitignore` if not already there.
 
 ---
 
-## Step 8 — Remaining setup
+## Step 8 — Scaffold dev scripts
+
+### 8a — Resolve Maestro bin path and set boot_cmd
+
+```bash
+find ~/.claude/plugins/cache/maestro -name "dev-up.sh" 2>/dev/null | sort -V | tail -1
+```
+
+Extract the directory from that path — this is `MAESTRO_BIN`.
+
+Update `ai.e2e.boot_cmd` in `.claude/maestro.json` to `"bash $MAESTRO_BIN/dev-up.sh"` (with the resolved absolute path).
+
+`dev-up.sh` and `dev-down.sh` live in Maestro — nothing to create in the project.
+
+---
+
+### 8b — Scaffold `.maestro/bin/dev-seed.sh`
+
+Check if it already exists:
+
+```bash
+ls .maestro/bin/dev-seed.sh 2>/dev/null
+```
+
+If it exists, skip to 8c.
+
+If not: use the `devops` agent findings from Step 3 and read the PHP source to infer what seeding this plugin needs. Look for:
+
+```bash
+grep -rh "get_option\|update_option" --include="*.php" . 2>/dev/null | grep -i "license\|key\|activation" | grep -v vendor | head -20
+find . -path "*/tests/e2e*" -o -path "*/tests/E2E*" 2>/dev/null | grep -vE "vendor|node_modules" | head -10
+```
+
+Determine with confidence:
+- Does the plugin store a license key in a WordPress option? If yes: option name + key field.
+- What env var should hold the test key? (convention: `PLUGIN_SLUG_UPPER_TESTS_LICENSE_KEY`)
+- Any plugin-specific state to seed (jobs, settings, cache flush, etc.)?
+
+If confidence is low on any point, ask before generating:
+> "For E2E seeding: does this plugin have a license key stored in a WordPress option? If yes — option name and field. Anything else that needs seeding (e.g. create a job, flush cache, configure settings)?"
+
+Wait for the answer, then generate `.maestro/bin/dev-seed.sh` using this structure as a base, filled with the plugin-specific values:
+
+```bash
+#!/usr/bin/env bash
+# Seed the wp-env environment with test data for E2E tests.
+# Idempotent — safe to run multiple times.
+set -euo pipefail
+
+WP="npx @wordpress/env run cli wp"
+
+echo "Seeding test data..."
+
+# Set license key if provided via env var.
+if [[ -n "${<LICENSE_KEY_ENV>:-}" ]]; then
+  $WP eval "
+    \$options = get_option( '<option_name>', [] );
+    \$options['<key_field>'] = '${<LICENSE_KEY_ENV>}';
+    update_option( '<option_name>', \$options );
+  "
+  echo "  License key set."
+fi
+
+# <plugin-specific seeding>
+
+echo "Done seeding."
+```
+
+Update `ai.e2e.seed_cmd` in `.claude/maestro.json` to `"bash .maestro/bin/dev-seed.sh"`.
+
+---
+
+### 8c — Update .gitignore
+
+Check the current `.gitignore`:
+
+```bash
+grep -n "\.maestro" .gitignore 2>/dev/null
+```
+
+If `.maestro/` appears as a whole-directory ignore, replace it with:
+
+```
+.maestro/*
+!.maestro/bin/
+```
+
+This keeps all generated working files gitignored while committing the seed script.
+
+---
+
+## Step 9 — Remaining setup
 
 Report what still needs to be done:
 
