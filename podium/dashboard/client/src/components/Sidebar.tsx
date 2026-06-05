@@ -395,7 +395,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
                 <span className="font-medium">{wsConnected ? "Live" : "Disconnected"}</span>
               )}
             </span>
-            {!collapsed && <span className="text-[11px] font-medium text-gray-600">v1.0.0</span>}
+            {!collapsed && <span className="text-[11px] font-medium text-gray-600">v{__APP_VERSION__}</span>}
           </div>
         </button>
         {!collapsed && (
