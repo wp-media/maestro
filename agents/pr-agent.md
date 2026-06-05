@@ -59,60 +59,24 @@ Focus on `src/`, `inc/`, `tests/`. Understand:
 
 ### Step 4 — Load the PR template
 
+Try the project-specific template first, then fall back to the Maestro-bundled one:
+
 ```bash
-test -f .github/refs/pr-template.md && cat .github/refs/pr-template.md
+if [ -f .github/refs/pr-template.md ]; then
+  cat .github/refs/pr-template.md
+elif [ -f .claude/commands/issue-workflow/refs/pr-template.md ]; then
+  cat .claude/commands/issue-workflow/refs/pr-template.md
+fi
 ```
 
-If the template exists, follow its structure exactly. Otherwise use the default structure in Step 5.
+Follow the loaded template's structure exactly.
 
 ### Step 5 — Generate the PR description
 
-Fill all sections. Do not leave placeholders.
+Fill all sections of the template. Do not leave placeholders.
 
 **Title:** `Closes #<N>: <short descriptive title>`
 Never use conventional-commit prefix format in the PR title (`fix:`, `feat:` are for commits only).
-
-**Mandatory structure (adapt to project template if one was found):**
-
-```markdown
-Closes #<N>
-
-## Description
-
-<1–2 sentence summary of user or developer impact>
-
-## What was done
-
-<Summary of the implementation>
-
-## How to test
-
-<Step-by-step instructions for a reviewer to verify the change>
-
-## Type of change
-
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Enhancement
-- [ ] Breaking change
-- [ ] Chore
-
-## Affected features & QA scope
-
-<List of areas touched>
-
-## Technical description
-
-<How the code works — not what it does>
-
-## New dependencies
-
-<List or "None">
-
-## Risks
-
-<Performance, security, compatibility concerns — or "None identified">
-```
 
 Scale detail to complexity:
 - ≤ 2 files, trivial change → one or two sentences per section
