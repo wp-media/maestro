@@ -29,6 +29,39 @@ Maestro is a **Claude Code plugin** — a single source of truth for the AI deli
 
 Every engineer installs it once. Every project tunes it through a single committed config file. When Maestro ships a new release, everyone picks it up automatically.
 
+---
+
+## Podium — Agent Observer Dashboard
+
+Maestro ships with **Podium**, a real-time observability dashboard for every Claude Code session. It captures every tool call, agent spawn, and session event through native Claude Code hooks — **zero token cost, zero orchestrator changes**.
+
+![Podium Dashboard](docs/images/podium-dashboard.png)
+
+### What it shows
+
+- **Live agent activity** — every session across all your projects, with readable names from the first user prompt
+- **Real-time tool feed** — every Bash, Read, Write, Agent call streaming as it happens
+- **Session analytics** — token usage by model, tool frequency, concurrency, cost tracking
+- **Conversation view** — reads Claude Code JSONL transcripts directly, shows your full chat history
+- **Agent hierarchy** — subagent spawns, effectiveness rates, parallel execution tracking
+
+### Quick start
+
+```bash
+# Install hooks once per project (restart Claude Code after)
+/podium setup
+
+# Start the dashboard
+/podium start
+# → http://localhost:4820
+```
+
+The dashboard auto-imports all your existing Claude Code sessions on first launch.
+
+### Why not the HTML log?
+
+The previous `workflow-log.html` wrote HTML after every agent step, consuming tokens each time. Podium captures everything at the harness level — hooks fire outside the LLM turn. Set `"html_log": false` in your `maestro.json` (the default) to skip HTML log writes entirely.
+
 ```
 Without Maestro                    With Maestro
 ─────────────────────              ──────────────────────────────
@@ -135,6 +168,8 @@ maestro/
 │   ├── orchestrator.md
 │   ├── orchestrator/
 │   │   └── html-log-format.md
+│   ├── podium.md                            ← /podium start|stop|setup|status…
+│   ├── onboard-project.md                  ← /maestro:onboard-project
 │   ├── dod.md
 │   ├── docs.md
 │   ├── e2e.md
@@ -143,12 +178,19 @@ maestro/
 │   │   ├── refs/pr-template.md
 │   │   └── scripts/
 │   ├── knowledge-graph.md
-│   ├── onboard-project.md
 │   ├── po-changelog.md
 │   ├── pr.md
 │   ├── sprint-planner.md
 │   ├── test.md
 │   └── wordpress-compliance.md
+│
+├── podium/                                  ← Podium agent observer dashboard
+│   ├── dashboard/                           ← React app (WP Media branded)
+│   │   ├── client/                          ← Vite + React + Tailwind frontend
+│   │   ├── server/                          ← Express + SQLite + WebSocket backend
+│   │   └── scripts/                         ← Hook handler, install script
+│   ├── hook.mjs                             ← Zero-token Claude Code hook
+│   └── install.mjs                          ← Hook registration helper
 │
 └── specs/phpcs/                             ← Recurring PHPCS fix patterns
     ├── escaped-output.md
@@ -165,10 +207,16 @@ maestro/
 Open the project in Claude and run:
 
 ```
-/onboard-project
+/maestro:onboard-project
 ```
 
-Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you.
+Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you and installs the Podium hooks.
+
+Then start the dashboard:
+
+```
+/podium start
+```
 
 ### 2. Write your architecture skill
 
@@ -272,7 +320,9 @@ Agents read `.claude/maestro.json` at session start. Nothing is hardcoded.
 
 | Command | When to use |
 |---|---|
-| `/onboard-project` | **Start here for new projects.** Creates `.claude/maestro.json` and scaffolds dev scripts |
+| `/maestro:onboard-project` | **Start here for new projects.** Creates `.claude/maestro.json`, installs Podium hooks |
+| `/podium setup` | Register Claude Code hooks for Podium (once per project) |
+| `/podium start` | Open the Podium dashboard at http://localhost:4820 |
 | `/issue-workflow` | Start the delivery pipeline from a GitHub issue number |
 | `/orchestrator` | Jump straight into routing if the issue is already loaded |
 | `/dod` | Run the Definition of Done checklist on the current branch |
