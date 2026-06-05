@@ -166,7 +166,6 @@ maestro/
 │   ├── orchestrator.md
 │   ├── orchestrator/
 │   │   └── html-log-format.md
-│   ├── podium.md                            ← /podium start|stop|setup|status…
 │   ├── onboard-project.md                  ← /maestro:onboard-project
 │   ├── dod.md
 │   ├── docs.md
@@ -181,14 +180,6 @@ maestro/
 │   ├── sprint-planner.md
 │   ├── test.md
 │   └── wordpress-compliance.md
-│
-├── podium/                                  ← Podium agent observer dashboard
-│   ├── dashboard/                           ← React app (WP Media branded)
-│   │   ├── client/                          ← Vite + React + Tailwind frontend
-│   │   ├── server/                          ← Express + SQLite + WebSocket backend
-│   │   └── scripts/                         ← Hook handler, install script
-│   ├── hook.mjs                             ← Zero-token Claude Code hook
-│   └── install.mjs                          ← Hook registration helper
 │
 └── specs/phpcs/                             ← Recurring PHPCS fix patterns
     ├── escaped-output.md
@@ -208,11 +199,12 @@ Open the project in Claude and run:
 /maestro:onboard-project
 ```
 
-Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you and installs the Podium hooks.
+Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you.
 
-Then start the dashboard:
+Optionally install the dashboard:
 
 ```
+/plugin install podium@wp-media
 /podium start
 ```
 

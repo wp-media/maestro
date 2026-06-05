@@ -2,33 +2,26 @@
 name: onboard-project
 description: >
   One-command Maestro setup for a new WordPress plugin project. Run this in the
-  project root to generate maestro.json, create the temp directory structure,
-  and install Podium hooks. Invoke with /maestro:onboard-project.
+  project root to generate maestro.json and create the temp directory structure.
+  Invoke with /maestro:onboard-project.
 ---
 
 # Onboard Project
 
 Wires a WordPress plugin project into the Maestro ecosystem in one pass: writes
-`.claude/maestro.json`, scaffolds the `.maestro/` working directory, installs the
-Podium hooks, and prints the next steps. After this skill runs, the project is
-ready for every Maestro agent and workflow.
+`.claude/maestro.json`, scaffolds the `.maestro/` working directory, and prints
+the next steps. After this skill runs, the project is ready for every Maestro
+agent and workflow. Podium (the optional dashboard) can be installed separately.
 
 Run from the **project root** (the plugin repo), not from inside Maestro.
 
 ---
 
-## Resolve the Maestro plugin root
+## Note: Podium is now optional (Step 5 update)
 
-This skill lives at `{maestro_plugin_root}/commands/onboard-project.md`. The
-plugin root is one level up from `commands/`. Locate the installer script — it
-is the source of truth for the plugin root:
-
-```bash
-find ~/.claude/plugins/cache/maestro ~/.claude/plugins/maestro -name "install-hooks.js" -path "*podium*" 2>/dev/null | sort -V | tail -1
-```
-
-Take the matched path and strip `/podium/dashboard/scripts/install-hooks.js`
-from the end — that prefix is `{maestro_plugin_root}`. Hold it for Step 5.
+In earlier versions, Podium hooks were installed as part of onboarding. Podium
+is now a **separate plugin** (see Installation section). Step 5 has been
+simplified.
 
 ---
 
@@ -149,20 +142,19 @@ If the user chose a non-default `temp_root`, substitute it in both paths.
 
 ---
 
-## Step 5 — Install Podium hooks
+## Step 5 — Podium (Optional)
 
-Run the hook installer from the resolved Maestro plugin root:
+Podium is a separate plugin. If the user wants the agent observer dashboard,
+they can install it after Maestro is set up:
 
 ```bash
-node {maestro_plugin_root}/podium/dashboard/scripts/install-hooks.js
+/plugin marketplace add wp-media/claude-marketplace
+/plugin install podium@wp-media
+/podium setup
 ```
 
-This registers the Podium hooks in your Claude Code settings. The hooks
-forward agent-spawn events to Podium at zero token cost. **They take effect
-only after Claude Code restarts.**
-
-If the command fails (script not found), tell the user the Maestro plugin root
-couldn't be resolved and point them at `/podium setup` as a fallback.
+This is optional — Maestro works fine without Podium. Mention it in Step 7
+as a suggested next step, but do not install it automatically.
 
 ---
 
@@ -193,11 +185,12 @@ Print exactly this (substituting the real display name):
 ✓ Maestro configured for {display_name}
   Config: .claude/maestro.json
   Temp:   .maestro/
-  Hooks:  ✓ installed (restart Claude Code to activate)
 
 Next steps:
-  /podium start          → open the Podium dashboard
   /orchestrator issue-N  → run the full delivery pipeline
+
+Optional:
+  /plugin install podium@wp-media  → install the agent observer dashboard
 ```
 
 If the architecture skill (`{slug}-architecture`) doesn't exist yet, add one
