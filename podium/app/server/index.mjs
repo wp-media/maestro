@@ -190,6 +190,7 @@ function deriveSummary(events, sessionId) {
       event_count: 0,
       turn_count: 0,
       agents: [],
+      first_prompt: null,
       first_label: null,
     }
   }
@@ -228,6 +229,13 @@ function deriveSummary(events, sessionId) {
   }
   const agents = Array.from(agentSet)
 
+  // First prompt: the user's actual message from the first turn_start event.
+  const firstTurnEvent = events.find((e) => e?.type === 'turn_start')
+  const firstPromptRaw = firstTurnEvent?.prompt_preview ?? firstTurnEvent?.prompt ?? null
+  const firstPrompt = typeof firstPromptRaw === 'string' && firstPromptRaw.trim().length > 0
+    ? firstPromptRaw.trim()
+    : null
+
   // First label: tool_start events belonging to the first turn (before the second
   // turn_start, if any).
   const firstTurnIdx = events.findIndex((e) => e?.type === 'turn_start')
@@ -255,6 +263,7 @@ function deriveSummary(events, sessionId) {
     event_count: events.length,
     turn_count: turnCount,
     agents,
+    first_prompt: firstPrompt,
     first_label: firstLabel,
   }
 }

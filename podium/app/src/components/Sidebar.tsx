@@ -61,8 +61,17 @@ interface SessionRowProps {
 function SessionRow({ session, selected, onSelect }: SessionRowProps) {
   const shortId = session.session_id.slice(-8)
   const dir = basename(session.cwd)
-  const statusLabel =
-    session.status === 'running' ? 'running' : session.status === 'success' ? 'done' : 'failed'
+  const dur = formatDuration(session.total_duration_ms)
+
+  // Title: prefer the user's actual prompt, fall back to first_label
+  const title = session.first_prompt ?? session.first_label ?? null
+
+  // Meta line: dir · time
+  const ts = session.started_at
+  const time = ts
+    ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : null
+  const meta = [dir, time].filter(Boolean).join(' · ')
 
   return (
     <button
@@ -70,6 +79,7 @@ function SessionRow({ session, selected, onSelect }: SessionRowProps) {
       onClick={onSelect}
       className="podium-session-row"
       data-selected={selected || undefined}
+      title={session.first_prompt ?? undefined}
       style={{
         display: 'block',
         width: '100%',
@@ -79,67 +89,55 @@ function SessionRow({ session, selected, onSelect }: SessionRowProps) {
         background: selected ? 'var(--surface-3)' : 'transparent',
         border: 'none',
         borderLeft: `2px solid ${selected ? 'var(--brand)' : 'transparent'}`,
-        padding: '8px 12px 8px 10px',
+        padding: '9px 12px 8px 10px',
         color: 'inherit',
         font: 'inherit',
+        transition: 'background .12s ease',
       }}
     >
-      {/* Row 1: id + status */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-        <StatusDot status={session.status} />
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 600,
-            color: 'var(--text)',
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-          }}
-        >
-          {shortId}
-        </span>
-        <span style={{ flex: 1 }} />
-        <span style={{ fontSize: 10, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          {statusLabel}
-        </span>
-      </div>
-
-      {/* Row 2: first label + duration */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 3 }}>
+      {/* Row 1: status dot + title + duration */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+        <div style={{ paddingTop: 2, flexShrink: 0 }}>
+          <StatusDot status={session.status} />
+        </div>
         <span
           style={{
             flex: 1,
             minWidth: 0,
-            fontSize: 11,
-            fontStyle: 'italic',
-            color: 'var(--text-muted)',
+            fontSize: 12,
+            fontWeight: 600,
+            lineHeight: 1.35,
+            color: 'var(--text)',
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
           }}
         >
-          {session.first_label || 'No activity yet'}
+          {title ?? (
+            <span style={{ color: 'var(--text-dim)', fontWeight: 400, fontStyle: 'italic' }}>
+              No prompt captured
+            </span>
+          )}
         </span>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', flex: '0 0 auto' }}>
-          {formatDuration(session.total_duration_ms)}
-        </span>
+        {dur !== '—' && (
+          <span style={{ fontSize: 10, color: 'var(--text-dim)', flexShrink: 0, paddingTop: 2 }}>
+            {dur}
+          </span>
+        )}
       </div>
 
-      {/* Row 3: cwd basename */}
-      {dir && (
-        <div
-          title={session.cwd ?? undefined}
-          style={{
-            marginTop: 2,
-            fontSize: 10,
-            color: 'var(--text-dim)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {dir}
-        </div>
-      )}
+      {/* Row 2: meta (dir · time) + tiny ID */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, paddingLeft: 16 }}>
+        {meta && (
+          <span style={{ fontSize: 10, color: 'var(--text-dim)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {meta}
+          </span>
+        )}
+        <span style={{ fontSize: 9, color: 'var(--text-dim)', opacity: 0.5, fontFamily: 'ui-monospace, monospace', flexShrink: 0 }}>
+          {shortId}
+        </span>
+      </div>
     </button>
   )
 }

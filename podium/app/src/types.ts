@@ -79,7 +79,8 @@ export interface SessionSummary {
   event_count: number
   turn_count: number
   agents: string[]
-  first_label: string | null
+  first_prompt: string | null   // user's actual message (from UserPromptSubmit)
+  first_label: string | null    // auto-generated label from tool calls
 }
 
 // ── React Flow node data types ────────────────────────────────────────────────
