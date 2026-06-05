@@ -196,13 +196,13 @@ export function Sessions() {
                   {t("common:live")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                   {t("common:offline")}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-700 dark:text-gray-500">
               {t("sessionCount", { count: total })}
               {filter ? ` ${filter}` : ""}
             </p>
@@ -217,7 +217,7 @@ export function Sessions() {
       <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 mb-6 bg-surface-2/40 p-2 rounded-xl border border-border w-full">
         {/* Search */}
         <div className="relative flex-1 min-w-[180px] max-w-[340px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 dark:text-gray-500" />
           <input
             type="text"
             placeholder={t("searchPlaceholder")}
@@ -241,7 +241,7 @@ export function Sessions() {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-700 dark:text-gray-500 pointer-events-none" />
         </div>
 
         {/* Sort Controls */}
@@ -258,12 +258,12 @@ export function Sessions() {
               </option>
               <option value="price">Sort by Price ({sortDesc ? "Highest" : "Lowest"})</option>
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-500 pointer-events-none" />
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 dark:text-gray-500 pointer-events-none" />
           </div>
           <div className="w-px h-4 bg-border mx-1" />
           <button
             onClick={() => setSortDesc(!sortDesc)}
-            className="p-1.5 rounded hover:bg-surface-3 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors shrink-0"
+            className="p-1.5 rounded hover:bg-surface-3 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors shrink-0"
             title={sortDesc ? "Descending" : "Ascending"}
           >
             {sortDesc ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />}
@@ -279,7 +279,7 @@ export function Sessions() {
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === opt.value
                   ? "bg-surface-4 text-gray-800 dark:text-gray-200"
-                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {opt.label}
@@ -300,25 +300,25 @@ export function Sessions() {
             <table className="w-full min-w-[800px]">
               <thead>
                 <tr className="border-b border-border text-left">
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableSession")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableStatus")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableLastActive")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableDuration")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableAgents")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableCost")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("tableDirectory")}
                   </th>
                   <th className="w-10"></th>
@@ -366,22 +366,22 @@ export function Sessions() {
                     <td className="px-5 py-4">
                       <SessionStatusBadge status={effectiveSessionStatus(session)} />
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-400">
+                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {formatDateTime(session.last_activity || session.started_at)}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-400 font-mono">
+                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 font-mono">
                       {session.ended_at
                         ? formatDuration(session.started_at, session.ended_at)
                         : t("common:running")}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-400">
+                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {session.agent_count ?? "-"}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-400 font-mono">
+                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 font-mono">
                       {session.cost != null && session.cost > 0 ? fmtCost(session.cost) : "-"}
                     </td>
                     <td
-                      className="px-5 py-4 text-[11px] text-gray-500 font-mono"
+                      className="px-5 py-4 text-[11px] text-gray-700 dark:text-gray-500 font-mono"
                       title={session.cwd || undefined}
                     >
                       {session.cwd ? truncate(session.cwd, 30) : "-"}
@@ -396,7 +396,7 @@ export function Sessions() {
           </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-700 dark:text-gray-500">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
@@ -407,17 +407,17 @@ export function Sessions() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {t("common:pagination.previous")}
                 </button>
-                <span className="px-3 py-1.5 text-xs text-gray-500">
+                <span className="px-3 py-1.5 text-xs text-gray-700 dark:text-gray-500">
                   {page + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {t("common:pagination.next")}
                 </button>

@@ -152,7 +152,7 @@ function StatBox({ label, value, accent = "text-accent" }: StatBoxProps) {
   return (
     <div className="flex flex-col gap-1 bg-surface-3 border border-border rounded-xl px-5 py-4 flex-1 min-w-0">
       <span className={`text-2xl font-semibold tabular-nums ${accent}`}>{value}</span>
-      <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+      <span className="text-xs font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider">{label}</span>
     </div>
   );
 }
@@ -181,7 +181,7 @@ export function CompactionImpact({ data }: CompactionImpactProps) {
 
   if (!hasData) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-700 dark:text-gray-500">
         <svg
           width="40"
           height="40"
@@ -219,7 +219,7 @@ export function CompactionImpact({ data }: CompactionImpactProps) {
 
       {/* Bar chart */}
       <div className="w-full overflow-hidden">
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+        <p className="text-xs font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2">
           {t("compaction.distribution")}
         </p>
         <svg
@@ -232,7 +232,7 @@ export function CompactionImpact({ data }: CompactionImpactProps) {
       </div>
 
       {/* Summary line */}
-      <p className="text-xs text-gray-500">{t("compaction.hadCompactions", { pct: sessionPct })}</p>
+      <p className="text-xs text-gray-700 dark:text-gray-500">{t("compaction.hadCompactions", { pct: sessionPct })}</p>
     </div>
   );
 }

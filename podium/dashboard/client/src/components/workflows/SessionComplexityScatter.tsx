@@ -77,7 +77,7 @@ function Tooltip({ state }: { state: TooltipState }) {
       <p className="font-semibold text-gray-100 mb-1 truncate max-w-[180px]">
         {state.item.name ?? state.item.id.slice(0, 12)}
       </p>
-      <div className="flex flex-col gap-0.5 text-gray-400">
+      <div className="flex flex-col gap-0.5 text-gray-600 dark:text-gray-400">
         <span>
           {t("complexity.tooltip.duration")} {formatDurationSec(state.item.duration)}
         </span>
@@ -119,7 +119,7 @@ function Legend() {
             className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ backgroundColor: statusColor(s) }}
           />
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-700 dark:text-gray-500">
             {t(`common:status.${s}`, { defaultValue: s })}
           </span>
         </div>
@@ -147,7 +147,7 @@ function EmptyState() {
           <circle cx="14" cy="17" r="4" />
         </svg>
       </div>
-      <p className="text-sm font-medium text-gray-400">{t("complexity.noData")}</p>
+      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("complexity.noData")}</p>
       <p className="text-xs text-gray-600 mt-1">{t("complexity.noDataDesc")}</p>
     </div>
   );

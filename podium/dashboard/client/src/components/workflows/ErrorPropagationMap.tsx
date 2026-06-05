@@ -84,7 +84,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
               totalSessions: data.totalSessions,
             })}
           </p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-gray-700 dark:text-gray-500 mt-0.5">
             {totalErrors > 0
               ? `${totalErrors}${t("errorPropagation.agentErrors")}`
               : t("errorPropagation.sessionErrorsOnly")}
@@ -95,7 +95,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
       {/* Errors by depth — horizontal bars */}
       {hasDepthData && (
         <div>
-          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-2.5">
+          <p className="text-[10px] font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2.5">
             {t("errorPropagation.errorsByDepth")}
           </p>
           <div className="flex flex-col gap-1.5">
@@ -112,7 +112,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
                     onMouseEnter={() => setHoveredDepth(d.depth)}
                     onMouseLeave={() => setHoveredDepth(null)}
                   >
-                    <span className="text-[11px] text-gray-500 w-24 flex-shrink-0 text-right truncate">
+                    <span className="text-[11px] text-gray-700 dark:text-gray-500 w-24 flex-shrink-0 text-right truncate">
                       {depthLabel(d.depth)}
                     </span>
                     <div className="flex-1 h-5 bg-surface-3 rounded overflow-hidden relative">
@@ -141,7 +141,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
       {/* Error-prone agent types */}
       {topTypes.length > 0 && (
         <div>
-          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-2.5">
+          <p className="text-[10px] font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2.5">
             {t("errorPropagation.errorProneTypes")}
           </p>
           <div className="flex flex-col gap-1">
@@ -179,7 +179,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
       {/* API & session errors */}
       {data.eventErrors && data.eventErrors.length > 0 && (
         <div>
-          <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider mb-2.5">
+          <p className="text-[10px] font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider mb-2.5">
             {t("errorPropagation.apiSessionErrors")}
           </p>
           <div className="flex flex-col gap-1">

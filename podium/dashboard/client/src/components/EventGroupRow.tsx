@@ -88,7 +88,7 @@ export function EventGroupRow({
           aria-label={expanded ? "Collapse group" : "Expand group"}
           disabled={!canExpand}
           className={`p-1 rounded flex-shrink-0 -mr-3 ${
-            canExpand ? "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer" : "text-transparent"
+            canExpand ? "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer" : "text-transparent"
           }`}
         >
           <ChevronRight
@@ -101,7 +101,7 @@ export function EventGroupRow({
           onClick={() => (onRowActivate ? onRowActivate() : canExpand && setExpanded((v) => !v))}
         >
           <div className="w-16 flex-shrink-0 text-right font-mono leading-tight">
-            <div className="text-[11px] text-gray-500">{formatTime(group.firstAt)}</div>
+            <div className="text-[11px] text-gray-700 dark:text-gray-500">{formatTime(group.firstAt)}</div>
             <div className="text-[9px] text-gray-600">{formatDateShort(group.firstAt)}</div>
           </div>
 
@@ -129,7 +129,7 @@ export function EventGroupRow({
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
                   {origin && (
-                    <span className="text-gray-500 mr-1" title={`${sid ?? ""} · ${agentId ?? ""}`}>
+                    <span className="text-gray-700 dark:text-gray-500 mr-1" title={`${sid ?? ""} · ${agentId ?? ""}`}>
                       {origin} ·
                     </span>
                   )}
@@ -140,13 +140,13 @@ export function EventGroupRow({
           })()}
 
           {group.tool_name && (
-            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-500 font-mono flex-shrink-0">
+            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
               {group.tool_name}
             </span>
           )}
 
           {duration && (
-            <span className="text-[11px] text-gray-500 font-mono flex-shrink-0">{duration}</span>
+            <span className="text-[11px] text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">{duration}</span>
           )}
 
           <span className="text-[11px] text-gray-600 flex-shrink-0 w-16 text-right">
@@ -159,7 +159,7 @@ export function EventGroupRow({
             to={`/sessions/${group.events[0].session_id}`}
             onClick={(e) => e.stopPropagation()}
             title={ta("viewSession")}
-            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
+            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
           >
             {ta("viewSession")}
             <ExternalLink className="w-3 h-3" />
@@ -192,7 +192,7 @@ export function EventGroupRow({
                   className="w-full text-left px-5 py-2 flex items-center gap-4 min-w-0 hover:bg-surface-3/60 transition-colors cursor-pointer"
                 >
                   <span
-                    className={`text-gray-500 text-[10px] w-3 flex-shrink-0 transition-transform ${innerOpen ? "rotate-90" : ""}`}
+                    className={`text-gray-700 dark:text-gray-500 text-[10px] w-3 flex-shrink-0 transition-transform ${innerOpen ? "rotate-90" : ""}`}
                     aria-hidden="true"
                   >
                     ▶
@@ -204,10 +204,10 @@ export function EventGroupRow({
                     </div>
                   </div>
                   <AgentStatusBadge status={statusFromEventType(event.event_type)} />
-                  <span className="text-[11px] text-gray-500 font-mono flex-shrink-0">
+                  <span className="text-[11px] text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
                     {event.event_type}
                   </span>
-                  <span className="text-[11px] text-gray-400 flex-1 truncate">
+                  <span className="text-[11px] text-gray-600 dark:text-gray-400 flex-1 truncate">
                     {buildEventTitle(event)}
                   </span>
                 </button>

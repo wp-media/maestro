@@ -213,22 +213,22 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Server className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Runtime</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Runtime</span>
             </div>
-            <span className="text-[10px] font-mono text-gray-500">
+            <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">
               {info.server.cpus} cores · {info.server.arch}
             </span>
           </div>
 
           <div className="space-y-2.5">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 w-28 flex-shrink-0">Uptime</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 w-28 flex-shrink-0">Uptime</span>
               <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
                 {formatUptime(info.server.uptime)}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 w-28 flex-shrink-0">CPU (1/5/15m)</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 w-28 flex-shrink-0">CPU (1/5/15m)</span>
               <div className="flex gap-1 ml-auto">
                 {(info.server.cpu_load || []).slice(0, 3).map((load, i) => (
                   <span
@@ -241,7 +241,7 @@ function SystemHealthTab() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 w-28 flex-shrink-0">Node RSS</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 w-28 flex-shrink-0">Node RSS</span>
               <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
                 {formatBytes(info.server.memory.rss)}
               </span>
@@ -255,8 +255,8 @@ function SystemHealthTab() {
             >
               <div className="space-y-1">
                 <div className="flex justify-between text-[10px]">
-                  <span className="text-gray-500">Host Memory</span>
-                  <span className="text-gray-400 font-mono">{memUsedPct.toFixed(0)}%</span>
+                  <span className="text-gray-700 dark:text-gray-500">Host Memory</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-mono">{memUsedPct.toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-surface-3 rounded-full h-2">
                   <div
@@ -272,8 +272,8 @@ function SystemHealthTab() {
             >
               <div className="space-y-1">
                 <div className="flex justify-between text-[10px]">
-                  <span className="text-gray-500">V8 Heap</span>
-                  <span className="text-gray-400 font-mono">{heapUsedPct.toFixed(0)}%</span>
+                  <span className="text-gray-700 dark:text-gray-500">V8 Heap</span>
+                  <span className="text-gray-600 dark:text-gray-400 font-mono">{heapUsedPct.toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-surface-3 rounded-full h-2">
                   <div
@@ -291,7 +291,7 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Database className="w-4 h-4 text-blue-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Storage</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Storage</span>
             </div>
             <Tip
               raw={`Write velocity (events):\n5 min: ${info.db.load_stats?.m5 ?? 0}\n15 min: ${info.db.load_stats?.m15 ?? 0}\n1 hr: ${info.db.load_stats?.h1 ?? 0}`}
@@ -304,7 +304,7 @@ function SystemHealthTab() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 w-28 flex-shrink-0">Database</span>
+            <span className="text-xs text-gray-600 dark:text-gray-400 w-28 flex-shrink-0">Database</span>
             <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
               {formatBytes(info.db.size)} · {info.db.pragmas?.journal_mode?.toUpperCase() || "WAL"}
             </span>
@@ -409,8 +409,8 @@ function SystemHealthTab() {
                       className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
                       style={{ backgroundColor: item.color }}
                     />
-                    <span className="text-gray-400">{item.label}</span>
-                    <span className="text-gray-500 ml-auto pl-3 font-mono">
+                    <span className="text-gray-600 dark:text-gray-400">{item.label}</span>
+                    <span className="text-gray-700 dark:text-gray-500 ml-auto pl-3 font-mono">
                       {Math.round(item.pct)}%
                     </span>
                   </div>
@@ -425,12 +425,12 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Health Score</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Health Score</span>
             </div>
             <Tip
               raw={`Composite Index formula:\n0.4 × Success Rate (${successRate.toFixed(1)}%)\n+ 0.25 × Cache Hit (${cacheHitRate.toFixed(1)}%)\n+ 0.25 × (100 − Error Rate) (${(100 - errorRate).toFixed(1)}%)\n+ 0.10 × (100 − Heap%) (${(100 - heapUsedPct).toFixed(1)}%)\n= ${healthScore.toFixed(1)}`}
             >
-              <span className="text-[10px] text-gray-500 cursor-help border-b border-dashed border-gray-700">
+              <span className="text-[10px] text-gray-700 dark:text-gray-500 cursor-help border-b border-dashed border-gray-700">
                 ⓘ Formula
               </span>
             </Tip>
@@ -541,9 +541,9 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bot className="w-4 h-4 text-blue-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Token Usage</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Token Usage</span>
             </div>
-            <span className="text-[10px] font-mono text-gray-500">
+            <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">
               {(totalTokens / 1000).toFixed(1)}K total
             </span>
           </div>
@@ -568,7 +568,7 @@ function SystemHealthTab() {
                 >
                   <div className="flex items-center gap-3 cursor-default">
                     <span
-                      className="text-xs text-gray-400 w-28 truncate flex-shrink-0"
+                      className="text-xs text-gray-600 dark:text-gray-400 w-28 truncate flex-shrink-0"
                       title={formatModelName(m.model) ?? m.model}
                     >
                       {formatModelName(m.model) ?? m.model}
@@ -579,7 +579,7 @@ function SystemHealthTab() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500 w-12 text-right flex-shrink-0 font-mono">
+                    <span className="text-xs text-gray-700 dark:text-gray-500 w-12 text-right flex-shrink-0 font-mono">
                       {pct.toFixed(1)}%
                     </span>
                   </div>
@@ -597,9 +597,9 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <BarChart3 className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Concurrency</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Concurrency</span>
             </div>
-            <span className="text-[10px] font-mono text-gray-500">{lanes.length} intervals</span>
+            <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">{lanes.length} intervals</span>
           </div>
 
           {/* Sparkline-style bar chart matching Analytics sparkline */}
@@ -678,9 +678,9 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Zap className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Tool Usage</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Tool Usage</span>
             </div>
-            <span className="text-[10px] font-mono text-gray-500">top {topTools.length}</span>
+            <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">top {topTools.length}</span>
           </div>
 
           <div className="space-y-2">
@@ -704,7 +704,7 @@ function SystemHealthTab() {
                 >
                   <div className="flex items-center gap-3 cursor-default">
                     <span
-                      className="text-xs text-gray-400 w-28 truncate flex-shrink-0"
+                      className="text-xs text-gray-600 dark:text-gray-400 w-28 truncate flex-shrink-0"
                       title={tool.tool_name}
                     >
                       {tool.tool_name}
@@ -715,7 +715,7 @@ function SystemHealthTab() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500 w-10 text-right flex-shrink-0 font-mono">
+                    <span className="text-xs text-gray-700 dark:text-gray-500 w-10 text-right flex-shrink-0 font-mono">
                       {tool.count > 999 ? `${(tool.count / 1000).toFixed(1)}K` : tool.count}
                     </span>
                   </div>
@@ -733,7 +733,7 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <GitBranch className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                 Subagent Effectiveness
               </span>
             </div>
@@ -754,7 +754,7 @@ function SystemHealthTab() {
                   raw={`${item.subagent_type || "default"}\nSuccess: ${item.successRate.toFixed(1)}%\nTotal: ${item.total} · OK: ${item.completed} · Errors: ${item.errors}`}
                 >
                   <div className="flex items-center gap-3 cursor-default">
-                    <span className="text-xs text-gray-400 w-28 truncate flex-shrink-0">
+                    <span className="text-xs text-gray-600 dark:text-gray-400 w-28 truncate flex-shrink-0">
                       {item.subagent_type || "default"}
                     </span>
                     <div className="flex-1 bg-surface-3 rounded-full h-2">
@@ -786,10 +786,10 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Plug className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Integration</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Integration</span>
             </div>
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded ${info.hooks.installed ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-surface-3 text-gray-500 border border-border"}`}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded ${info.hooks.installed ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-surface-3 text-gray-700 dark:text-gray-500 border border-border"}`}
             >
               {info.hooks.installed ? "Active" : "Offline"}
             </span>
@@ -817,7 +817,7 @@ function SystemHealthTab() {
           ) : (
             <div className="flex flex-col items-center justify-center py-6 border border-dashed border-border/40 rounded-lg">
               <Search className="w-4 h-4 text-gray-600 mb-2" />
-              <p className="text-xs text-gray-500">No project hooks registered</p>
+              <p className="text-xs text-gray-700 dark:text-gray-500">No project hooks registered</p>
             </div>
           )}
 
@@ -829,7 +829,7 @@ function SystemHealthTab() {
               <Activity className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
               <div>
                 <p className="text-[10px] text-emerald-400 font-medium">WebSocket Active</p>
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-gray-700 dark:text-gray-500">
                   {info.server.ws_connections} connection
                   {info.server.ws_connections !== 1 ? "s" : ""}
                 </p>
@@ -843,9 +843,9 @@ function SystemHealthTab() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Cpu className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Platform</span>
+              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Platform</span>
             </div>
-            <span className="text-[10px] font-mono text-gray-500">{info.server.node_version}</span>
+            <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">{info.server.node_version}</span>
           </div>
 
           <div className="space-y-2">
@@ -869,7 +869,7 @@ function SystemHealthTab() {
               { label: "Platform", value: `${info.server.platform} / ${info.server.arch}` },
             ].map((row) => (
               <div key={row.label} className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-28 flex-shrink-0">{row.label}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-400 w-28 flex-shrink-0">{row.label}</span>
                 <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">{row.value}</span>
               </div>
             ))}
@@ -877,8 +877,8 @@ function SystemHealthTab() {
 
           <Tip block raw={info.db.path}>
             <div className="flex items-center gap-2 bg-surface-2/50 px-3 py-2 rounded-lg border border-border/30 cursor-default">
-              <HardDrive className="w-3 h-3 text-gray-500 flex-shrink-0" />
-              <span className="text-[10px] text-gray-400 font-mono truncate">{info.db.path}</span>
+              <HardDrive className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
+              <span className="text-[10px] text-gray-600 dark:text-gray-400 font-mono truncate">{info.db.path}</span>
             </div>
           </Tip>
         </div>
@@ -1067,7 +1067,7 @@ export function Dashboard() {
     return (
       <div className="text-center py-20">
         <p className="text-red-400 mb-2">{t("failedConnect")}</p>
-        <p className="text-sm text-gray-500">{error}</p>
+        <p className="text-sm text-gray-700 dark:text-gray-500">{error}</p>
         <button onClick={load} className="btn-primary mt-4">
           {t("common:retry")}
         </button>
@@ -1091,13 +1091,13 @@ export function Dashboard() {
                   {t("common:live")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                   {t("common:offline")}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500">{t("subtitle")}</p>
+            <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -1108,7 +1108,7 @@ export function Dashboard() {
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "monitor"
                   ? "bg-accent/15 text-accent shadow-sm"
-                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               <Activity className="w-3.5 h-3.5" /> Monitor
@@ -1118,7 +1118,7 @@ export function Dashboard() {
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "health"
                   ? "bg-accent/15 text-accent shadow-sm"
-                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               <Server className="w-3.5 h-3.5" /> Health
@@ -1225,7 +1225,7 @@ export function Dashboard() {
                             {hasChildren && (
                               <button
                                 onClick={toggleExpanded}
-                                className="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 transition-colors flex-shrink-0"
+                                className="p-1 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 transition-colors flex-shrink-0"
                                 aria-label={isExpanded ? "Collapse subagents" : "Expand subagents"}
                                 aria-expanded={isExpanded}
                               >
@@ -1375,7 +1375,7 @@ export function Dashboard() {
                         {event.summary || event.event_type}
                       </span>
                       {event.tool_name && (
-                        <span className="text-[11px] text-gray-500 font-mono">
+                        <span className="text-[11px] text-gray-700 dark:text-gray-500 font-mono">
                           {event.tool_name}
                         </span>
                       )}

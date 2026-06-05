@@ -80,7 +80,7 @@ function TerminalBlock({ text, stream }: { text: string; stream: "stdout" | "std
   const accent = isErr
     ? "border-red-500/30 bg-red-950/30 text-red-200/90"
     : "border-surface-3 bg-surface-4/60 text-gray-200";
-  const labelColor = isErr ? "text-red-300/80" : "text-gray-400";
+  const labelColor = isErr ? "text-red-300/80" : "text-gray-600 dark:text-gray-400";
   return (
     <div className={`rounded-lg border ${accent} overflow-hidden`}>
       <div
@@ -201,7 +201,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-gray-500 text-sm">
+      <div className="flex items-center justify-center py-12 text-gray-700 dark:text-gray-500 text-sm">
         Loading conversation...
       </div>
     );
@@ -209,7 +209,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
 
   if (messages.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500 text-sm">No conversation records found.</div>
+      <div className="text-center py-12 text-gray-700 dark:text-gray-500 text-sm">No conversation records found.</div>
     );
   }
 
@@ -264,12 +264,12 @@ export function MessageList({ messages, loading }: MessageListProps) {
                   {isAssistant ? "Assistant" : "User"}
                 </span>
                 {msg.model && (
-                  <span className="text-[10px] text-gray-400 font-mono bg-surface-3/60 border border-surface-3 rounded px-1.5 py-0.5">
+                  <span className="text-[10px] text-gray-600 dark:text-gray-400 font-mono bg-surface-3/60 border border-surface-3 rounded px-1.5 py-0.5">
                     {formatModelName(msg.model)}
                   </span>
                 )}
                 {msg.usage && (
-                  <span className="text-[10px] text-gray-500 font-mono inline-flex items-center gap-1">
+                  <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono inline-flex items-center gap-1">
                     <span className="text-emerald-300/70">↓ {fmt(msg.usage.input_tokens)}</span>
                     <span className="text-gray-700">·</span>
                     <span className="text-orange-300/70">↑ {fmt(msg.usage.output_tokens)}</span>

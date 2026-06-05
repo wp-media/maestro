@@ -108,7 +108,7 @@ export function CodeBlock({
         : {
             wrapper: "border-surface-3 bg-surface-4/50",
             chrome: "bg-surface-3/70 border-b border-surface-3",
-            label: "text-gray-400",
+            label: "text-gray-600 dark:text-gray-400",
           };
 
   const preStyle: React.CSSProperties = {};
@@ -147,7 +147,7 @@ export function CodeBlock({
               type="button"
               onClick={handleCopy}
               className={`inline-flex items-center gap-1 transition-colors ${
-                copied ? "text-emerald-300" : "text-gray-500 hover:text-gray-200"
+                copied ? "text-emerald-300" : "text-gray-700 dark:text-gray-500 hover:text-gray-200"
               }`}
               aria-label="Copy code"
             >

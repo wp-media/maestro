@@ -410,7 +410,7 @@ export function CcConfig() {
       <div className="rounded-xl border border-border bg-surface-1">
         {tab !== "overview" && (
           <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
-            <Search className="w-4 h-4 text-gray-500" />
+            <Search className="w-4 h-4 text-gray-700 dark:text-gray-500" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -501,13 +501,13 @@ function Header({
                 {tCommon("live")}
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                 {tCommon("offline")}
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-500 max-w-2xl">{t("subtitle")}</p>
+          <p className="text-xs text-gray-700 dark:text-gray-500 max-w-2xl">{t("subtitle")}</p>
         </div>
       </div>
       <div className="flex flex-col items-stretch lg:items-end gap-2 flex-shrink-0">
@@ -530,7 +530,7 @@ function Header({
           </button>
         </div>
         {lastUpdated && (
-          <span className="text-[11px] text-gray-500 self-end">
+          <span className="text-[11px] text-gray-700 dark:text-gray-500 self-end">
             {t("lastUpdated", { time: formatted })}
           </span>
         )}
@@ -555,7 +555,7 @@ function ScopeToggle({ value, onChange }: { value: CcScope; onChange: (s: CcScop
           className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors ${
             value === o.v
               ? "bg-accent/20 text-accent border border-accent/30"
-              : "text-gray-400 hover:text-gray-200"
+              : "text-gray-600 dark:text-gray-400 hover:text-gray-200"
           }`}
         >
           {o.label}
@@ -685,7 +685,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex-shrink-0 whitespace-nowrap ${
                 active
                   ? "bg-accent/15 text-accent border border-accent/30"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-surface-3 border border-transparent"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-surface-3 border border-transparent"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -693,7 +693,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
               {c !== null && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                    active ? "bg-accent/20 text-accent" : "bg-surface-3 text-gray-400"
+                    active ? "bg-accent/20 text-accent" : "bg-surface-3 text-gray-600 dark:text-gray-400"
                   }`}
                 >
                   {c}
@@ -934,7 +934,7 @@ function OverviewPanel({ overview }: { overview: CcOverview | null }) {
   return (
     <div className="space-y-5">
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
           {t("overview.rootsTitle")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -966,7 +966,7 @@ function OverviewPanel({ overview }: { overview: CcOverview | null }) {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
           {t("overview.summary")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -1068,14 +1068,14 @@ function SummaryStat({ tone, icon: Icon, label, value, user, project }: SummaryS
           >
             <Icon className={`w-3.5 h-3.5 ${T.iconText}`} />
           </span>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 truncate">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 truncate">
             {label}
           </span>
         </div>
         <div className="mt-1.5 flex items-baseline gap-2">
           <span className="text-xl font-semibold text-gray-100 tabular-nums">{total}</span>
           {showBreakdown && (
-            <span className="text-[10px] text-gray-500 truncate">
+            <span className="text-[10px] text-gray-700 dark:text-gray-500 truncate">
               {user} {t("overview.user")} · {project} {t("overview.project")}
             </span>
           )}
@@ -1106,7 +1106,7 @@ function RootRow({
         <Icon className={`w-3.5 h-3.5 ${T.iconText}`} />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
           {label}
         </div>
         <div className="font-mono text-[11px] text-gray-200 truncate">{value}</div>
@@ -1209,14 +1209,14 @@ function MdItemCard({ item, onOpen, onEdit, onDelete, kind }: MdItemCardProps) {
             )}
           </div>
           {description && (
-            <p className="mt-1.5 text-xs text-gray-400 leading-relaxed line-clamp-2">
+            <p className="mt-1.5 text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
               {description}
             </p>
           )}
           {kind === "agents" && item.frontmatter.tools && (
-            <div className="mt-2 text-[11px] text-gray-500">
-              <span className="text-gray-500">{t("agents.tools")}:</span>{" "}
-              <span className="font-mono text-gray-400">{item.frontmatter.tools}</span>
+            <div className="mt-2 text-[11px] text-gray-700 dark:text-gray-500">
+              <span className="text-gray-700 dark:text-gray-500">{t("agents.tools")}:</span>{" "}
+              <span className="font-mono text-gray-600 dark:text-gray-400">{item.frontmatter.tools}</span>
             </div>
           )}
           <div className="mt-2 font-mono text-[10px] text-gray-600 truncate">{filePath}</div>
@@ -1266,7 +1266,7 @@ function PluginsPanel({ data, search }: { data: CcPluginsResponse | null; search
         howTo={t("explain.plugins.install")}
         commands={[{ cmd: t("explain.plugins.installCmd"), note: "" }]}
       />
-      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-500">
+      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
         <FileText className="w-3.5 h-3.5" />
         <span className="font-mono truncate">{data.manifestPath}</span>
         {!data.manifestExists && (
@@ -1328,7 +1328,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-mono text-sm text-gray-100">{p.name}</span>
             {p.marketplace && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
                 {p.marketplace}
               </span>
             )}
@@ -1345,7 +1345,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
               </span>
             )}
             {p.enabled === false && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-500/10 text-gray-400 border border-gray-500/30 inline-flex items-center gap-1">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-500/10 text-gray-600 dark:text-gray-400 border border-gray-500/30 inline-flex items-center gap-1">
                 <CircleSlash className="w-3 h-3" />
                 {t("plugins.disabled")}
               </span>
@@ -1358,11 +1358,11 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
             )}
           </div>
           {description && (
-            <p className="mt-1.5 text-xs text-gray-400 leading-relaxed">{description}</p>
+            <p className="mt-1.5 text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{description}</p>
           )}
           {contribCounts.length > 0 && (
             <div className="mt-2.5">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1">
                 {t("plugins.contributes")}
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -1377,7 +1377,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
               </div>
             </div>
           )}
-          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-gray-500">
+          <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-gray-700 dark:text-gray-500">
             {meta?.author?.name && (
               <div>
                 <span className="text-gray-600">{t("plugins.author")}:</span> {meta.author.name}
@@ -1460,13 +1460,13 @@ function McpPanel({ data, search }: { data: CcMcpResponse | null; search: string
         ]}
       />
       {all.length === 0 && (
-        <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-500">
+        <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-700 dark:text-gray-500">
           {t("mcp.noServers")}
         </div>
       )}
       {data.user.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
             {t("mcp.userScope")}
           </h3>
           <div className="space-y-2">
@@ -1478,7 +1478,7 @@ function McpPanel({ data, search }: { data: CcMcpResponse | null; search: string
       )}
       {data.projectScoped.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
             {t("mcp.projectScope")}
           </h3>
           <div className="space-y-2">
@@ -1498,10 +1498,10 @@ function McpCard({ server }: { server: CcMcpServer }) {
     <div className="rounded-lg border border-border bg-surface-2 px-4 py-3">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="font-mono text-sm text-gray-100">{server.name}</span>
-        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border">
+        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
           {server.kind}
         </span>
-        <span className="text-[10px] text-gray-500 ml-auto truncate max-w-xs">{server.source}</span>
+        <span className="text-[10px] text-gray-700 dark:text-gray-500 ml-auto truncate max-w-xs">{server.source}</span>
       </div>
       <div className="mt-2 space-y-1 text-[11px]">
         {server.kind === "stdio" && (
@@ -1511,12 +1511,12 @@ function McpCard({ server }: { server: CcMcpServer }) {
             </Field>
             {server.args && server.args.length > 0 && (
               <Field label={t("mcp.args")}>
-                <span className="font-mono text-gray-400">{server.args.join(" ")}</span>
+                <span className="font-mono text-gray-600 dark:text-gray-400">{server.args.join(" ")}</span>
               </Field>
             )}
             {server.envNames && server.envNames.length > 0 && (
               <Field label={t("mcp.env")}>
-                <span className="font-mono text-gray-400">{server.envNames.join(", ")}</span>
+                <span className="font-mono text-gray-600 dark:text-gray-400">{server.envNames.join(", ")}</span>
               </Field>
             )}
           </>
@@ -1528,7 +1528,7 @@ function McpCard({ server }: { server: CcMcpServer }) {
             </Field>
             {server.headers && server.headers.length > 0 && (
               <Field label={t("mcp.headers")}>
-                <span className="font-mono text-gray-400">{server.headers.join(", ")}</span>
+                <span className="font-mono text-gray-600 dark:text-gray-400">{server.headers.join(", ")}</span>
               </Field>
             )}
           </>
@@ -1589,7 +1589,7 @@ function HooksPanel({
           <div key={src.scope} className="rounded-lg border border-border bg-surface-2">
             <div className="border-b border-border px-4 py-2.5 flex items-center gap-2">
               <ScopeBadge scope={src.scope} />
-              <span className="font-mono text-[11px] text-gray-500 truncate flex-1">
+              <span className="font-mono text-[11px] text-gray-700 dark:text-gray-500 truncate flex-1">
                 {src.file}
               </span>
               {src.exists ? (
@@ -1606,13 +1606,13 @@ function HooksPanel({
             </div>
             <div className="p-3">
               {filteredEvents.length === 0 ? (
-                <div className="text-xs text-gray-500 px-1 py-2">{t("hooks.noHooks")}</div>
+                <div className="text-xs text-gray-700 dark:text-gray-500 px-1 py-2">{t("hooks.noHooks")}</div>
               ) : (
                 <div className="space-y-3">
                   {filteredEvents.map(([event, entries]) => (
                     <div key={event}>
                       <div className="text-[11px] font-semibold text-gray-300 mb-1.5 inline-flex items-center gap-2">
-                        <Wrench className="w-3 h-3 text-gray-500" />
+                        <Wrench className="w-3 h-3 text-gray-700 dark:text-gray-500" />
                         {event}
                         <span className="text-[10px] text-gray-600">({entries.length})</span>
                       </div>
@@ -1623,11 +1623,11 @@ function HooksPanel({
                             className="rounded-md border border-border bg-surface-1 px-2.5 py-1.5 text-[11px]"
                           >
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-[10px] text-gray-500">
+                              <span className="font-mono text-[10px] text-gray-700 dark:text-gray-500">
                                 {t("hooks.matcher")}={h.matcher}
                               </span>
                               <span className="text-[10px] text-gray-600">·</span>
-                              <span className="font-mono text-[10px] text-gray-500">{h.type}</span>
+                              <span className="font-mono text-[10px] text-gray-700 dark:text-gray-500">{h.type}</span>
                               {h.timeout != null && (
                                 <span className="text-[10px] text-gray-600">{h.timeout}ms</span>
                               )}
@@ -1653,7 +1653,7 @@ function HooksPanel({
         <div className="rounded-lg border border-border bg-surface-2">
           <div className="border-b border-border px-4 py-2.5">
             <div className="text-sm font-medium text-gray-100">{t("hookScripts.title")}</div>
-            <p className="mt-1 text-[11px] text-gray-500 leading-relaxed">
+            <p className="mt-1 text-[11px] text-gray-700 dark:text-gray-500 leading-relaxed">
               {t("hookScripts.subtitle")}
             </p>
             <div className="mt-1 font-mono text-[10px] text-gray-600">{scripts.dir}</div>
@@ -1665,11 +1665,11 @@ function HooksPanel({
                 onClick={() => onOpen(s.file)}
                 className="w-full text-left rounded-md border border-border bg-surface-1 hover:bg-surface-3 px-3 py-1.5 inline-flex items-center gap-2"
               >
-                <FileText className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                <FileText className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                 <span className="font-mono text-[11px] text-gray-200 flex-1 truncate">
                   {s.name}
                 </span>
-                <span className="text-[10px] text-gray-500">{formatBytes(s.size)}</span>
+                <span className="text-[10px] text-gray-700 dark:text-gray-500">{formatBytes(s.size)}</span>
                 <span className="text-[10px] text-gray-600 hidden md:inline">
                   {new Date(s.mtime).toLocaleDateString()}
                 </span>
@@ -1731,25 +1731,25 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
       <div className="p-3 space-y-3">
         {data.config ? (
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
               {t("statusline.configured")}
             </div>
             <div className="rounded-md border border-border bg-surface-1 px-3 py-2 text-[11px] font-mono text-gray-200">
-              <span className="text-gray-500">type:</span> {data.config.type ?? "—"}
+              <span className="text-gray-700 dark:text-gray-500">type:</span> {data.config.type ?? "—"}
               {data.config.command && (
                 <>
                   <br />
-                  <span className="text-gray-500">command:</span> {data.config.command}
+                  <span className="text-gray-700 dark:text-gray-500">command:</span> {data.config.command}
                 </>
               )}
             </div>
           </div>
         ) : (
-          <div className="text-xs text-gray-500">{t("statusline.noStatusline")}</div>
+          <div className="text-xs text-gray-700 dark:text-gray-500">{t("statusline.noStatusline")}</div>
         )}
         {data.scripts.length > 0 && (
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
               {t("statusline.scripts")}
             </div>
             <div className="space-y-1.5">
@@ -1759,11 +1759,11 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
                   onClick={() => onOpen(s.file)}
                   className="w-full text-left rounded-md border border-border bg-surface-1 hover:bg-surface-3 px-3 py-1.5 inline-flex items-center gap-2"
                 >
-                  <FileText className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                  <FileText className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                   <span className="font-mono text-[11px] text-gray-200 flex-1 truncate">
                     {s.file}
                   </span>
-                  <span className="text-[10px] text-gray-500">{formatBytes(s.size)}</span>
+                  <span className="text-[10px] text-gray-700 dark:text-gray-500">{formatBytes(s.size)}</span>
                 </button>
               ))}
             </div>
@@ -1787,7 +1787,7 @@ function SettingsBlock({
     <div className="rounded-lg border border-border bg-surface-2">
       <div className="border-b border-border px-4 py-2.5 flex items-center gap-2 flex-wrap">
         <ScopeBadge scope={source.scope} />
-        <span className="font-mono text-[11px] text-gray-500 truncate flex-1 min-w-0">
+        <span className="font-mono text-[11px] text-gray-700 dark:text-gray-500 truncate flex-1 min-w-0">
           {source.file}
         </span>
         {source.exists ? (
@@ -1824,11 +1824,11 @@ function SettingsBlock({
 
 function SettingsKeyValueList({ data }: { data: Record<string, unknown> | null | undefined }) {
   if (!data || typeof data !== "object") {
-    return <div className="p-3 text-xs text-gray-500">—</div>;
+    return <div className="p-3 text-xs text-gray-700 dark:text-gray-500">—</div>;
   }
   const entries = Object.entries(data);
   if (entries.length === 0) {
-    return <div className="p-3 text-xs text-gray-500">{}</div>;
+    return <div className="p-3 text-xs text-gray-700 dark:text-gray-500">{}</div>;
   }
   return (
     <div className="divide-y divide-border">
@@ -1837,7 +1837,7 @@ function SettingsKeyValueList({ data }: { data: Record<string, unknown> | null |
           key={k}
           className="px-3 py-2 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-1 md:gap-3 items-start"
         >
-          <div className="font-mono text-[11px] text-gray-400 truncate">{k}</div>
+          <div className="font-mono text-[11px] text-gray-600 dark:text-gray-400 truncate">{k}</div>
           <div className="min-w-0">
             <SettingsValue value={v} />
           </div>
@@ -1856,7 +1856,7 @@ function SettingsValue({ value }: { value: unknown }) {
         className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
           value
             ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-            : "bg-gray-500/10 text-gray-400 border-gray-500/30"
+            : "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/30"
         }`}
       >
         {value ? "true" : "false"}
@@ -1890,7 +1890,7 @@ function SettingsValue({ value }: { value: unknown }) {
     <div className="space-y-0.5">
       {Object.entries(obj).map(([k, v]) => (
         <div key={k} className="font-mono text-[11px]">
-          <span className="text-gray-500">{k}:</span>{" "}
+          <span className="text-gray-700 dark:text-gray-500">{k}:</span>{" "}
           <span className="text-gray-200 break-all">
             {typeof v === "object" ? JSON.stringify(v) : String(v)}
           </span>
@@ -1933,7 +1933,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
         <div key={m.scope} className="rounded-lg border border-border bg-surface-2">
           <div className="border-b border-border px-4 py-2.5 flex items-center gap-2 flex-wrap">
             <ScopeBadge scope={m.scope} />
-            <span className="font-mono text-[11px] text-gray-500 truncate flex-1 min-w-0">
+            <span className="font-mono text-[11px] text-gray-700 dark:text-gray-500 truncate flex-1 min-w-0">
               {m.file}
             </span>
             <span className="text-[10px] text-gray-600">{formatBytes(m.size)}</span>
@@ -1978,7 +1978,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
         >
           <div className="flex items-center gap-2">
             <ScopeBadge scope={s} />
-            <span className="text-xs text-gray-500">{t("memory.missing")}</span>
+            <span className="text-xs text-gray-700 dark:text-gray-500">{t("memory.missing")}</span>
           </div>
           <button
             onClick={() => onCreate(s)}
@@ -2018,22 +2018,22 @@ function MarketplacesPanel({
         howTo={t("marketplaces.manifest")}
         commands={[{ cmd: t("marketplaces.addCmd"), note: "" }]}
       />
-      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-500">
+      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
         <FileText className="w-3.5 h-3.5" />
         <span className="font-mono truncate">{data.knownPath}</span>
       </div>
       {filtered.length === 0 ? (
-        <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-500">
+        <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-700 dark:text-gray-500">
           {t("marketplaces.noMarketplaces")}
         </div>
       ) : (
         filtered.map((m) => (
           <div key={m.name} className="rounded-lg border border-border bg-surface-2 px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <Store className="w-3.5 h-3.5 text-gray-500" />
+              <Store className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500" />
               <span className="font-mono text-sm text-gray-100">{m.name}</span>
               {m.marketplaceName && m.marketplaceName !== m.name && (
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
                   {m.marketplaceName}
                 </span>
               )}
@@ -2044,11 +2044,11 @@ function MarketplacesPanel({
               )}
             </div>
             {m.marketplaceDescription && (
-              <p className="mt-1.5 text-xs text-gray-400 leading-relaxed line-clamp-2">
+              <p className="mt-1.5 text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
                 {m.marketplaceDescription}
               </p>
             )}
-            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-gray-500">
+            <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-gray-700 dark:text-gray-500">
               {m.source && (
                 <div className="col-span-2 truncate">
                   <span className="text-gray-600">{t("marketplaces.source")}:</span>{" "}
@@ -2094,7 +2094,7 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
   if (!data) return <SkeletonRows n={3} />;
   if (!data.exists) {
     return (
-      <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-500">
+      <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-700 dark:text-gray-500">
         {t("keybindings.missing", { path: data.file })}
       </div>
     );
@@ -2102,7 +2102,7 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
   const q = search.toLowerCase();
   return (
     <div className="space-y-3">
-      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-500 flex-wrap">
+      <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500 flex-wrap">
         <FileText className="w-3.5 h-3.5" />
         <span className="font-mono truncate flex-1 min-w-0">{data.file}</span>
         {data.docs && (
@@ -2138,7 +2138,7 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
                   <kbd className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-3 border border-border text-gray-200 min-w-20 text-center">
                     {b.key}
                   </kbd>
-                  <span className="font-mono text-[11px] text-gray-400">{b.action}</span>
+                  <span className="font-mono text-[11px] text-gray-600 dark:text-gray-400">{b.action}</span>
                 </div>
               ))}
             </div>
@@ -2160,7 +2160,7 @@ function ScopeBadge({ scope }: { scope: string }) {
         ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
         : scope === "project-local"
           ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
-          : "bg-surface-3 text-gray-400 border-border";
+          : "bg-surface-3 text-gray-600 dark:text-gray-400 border-border";
   const label =
     scope === "project-local"
       ? t("scope.projectLocal")
@@ -2188,7 +2188,7 @@ function CopyButton({ value }: { value: string }) {
           /* clipboard unavailable */
         }
       }}
-      className="text-[10px] font-medium px-1.5 py-1 rounded border border-border bg-surface-1 hover:bg-surface-3 text-gray-400 hover:text-gray-200 inline-flex items-center gap-1 flex-shrink-0"
+      className="text-[10px] font-medium px-1.5 py-1 rounded border border-border bg-surface-1 hover:bg-surface-3 text-gray-600 dark:text-gray-400 hover:text-gray-200 inline-flex items-center gap-1 flex-shrink-0"
       title={t("common.copyPath")}
     >
       {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -2199,7 +2199,7 @@ function CopyButton({ value }: { value: string }) {
 function Empty() {
   const { t } = useTranslation("ccConfig");
   return (
-    <div className="rounded-lg border border-dashed border-border bg-surface-2 px-4 py-8 text-center text-sm text-gray-500">
+    <div className="rounded-lg border border-dashed border-border bg-surface-2 px-4 py-8 text-center text-sm text-gray-700 dark:text-gray-500">
       {t("common.empty")}
     </div>
   );
@@ -2248,12 +2248,12 @@ function FileViewer({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
-          <FileText className="w-4 h-4 text-gray-500" />
+          <FileText className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           <span className="font-mono text-[12px] text-gray-300 truncate flex-1">{state.path}</span>
           <CopyButton value={state.path} />
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
             aria-label={t("common.close")}
           >
             <X className="w-4 h-4" />
@@ -2266,12 +2266,12 @@ function FileViewer({
               {state.error}
             </div>
           ) : !state.data ? (
-            <div className="text-sm text-gray-500">…</div>
+            <div className="text-sm text-gray-700 dark:text-gray-500">…</div>
           ) : (
             <pre className="text-[11px] font-mono text-gray-200 whitespace-pre-wrap break-words">
               {state.data.text}
               {state.data.truncated && (
-                <span className="text-gray-500 italic">
+                <span className="text-gray-700 dark:text-gray-500 italic">
                   {"\n\n"}
                   {t("common.truncated")}
                 </span>
@@ -2370,11 +2370,11 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
-          <Pencil className="w-4 h-4 text-gray-500" />
+          <Pencil className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           <span className="text-sm font-medium text-gray-100 flex-1 truncate">{titleText}</span>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
             aria-label={t("common.close")}
           >
             <X className="w-4 h-4" />
@@ -2385,7 +2385,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
           {isCreate && state.type !== "memory" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1">
                   {t("edit.nameLabel")}
                 </label>
                 <input
@@ -2395,10 +2395,10 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
                   pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}"
                   className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-sm font-mono text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
                 />
-                <p className="mt-1 text-[10px] text-gray-500">{t("edit.nameHelp")}</p>
+                <p className="mt-1 text-[10px] text-gray-700 dark:text-gray-500">{t("edit.nameHelp")}</p>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1">
                   {t("edit.scopePicker")}
                 </label>
                 <div className="inline-flex rounded-md border border-border bg-surface-2 p-0.5">
@@ -2409,7 +2409,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
                       className={`px-3 py-1 text-[11px] font-medium rounded ${
                         targetScope === s
                           ? "bg-accent/20 text-accent border border-accent/30"
-                          : "text-gray-400 hover:text-gray-200"
+                          : "text-gray-600 dark:text-gray-400 hover:text-gray-200"
                       }`}
                     >
                       {t(`scope.${s}`)}
@@ -2421,7 +2421,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1">
               {t("edit.contentLabel")}
             </label>
             {loading ? (
@@ -2510,7 +2510,7 @@ function ConfirmDeleteModal({ state, onCancel, onConfirm }: ConfirmDeleteModalPr
           </span>
         </div>
         <div className="p-4 space-y-3">
-          <p className="text-xs text-gray-400 leading-relaxed">{t("edit.confirmDeleteBody")}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{t("edit.confirmDeleteBody")}</p>
           <div className="rounded-md border border-border bg-surface-2 px-3 py-2 font-mono text-[11px] text-gray-300 break-all">
             {t("edit.confirmDeletePath", { path: state.path })}
           </div>
@@ -2584,10 +2584,10 @@ function ExplainerBanner({ title, body, howTo, commands }: ExplainerBannerProps)
         <Lock className="w-4 h-4 text-amber-300 flex-shrink-0 mt-0.5" />
         <div className="min-w-0 flex-1 space-y-2">
           <div className="text-sm font-medium text-amber-100">{title}</div>
-          <p className="text-xs text-gray-400 leading-relaxed">{body}</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{body}</p>
           {commands.length > 0 && (
             <div className="pt-1">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
                 {howTo}
               </div>
               <div className="space-y-1.5">
@@ -2610,10 +2610,10 @@ function CommandSnippet({ command, label }: { command: string; label?: string })
   const [copied, setCopied] = useState(false);
   return (
     <div className="rounded-md border border-border bg-surface-2 px-2.5 py-1.5 flex items-center gap-2">
-      <Terminal className="w-3 h-3 text-gray-500 flex-shrink-0" />
+      <Terminal className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
       <code className="font-mono text-[11px] text-gray-200 truncate flex-1">{command}</code>
       {label && (
-        <span className="text-[10px] text-gray-500 hidden md:inline truncate">{label}</span>
+        <span className="text-[10px] text-gray-700 dark:text-gray-500 hidden md:inline truncate">{label}</span>
       )}
       <button
         onClick={async () => {
@@ -2625,7 +2625,7 @@ function CommandSnippet({ command, label }: { command: string; label?: string })
             /* clipboard unavailable */
           }
         }}
-        className="text-[10px] font-medium px-1.5 py-1 rounded border border-border bg-surface-1 hover:bg-surface-3 text-gray-400 hover:text-gray-200 inline-flex items-center gap-1 flex-shrink-0"
+        className="text-[10px] font-medium px-1.5 py-1 rounded border border-border bg-surface-1 hover:bg-surface-3 text-gray-600 dark:text-gray-400 hover:text-gray-200 inline-flex items-center gap-1 flex-shrink-0"
         title={t("snippet.copy")}
       >
         {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -2667,18 +2667,18 @@ function BackupsModal({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
-          <History className="w-4 h-4 text-gray-500" />
+          <History className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           <span className="text-sm font-medium text-gray-100 flex-1">{t("backups.title")}</span>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
             aria-label={t("common.close")}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="px-4 py-3 border-b border-border">
-          <p className="text-[11px] text-gray-500 leading-relaxed">{t("backups.subtitle")}</p>
+          <p className="text-[11px] text-gray-700 dark:text-gray-500 leading-relaxed">{t("backups.subtitle")}</p>
         </div>
         <div className="overflow-auto p-4 space-y-2">
           {error && (
@@ -2689,7 +2689,7 @@ function BackupsModal({ onClose }: { onClose: () => void }) {
           )}
           {items === null && !error && <SkeletonRows n={4} />}
           {items !== null && items.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border bg-surface-2 px-4 py-8 text-center text-sm text-gray-500">
+            <div className="rounded-lg border border-dashed border-border bg-surface-2 px-4 py-8 text-center text-sm text-gray-700 dark:text-gray-500">
               {t("backups.empty")}
             </div>
           )}
@@ -2712,20 +2712,20 @@ function BackupRow({ backup }: { backup: CcBackup }) {
     <div className="rounded-lg border border-border bg-surface-2 px-3 py-2.5">
       <div className="flex items-center gap-2 flex-wrap">
         <ScopeBadge scope={backup.scope} />
-        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border">
+        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
           {backup.type}
         </span>
         <span className="font-mono text-xs text-gray-100 truncate flex-1 min-w-0">
           {backup.name}
         </span>
-        <span className="text-[10px] text-gray-500">{new Date(backup.mtime).toLocaleString()}</span>
+        <span className="text-[10px] text-gray-700 dark:text-gray-500">{new Date(backup.mtime).toLocaleString()}</span>
         {backup.size != null && (
           <span className="text-[10px] text-gray-600">{formatBytes(backup.size)}</span>
         )}
       </div>
       <div className="mt-1.5 font-mono text-[10px] text-gray-600 truncate">{backup.backupPath}</div>
       <div className="mt-2">
-        <div className="text-[10px] text-gray-500 mb-1">{t("backups.restoreHint")}</div>
+        <div className="text-[10px] text-gray-700 dark:text-gray-500 mb-1">{t("backups.restoreHint")}</div>
         <CommandSnippet command={restoreCmd} />
       </div>
     </div>

@@ -262,13 +262,13 @@ export function ActivityFeed() {
                   {t("common:live")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                   {t("common:offline")}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-700 dark:text-gray-500">
               {t("subtitle")}
               {paused && (
                 <span className="ml-2 text-yellow-400">{t("paused", { count: bufferCount })}</span>
@@ -322,7 +322,7 @@ export function ActivityFeed() {
             className={`text-[11px] px-3 py-1 cursor-pointer ${
               grouped
                 ? "bg-accent/20 text-accent"
-                : "bg-surface-2 text-gray-400 hover:text-gray-200"
+                : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
             }`}
           >
             {t("common:eventFilters.grouped")}
@@ -334,7 +334,7 @@ export function ActivityFeed() {
             className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
               !grouped
                 ? "bg-accent/20 text-accent"
-                : "bg-surface-2 text-gray-400 hover:text-gray-200"
+                : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
             }`}
           >
             {t("common:eventFilters.flat")}
@@ -396,11 +396,11 @@ export function ActivityFeed() {
                           className="flex items-center px-5 py-3.5 gap-4 hover:bg-surface-4 transition-colors cursor-pointer select-none"
                         >
                           <ChevronRight
-                            className={`w-3.5 h-3.5 text-gray-500 transition-transform flex-shrink-0 -mr-1.5 ${isOpen ? "rotate-90" : ""}`}
+                            className={`w-3.5 h-3.5 text-gray-700 dark:text-gray-500 transition-transform flex-shrink-0 -mr-1.5 ${isOpen ? "rotate-90" : ""}`}
                           />
 
                           <div className="w-16 flex-shrink-0 text-right font-mono leading-tight">
-                            <div className="text-[11px] text-gray-500">
+                            <div className="text-[11px] text-gray-700 dark:text-gray-500">
                               {formatTime(event.created_at)}
                             </div>
                             <div className="text-[9px] text-gray-600">
@@ -423,7 +423,7 @@ export function ActivityFeed() {
                                 <p className="text-sm text-gray-300 truncate">
                                   {origin && (
                                     <span
-                                      className="text-gray-500 mr-1"
+                                      className="text-gray-700 dark:text-gray-500 mr-1"
                                       title={`${event.session_id} · ${event.agent_id ?? ""}`}
                                     >
                                       {origin} ·
@@ -436,7 +436,7 @@ export function ActivityFeed() {
                           })()}
 
                           {event.tool_name && (
-                            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-500 font-mono flex-shrink-0">
+                            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
                               {event.tool_name}
                             </span>
                           )}
@@ -449,7 +449,7 @@ export function ActivityFeed() {
                             to={`/sessions/${event.session_id}`}
                             onClick={(e) => e.stopPropagation()}
                             title={t("viewSession")}
-                            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
+                            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
                           >
                             {t("viewSession")}
                             <ExternalLink className="w-3 h-3" />
@@ -463,7 +463,7 @@ export function ActivityFeed() {
           </div>
           {total > 0 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-700 dark:text-gray-500">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
@@ -474,7 +474,7 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage(0)}
                   disabled={page === 0}
-                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   aria-label="First page"
                 >
                   «
@@ -482,7 +482,7 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {t("common:pagination.previous")}
                 </button>
@@ -519,7 +519,7 @@ export function ActivityFeed() {
                         className={`min-w-[32px] px-2.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors ${
                           p === page
                             ? "bg-accent/20 text-accent border border-accent/30"
-                            : "bg-surface-2 text-gray-400 hover:text-gray-200"
+                            : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
                         }`}
                       >
                         {p + 1}
@@ -530,14 +530,14 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {t("common:pagination.next")}
                 </button>
                 <button
                   onClick={() => setPage(totalPages - 1)}
                   disabled={page >= totalPages - 1}
-                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   aria-label="Last page"
                 >
                   »

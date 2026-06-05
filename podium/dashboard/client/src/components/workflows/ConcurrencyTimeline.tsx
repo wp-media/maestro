@@ -61,7 +61,7 @@ function LaneRow({ lane, color, maxCount, onShowTip, onHideTip }: LaneRowProps) 
     <div className="flex items-center gap-3 py-1.5 group">
       {/* Label column */}
       <div className="flex-shrink-0 w-[140px] text-right" title={displayName}>
-        <span className="text-xs font-medium text-gray-400 truncate block group-hover:text-gray-200 transition-colors">
+        <span className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate block group-hover:text-gray-200 transition-colors">
           {displayName}
         </span>
       </div>
@@ -180,7 +180,7 @@ function EmptyState() {
           <rect x="3" y="16" width="15" height="4" rx="1" />
         </svg>
       </div>
-      <p className="text-sm font-medium text-gray-400">{t("concurrency.noData")}</p>
+      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("concurrency.noData")}</p>
       <p className="text-xs text-gray-600 mt-1">{t("concurrency.noDataDesc")}</p>
     </div>
   );

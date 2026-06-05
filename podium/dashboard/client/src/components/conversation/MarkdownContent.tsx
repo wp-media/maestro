@@ -261,7 +261,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
     const strikeM = rest.match(/^~~(.+?)~~/);
     if (strikeM) {
       push(
-        <span className="line-through text-gray-500">
+        <span className="line-through text-gray-700 dark:text-gray-500">
           {renderInline(strikeM[1]!, `${baseKey}-s${n}`)}
         </span>
       );
@@ -323,7 +323,7 @@ function renderListItem(item: string, key: string): React.ReactNode {
           }`}
           aria-hidden="true"
         />
-        <span className={checked ? "text-gray-500 line-through" : ""}>
+        <span className={checked ? "text-gray-700 dark:text-gray-500 line-through" : ""}>
           {renderInline(taskMatch[2]!, key)}
         </span>
       </span>
@@ -396,7 +396,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
             return (
               <blockquote
                 key={idx}
-                className="relative border-l-2 border-violet-400/50 pl-3 pr-2 py-1 text-gray-400 italic bg-violet-500/[0.04] rounded-r"
+                className="relative border-l-2 border-violet-400/50 pl-3 pr-2 py-1 text-gray-600 dark:text-gray-400 italic bg-violet-500/[0.04] rounded-r"
               >
                 {renderInline(b.text, `q${idx}`)}
               </blockquote>

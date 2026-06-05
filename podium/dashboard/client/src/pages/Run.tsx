@@ -1150,7 +1150,7 @@ function LimitationsBanner() {
         <span className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/30 inline-flex items-center justify-center flex-shrink-0">
           <Lightbulb className="w-3 h-3 text-amber-300" />
         </span>
-        <span className="text-[11.5px] text-gray-400 truncate">
+        <span className="text-[11.5px] text-gray-600 dark:text-gray-400 truncate">
           <span className="text-gray-200 font-medium">{t("limitations.title")}</span>
           <span className="text-gray-600 mx-1.5">·</span>
           <span>
@@ -1160,7 +1160,7 @@ function LimitationsBanner() {
             )}
           </span>
         </span>
-        <ChevronDown className="w-3 h-3 text-gray-500 group-hover:text-gray-300 ml-auto flex-shrink-0 transition-colors" />
+        <ChevronDown className="w-3 h-3 text-gray-700 dark:text-gray-500 group-hover:text-gray-300 ml-auto flex-shrink-0 transition-colors" />
       </button>
     );
   }
@@ -1168,7 +1168,7 @@ function LimitationsBanner() {
     <div className="relative rounded-xl border border-border/70 bg-gradient-to-br from-amber-500/[0.04] via-surface-2 to-surface-1 px-5 py-4 shadow-sm shadow-black/10">
       <button
         onClick={minimize}
-        className="absolute top-3 right-3 w-6 h-6 rounded-md text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center transition-colors"
+        className="absolute top-3 right-3 w-6 h-6 rounded-md text-gray-700 dark:text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center transition-colors"
         aria-label={t("limitations.minimize", "Minimize")}
         title={t("limitations.minimize", "Minimize")}
       >
@@ -1182,8 +1182,8 @@ function LimitationsBanner() {
           <div className="text-sm font-semibold text-gray-100 leading-tight">
             {t("limitations.title")}
           </div>
-          <div className="mt-1 inline-flex items-center gap-2 text-[11px] text-gray-500">
-            <span className="font-mono px-1.5 py-0.5 rounded border border-border bg-surface-2/60 text-gray-400">
+          <div className="mt-1 inline-flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
+            <span className="font-mono px-1.5 py-0.5 rounded border border-border bg-surface-2/60 text-gray-600 dark:text-gray-400">
               stream-json
             </span>
             <span className="text-gray-600">·</span>
@@ -1253,8 +1253,8 @@ function LimitationsBanner() {
       </div>
       {expanded && (
         <div className="mt-3 pl-12 pr-1 space-y-2 border-t border-border/40 pt-3">
-          <p className="text-[11.5px] text-gray-400 leading-relaxed">{t("limitations.intro")}</p>
-          <p className="text-[11px] text-gray-500 leading-relaxed">{t("limitations.tldr")}</p>
+          <p className="text-[11.5px] text-gray-600 dark:text-gray-400 leading-relaxed">{t("limitations.intro")}</p>
+          <p className="text-[11px] text-gray-700 dark:text-gray-500 leading-relaxed">{t("limitations.tldr")}</p>
         </div>
       )}
     </div>
@@ -1474,15 +1474,15 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
         ? "bg-amber-500"
         : "bg-gradient-to-r from-cyan-500 to-indigo-500";
   return (
-    <div className="border-t border-border px-4 py-2 flex items-center gap-3 text-[11px] text-gray-400 flex-wrap">
+    <div className="border-t border-border px-4 py-2 flex items-center gap-3 text-[11px] text-gray-600 dark:text-gray-400 flex-wrap">
       <span className="inline-flex items-center gap-1.5">
-        <Activity className="w-3 h-3 text-gray-500" />
-        <span className="text-gray-500">{t("tokens.label")}</span>
+        <Activity className="w-3 h-3 text-gray-700 dark:text-gray-500" />
+        <span className="text-gray-700 dark:text-gray-500">{t("tokens.label")}</span>
         <span className="font-mono text-gray-200">
           {formatNum(total)} / {formatNum(cap)}
         </span>
         <span
-          className={`font-mono ${tone === "red" ? "text-red-300" : tone === "amber" ? "text-amber-300" : "text-gray-500"}`}
+          className={`font-mono ${tone === "red" ? "text-red-300" : tone === "amber" ? "text-amber-300" : "text-gray-700 dark:text-gray-500"}`}
         >
           ({pct}%)
         </span>
@@ -1495,22 +1495,22 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
       </div>
       <span className="inline-flex items-center gap-3">
         <span>
-          <span className="text-gray-500">{t("tokens.input")}:</span>{" "}
+          <span className="text-gray-700 dark:text-gray-500">{t("tokens.input")}:</span>{" "}
           <span className="font-mono text-gray-300">{formatNum(stats.inputTokens)}</span>
         </span>
         <span>
-          <span className="text-gray-500">{t("tokens.output")}:</span>{" "}
+          <span className="text-gray-700 dark:text-gray-500">{t("tokens.output")}:</span>{" "}
           <span className="font-mono text-gray-300">{formatNum(stats.outputTokens)}</span>
         </span>
         {stats.cacheReadTokens > 0 && (
           <span>
-            <span className="text-gray-500">{t("tokens.cacheRead")}:</span>{" "}
+            <span className="text-gray-700 dark:text-gray-500">{t("tokens.cacheRead")}:</span>{" "}
             <span className="font-mono text-emerald-300">{formatNum(stats.cacheReadTokens)}</span>
           </span>
         )}
         {stats.costUsd != null && (
           <span>
-            <span className="text-gray-500">{t("tokens.cost")}:</span>{" "}
+            <span className="text-gray-700 dark:text-gray-500">{t("tokens.cost")}:</span>{" "}
             <span className="font-mono text-gray-200">${stats.costUsd.toFixed(4)}</span>
           </span>
         )}
@@ -1566,7 +1566,7 @@ function commandSourceLabel(s: SlashCommand["source"]): string {
 
 function commandSourceTone(s: SlashCommand["source"]): string {
   return s === "builtin"
-    ? "bg-gray-500/10 text-gray-400 border-gray-500/30"
+    ? "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/30"
     : s === "user"
       ? "bg-sky-500/10 text-sky-300 border-sky-500/30"
       : s === "project"
@@ -1841,7 +1841,7 @@ function PromptEditor({
       />
       {state && (
         <div className="absolute z-30 left-0 right-0 bottom-full mb-1 rounded-md border border-border bg-surface-1 shadow-lg shadow-black/40 max-h-72 overflow-auto py-1">
-          <div className="px-3 py-1.5 border-b border-border text-[10px] font-semibold uppercase tracking-wider text-gray-500 inline-flex items-center gap-1.5">
+          <div className="px-3 py-1.5 border-b border-border text-[10px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 inline-flex items-center gap-1.5">
             {state.kind === "slash" ? (
               <>
                 <SlashIcon className="w-3 h-3" />
@@ -1855,7 +1855,7 @@ function PromptEditor({
             )}
           </div>
           {items.length === 0 ? (
-            <div className="px-3 py-2 text-[11px] text-gray-500">{t("autocomplete.noMatches")}</div>
+            <div className="px-3 py-2 text-[11px] text-gray-700 dark:text-gray-500">{t("autocomplete.noMatches")}</div>
           ) : state.kind === "slash" ? (
             (items as SlashCommand[]).map((c, idx) => (
               <button
@@ -1877,7 +1877,7 @@ function PromptEditor({
                   </span>
                 </div>
                 {c.description && (
-                  <div className="text-[10.5px] text-gray-500 truncate mt-0.5">{c.description}</div>
+                  <div className="text-[10.5px] text-gray-700 dark:text-gray-500 truncate mt-0.5">{c.description}</div>
                 )}
               </button>
             ))
@@ -1893,7 +1893,7 @@ function PromptEditor({
                   idx === active ? "bg-accent/15" : "hover:bg-surface-3"
                 }`}
               >
-                <FileCode className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                <FileCode className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                 <span className="font-mono text-[11px] text-gray-200 truncate">{p}</span>
               </button>
             ))
@@ -1941,13 +1941,13 @@ function Header({
               {tCommon("live")}
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
               {tCommon("offline")}
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-500 max-w-3xl">{t("subtitle")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 max-w-3xl">{t("subtitle")}</p>
       </div>
       <ActiveRunsSwitcher
         activeRuns={activeRuns}
@@ -2087,7 +2087,7 @@ function ActiveRunsSwitcher({
         ) : (
           <>
             {t("runs.switcher")}
-            {totalCount > 0 && <span className="text-gray-500 font-mono">{totalCount}</span>}
+            {totalCount > 0 && <span className="text-gray-700 dark:text-gray-500 font-mono">{totalCount}</span>}
           </>
         )}
       </button>
@@ -2206,7 +2206,7 @@ function RunsModal({
             <h2 className="text-sm font-semibold text-gray-100">
               {t("runs.modalTitle", "Dashboard runs")}
             </h2>
-            <p className="text-[11px] text-gray-500">
+            <p className="text-[11px] text-gray-700 dark:text-gray-500">
               {t(
                 "runs.modalSubtitle",
                 "Every run started from this dashboard, regardless of status"
@@ -2215,7 +2215,7 @@ function RunsModal({
           </div>
           <button
             onClick={onRefresh}
-            className="w-7 h-7 rounded-md text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center"
+            className="w-7 h-7 rounded-md text-gray-700 dark:text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center"
             aria-label={t("runs.refresh", "Refresh")}
             title={t("runs.refresh", "Refresh")}
           >
@@ -2230,7 +2230,7 @@ function RunsModal({
           </Link>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-md text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center"
+            className="w-7 h-7 rounded-md text-gray-700 dark:text-gray-500 hover:text-gray-200 hover:bg-surface-3 inline-flex items-center justify-center"
             aria-label={t("limitations.dismiss")}
           >
             <X className="w-4 h-4" />
@@ -2240,7 +2240,7 @@ function RunsModal({
         {/* Filter bar */}
         <div className="px-5 py-3 border-b border-border flex flex-col gap-2.5 flex-shrink-0">
           <div className="flex items-center gap-2 bg-surface-2 border border-border rounded-md px-2.5 py-1.5">
-            <Search className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+            <Search className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
             <input
               autoFocus
               value={search}
@@ -2251,7 +2251,7 @@ function RunsModal({
             {search && (
               <button
                 onClick={() => setSearch("")}
-                className="text-gray-500 hover:text-gray-200 text-[10px]"
+                className="text-gray-700 dark:text-gray-500 hover:text-gray-200 text-[10px]"
                 aria-label="Clear"
               >
                 <X className="w-3 h-3" />
@@ -2285,7 +2285,7 @@ function RunsModal({
         {/* List */}
         <div className="flex-1 min-h-0 overflow-auto divide-y divide-border">
           {filtered.length === 0 ? (
-            <div className="px-5 py-12 text-center text-[12px] text-gray-500">
+            <div className="px-5 py-12 text-center text-[12px] text-gray-700 dark:text-gray-500">
               {rows.length === 0
                 ? t(
                     "runs.modalEmpty",
@@ -2318,11 +2318,11 @@ function RunsModal({
 
         {/* Footer */}
         <div className="px-5 py-2.5 border-t border-border bg-surface-2/40 flex items-center gap-2 flex-shrink-0">
-          <Info className="w-3 h-3 text-gray-500 flex-shrink-0" />
-          <span className="text-[10.5px] text-gray-500 leading-relaxed flex-1">
+          <Info className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
+          <span className="text-[10.5px] text-gray-700 dark:text-gray-500 leading-relaxed flex-1">
             {t("runs.scopeNote")}
           </span>
-          <span className="text-[10.5px] text-gray-500 font-mono">
+          <span className="text-[10.5px] text-gray-700 dark:text-gray-500 font-mono">
             {filtered.length} / {rows.length}
           </span>
         </div>
@@ -2344,7 +2344,7 @@ function FilterChipGroup<T extends string>({
 }) {
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-500 mr-1">
+      <span className="text-[10px] uppercase tracking-wider font-semibold text-gray-700 dark:text-gray-500 mr-1">
         {label}
       </span>
       {options.map((opt) => {
@@ -2362,7 +2362,7 @@ function FilterChipGroup<T extends string>({
             }`}
           >
             {opt.label}
-            <span className="ml-1 text-gray-500 font-mono">{opt.count}</span>
+            <span className="ml-1 text-gray-700 dark:text-gray-500 font-mono">{opt.count}</span>
           </button>
         );
       })}
@@ -2452,14 +2452,14 @@ function UnifiedRunRowView({
           {row.promptPreview}
         </div>
       )}
-      <div className="font-mono text-[10px] text-gray-500 truncate mt-1">{row.cwd}</div>
+      <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate mt-1">{row.cwd}</div>
       <div className="text-[10px] text-gray-600 mt-0.5 flex items-center gap-2 flex-wrap">
         <span>{startedLabel}</span>
-        {row.model && <span className="font-mono text-gray-500">· {row.model}</span>}
+        {row.model && <span className="font-mono text-gray-700 dark:text-gray-500">· {row.model}</span>}
         {row.sessionId && (
           <Link
             to={`/sessions/${encodeURIComponent(row.sessionId)}`}
-            className="inline-flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors"
+            className="inline-flex items-center gap-1 text-gray-700 dark:text-gray-500 hover:text-gray-300 transition-colors"
             title={t("actions.viewSession")}
           >
             <ExternalLink className="w-2.5 h-2.5" />
@@ -2519,7 +2519,7 @@ function ConfigCard(props: ConfigCardProps) {
     <div className="rounded-xl border border-border bg-surface-1">
       {/* Step 1: Mode (always visible — the primary decision) */}
       <div className="border-b border-border px-4 py-3">
-        <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
           {t("mode.label")}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2540,8 +2540,8 @@ function ConfigCard(props: ConfigCardProps) {
           />
         </div>
         {props.mode === "headless" && (
-          <p className="mt-2 text-[11px] text-gray-500 leading-relaxed flex items-start gap-1.5">
-            <Info className="w-3 h-3 text-gray-500 flex-shrink-0 mt-0.5" />
+          <p className="mt-2 text-[11px] text-gray-700 dark:text-gray-500 leading-relaxed flex items-start gap-1.5">
+            <Info className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0 mt-0.5" />
             {t("hint.headlessExplain")}
           </p>
         )}
@@ -2550,7 +2550,7 @@ function ConfigCard(props: ConfigCardProps) {
       {/* Step 2 (only for multi-turn): Source — new vs resume */}
       {props.mode === "conversation" && (
         <div className="border-b border-border px-4 py-3">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-2">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
             {t("resume.label")}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2587,7 +2587,7 @@ function ConfigCard(props: ConfigCardProps) {
 
       {/* Prompt */}
       <div className="px-4 py-3 border-b border-border">
-        <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+        <label className="block text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
           {t("fields.prompt")}
         </label>
         <PromptEditor
@@ -2609,7 +2609,7 @@ function ConfigCard(props: ConfigCardProps) {
         <Field label={t("fields.cwd")}>
           {isResume && props.resumeSession ? (
             <div className="bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-300 flex items-center gap-2">
-              <Lock className="w-3 h-3 text-gray-500 flex-shrink-0" />
+              <Lock className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
               <span className="truncate">{props.resumeSession.cwd}</span>
             </div>
           ) : (
@@ -2619,7 +2619,7 @@ function ConfigCard(props: ConfigCardProps) {
               suggestions={props.cwdSuggestions}
             />
           )}
-          <p className="mt-1 text-[10px] text-gray-500">
+          <p className="mt-1 text-[10px] text-gray-700 dark:text-gray-500">
             {isResume ? t("resume.originalCwd") : t("fields.cwdHint")}
           </p>
         </Field>
@@ -2648,7 +2648,7 @@ function ConfigCard(props: ConfigCardProps) {
               hint: c.hint,
             }))}
           />
-          <p className="mt-1 text-[10px] text-gray-500">{t("fields.effortHint")}</p>
+          <p className="mt-1 text-[10px] text-gray-700 dark:text-gray-500">{t("fields.effortHint")}</p>
         </Field>
       </div>
 
@@ -2668,7 +2668,7 @@ function ConfigCard(props: ConfigCardProps) {
               {t("concurrency.atCap", { max: props.activeRuns?.maxConcurrent ?? 0 })}
             </span>
           ) : props.activeRuns && props.activeRuns.activeCount > 0 ? (
-            <span className="inline-flex items-center gap-1.5 text-gray-400">
+            <span className="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               {t("concurrency.active", { count: props.activeRuns.activeCount })}
             </span>
@@ -2722,7 +2722,7 @@ function ModeOption({
       <div className={`text-sm font-medium ${active ? "text-accent" : "text-gray-200"}`}>
         {label}
       </div>
-      <div className="text-[11px] text-gray-500 mt-0.5">{hint}</div>
+      <div className="text-[11px] text-gray-700 dark:text-gray-500 mt-0.5">{hint}</div>
     </button>
   );
 }
@@ -2730,7 +2730,7 @@ function ModeOption({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+      <label className="block text-[10px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1">
         {label}
       </label>
       {children}
@@ -2821,7 +2821,7 @@ function CwdAutocomplete({
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
-        <FolderOpen className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 pointer-events-none" />
+        <FolderOpen className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-700 dark:text-gray-500 pointer-events-none" />
         <input
           ref={inputRef}
           type="text"
@@ -2842,11 +2842,11 @@ function CwdAutocomplete({
       {open && (
         <div className="absolute z-30 left-0 right-0 mt-1 rounded-md border border-border bg-surface-1 shadow-lg shadow-black/40 max-h-72 overflow-auto py-1">
           {groups.length === 0 ? (
-            <div className="px-3 py-2 text-[11px] text-gray-500">{t("fields.cwdNoMatches")}</div>
+            <div className="px-3 py-2 text-[11px] text-gray-700 dark:text-gray-500">{t("fields.cwdNoMatches")}</div>
           ) : (
             groups.map((g) => (
               <div key={g.kind}>
-                <div className="px-3 pt-1.5 pb-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                <div className="px-3 pt-1.5 pb-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 flex items-center gap-1.5">
                   {g.kind === "dashboard" ? (
                     <FolderOpen className="w-3 h-3" />
                   ) : g.kind === "home" ? (
@@ -2871,7 +2871,7 @@ function CwdAutocomplete({
                       }`}
                     >
                       <div className="text-[11px] text-gray-200 truncate">{s.label}</div>
-                      <div className="font-mono text-[10px] text-gray-500 truncate">{s.path}</div>
+                      <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate">{s.path}</div>
                     </button>
                   );
                 })}
@@ -2943,7 +2943,7 @@ function SessionPicker({
             </span>
             <span className="font-mono text-[11px] text-gray-200 truncate">{selected.id}</span>
           </div>
-          <div className="font-mono text-[10px] text-gray-500 truncate mt-0.5">{selected.cwd}</div>
+          <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate mt-0.5">{selected.cwd}</div>
         </div>
         <button
           onClick={() => onSelect(null)}
@@ -2960,7 +2960,7 @@ function SessionPicker({
     <div ref={containerRef} className="relative mt-2">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full text-left rounded-md border border-dashed border-border bg-surface-2 hover:bg-surface-3 px-3 py-2 text-[11px] text-gray-400 inline-flex items-center gap-2"
+        className="w-full text-left rounded-md border border-dashed border-border bg-surface-2 hover:bg-surface-3 px-3 py-2 text-[11px] text-gray-600 dark:text-gray-400 inline-flex items-center gap-2"
       >
         <RotateCcw className="w-3.5 h-3.5" />
         {t("resume.pickSession")}
@@ -2969,7 +2969,7 @@ function SessionPicker({
       {open && (
         <div className="absolute z-30 left-0 right-0 mt-1 rounded-md border border-border bg-surface-1 shadow-lg shadow-black/40 overflow-hidden">
           <div className="px-3 py-2 border-b border-border flex items-center gap-2">
-            <Search className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+            <Search className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
             <input
               autoFocus
               value={query}
@@ -2980,9 +2980,9 @@ function SessionPicker({
           </div>
           <div className="max-h-72 overflow-auto py-1">
             {sessions === null ? (
-              <div className="px-3 py-2 text-[11px] text-gray-500">…</div>
+              <div className="px-3 py-2 text-[11px] text-gray-700 dark:text-gray-500">…</div>
             ) : filtered.length === 0 ? (
-              <div className="px-3 py-2 text-[11px] text-gray-500">{t("resume.noSessions")}</div>
+              <div className="px-3 py-2 text-[11px] text-gray-700 dark:text-gray-500">{t("resume.noSessions")}</div>
             ) : (
               filtered.map((s) => (
                 <button
@@ -3003,7 +3003,7 @@ function SessionPicker({
                             ? "bg-sky-500/10 text-sky-300 border-sky-500/30"
                             : s.status === "error"
                               ? "bg-red-500/10 text-red-300 border-red-500/30"
-                              : "bg-surface-3 text-gray-400 border-border"
+                              : "bg-surface-3 text-gray-600 dark:text-gray-400 border-border"
                       }`}
                     >
                       {s.status}
@@ -3015,7 +3015,7 @@ function SessionPicker({
                       {new Date(s.started_at).toLocaleString()}
                     </span>
                   </div>
-                  <div className="font-mono text-[10px] text-gray-500 truncate">{s.cwd}</div>
+                  <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate">{s.cwd}</div>
                 </button>
               ))
             )}
@@ -3131,7 +3131,7 @@ function Select<T extends string>({
         className="w-full flex items-center justify-between gap-2 bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] text-gray-100 focus:outline-none focus:border-accent/50 hover:bg-surface-3 transition-colors"
       >
         <span className="truncate">{current?.label ?? "—"}</span>
-        <ChevronDown className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+        <ChevronDown className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
       </button>
       {open && (
         <div
@@ -3164,7 +3164,7 @@ function Select<T extends string>({
                   {isSelected && <Check className="w-3 h-3 text-accent flex-shrink-0" />}
                 </div>
                 {opt.hint && (
-                  <div className="text-[10px] text-gray-500 truncate mt-0.5">{opt.hint}</div>
+                  <div className="text-[10px] text-gray-700 dark:text-gray-500 truncate mt-0.5">{opt.hint}</div>
                 )}
               </button>
             );
@@ -3292,12 +3292,12 @@ function RunSession(props: RunSessionProps) {
         <StatusPill status={props.handle.status} />
         <ModeBadge mode={props.mode} />
         {init?.model && (
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border">
+          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
             {init.model}
           </span>
         )}
         {props.handle.sessionId && (
-          <span className="text-[10px] font-mono text-gray-500 truncate max-w-xs">
+          <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500 truncate max-w-xs">
             {props.handle.sessionId.slice(0, 8)}…
           </span>
         )}
@@ -3380,7 +3380,7 @@ function EmptyStream({ isLive }: { isLive: boolean }) {
   const { t } = useTranslation("run");
   if (isLive) {
     return (
-      <div className="text-center py-12 text-gray-500 flex flex-col items-center gap-2">
+      <div className="text-center py-12 text-gray-700 dark:text-gray-500 flex flex-col items-center gap-2">
         <RefreshCw className="w-5 h-5 animate-spin" />
         <span className="text-xs">{t("status.spawning")}</span>
       </div>
@@ -3389,15 +3389,15 @@ function EmptyStream({ isLive }: { isLive: boolean }) {
   return (
     <div className="text-center py-12 flex flex-col items-center gap-2">
       <Sparkles className="w-6 h-6 text-gray-600" />
-      <div className="text-sm font-medium text-gray-400">{t("empty.title")}</div>
-      <div className="text-xs text-gray-500 max-w-md">{t("empty.body")}</div>
+      <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("empty.title")}</div>
+      <div className="text-xs text-gray-700 dark:text-gray-500 max-w-md">{t("empty.body")}</div>
     </div>
   );
 }
 
 function StatusPill({ status }: { status: string }) {
   const { t } = useTranslation("run");
-  const idle = { color: "bg-surface-3 text-gray-400 border-border", icon: Clock as typeof Play };
+  const idle = { color: "bg-surface-3 text-gray-600 dark:text-gray-400 border-border", icon: Clock as typeof Play };
   const config: Record<string, { color: string; icon: typeof Play }> = {
     spawning: { color: "bg-amber-500/15 text-amber-300 border-amber-500/30", icon: RefreshCw },
     running: { color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: Sparkles },
@@ -3406,7 +3406,7 @@ function StatusPill({ status }: { status: string }) {
       icon: CheckCircle2,
     },
     error: { color: "bg-red-500/15 text-red-300 border-red-500/30", icon: XCircle },
-    killed: { color: "bg-gray-500/15 text-gray-400 border-gray-500/30", icon: Square },
+    killed: { color: "bg-gray-500/15 text-gray-600 dark:text-gray-400 border-gray-500/30", icon: Square },
     abandoned: {
       color: "bg-orange-500/10 text-orange-300 border-orange-500/30",
       icon: Square,
@@ -3431,7 +3431,7 @@ function StatusPill({ status }: { status: string }) {
 function ModeBadge({ mode }: { mode: RunMode }) {
   const { t } = useTranslation("run");
   return (
-    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-400 border border-border inline-flex items-center gap-1">
+    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border inline-flex items-center gap-1">
       {mode === "conversation" ? (
         <Terminal className="w-3 h-3" />
       ) : (
@@ -3588,7 +3588,7 @@ function ToolUseBlock({ toolUse }: { toolUse: Extract<ContentBlock, { type: "too
         )}
         <Wrench className="w-3 h-3 text-amber-300 flex-shrink-0" />
         <span className="font-mono text-amber-200">{toolUse.name}</span>
-        {summary && <span className="text-gray-500 truncate">· {summary}</span>}
+        {summary && <span className="text-gray-700 dark:text-gray-500 truncate">· {summary}</span>}
         <span className="text-[10px] text-gray-600 ml-auto">{t("events.tool")}</span>
       </button>
       {open && (
@@ -3653,10 +3653,10 @@ function ToolResultBlock({ result }: { result: Extract<ContentBlock, { type: "to
 function UnknownTurn({ env }: { env: Envelope }) {
   return (
     <details className="rounded-md border border-border bg-surface-2 px-2.5 py-1.5">
-      <summary className="text-[10px] font-mono text-gray-500 cursor-pointer">
+      <summary className="text-[10px] font-mono text-gray-700 dark:text-gray-500 cursor-pointer">
         {(env.type as string) || "?"}
       </summary>
-      <pre className="mt-2 text-[10px] font-mono text-gray-400 whitespace-pre-wrap break-words max-h-48 overflow-auto">
+      <pre className="mt-2 text-[10px] font-mono text-gray-600 dark:text-gray-400 whitespace-pre-wrap break-words max-h-48 overflow-auto">
         {JSON.stringify(env, null, 2)}
       </pre>
     </details>

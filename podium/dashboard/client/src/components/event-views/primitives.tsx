@@ -32,7 +32,7 @@ export function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={copy}
-      className="flex items-center gap-1 text-[10px] py-0.5 px-1.5 rounded text-gray-400 hover:text-gray-200 hover:bg-surface-2 cursor-pointer"
+      className="flex items-center gap-1 text-[10px] py-0.5 px-1.5 rounded text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-surface-2 cursor-pointer"
       aria-label={t("eventDetail.copy")}
     >
       {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -47,11 +47,11 @@ export function Terminal({ command, description }: { command: string; descriptio
   return (
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
       <div className="flex items-center justify-between px-3 py-1 border-b border-border bg-black/40">
-        <span className="text-gray-500 text-[10px] uppercase tracking-wide">terminal</span>
+        <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide">terminal</span>
         <CopyButton text={command} />
       </div>
       <pre className="px-3 py-2 text-gray-200 whitespace-pre-wrap break-words">
-        {description && <div className="text-gray-500 mb-1"># {description}</div>}
+        {description && <div className="text-gray-700 dark:text-gray-500 mb-1"># {description}</div>}
         <div>
           <span className="text-emerald-400 select-none">$ </span>
           {command}
@@ -114,7 +114,7 @@ function OutputBlock({
   return (
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
       <div className="flex items-center justify-between px-3 py-1 border-b border-border bg-black/40">
-        <span className="text-gray-500 text-[10px] uppercase tracking-wide">{label}</span>
+        <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide">{label}</span>
         <CopyButton text={text} />
       </div>
       <pre className={`px-3 py-2 whitespace-pre-wrap break-words max-h-96 overflow-auto ${color}`}>
@@ -142,7 +142,7 @@ export function LineNumberedCode({
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
       {label && (
         <div className="flex items-center justify-between px-3 py-1 border-b border-border bg-black/40">
-          <span className="text-gray-500 text-[10px] uppercase tracking-wide">{label}</span>
+          <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide">{label}</span>
           <CopyButton text={text} />
         </div>
       )}
@@ -176,7 +176,7 @@ export type DiffHunk = {
 
 export function UnifiedDiff({ hunks }: { hunks: DiffHunk[] }) {
   if (hunks.length === 0) {
-    return <p className="text-[11px] text-gray-500 italic">no diff</p>;
+    return <p className="text-[11px] text-gray-700 dark:text-gray-500 italic">no diff</p>;
   }
   return (
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
@@ -249,7 +249,7 @@ export function KeyValueCard({
   const ordered = [...priorityEntries, ...restEntries];
 
   if (ordered.length === 0) {
-    return <p className="text-[11px] text-gray-500 italic">empty</p>;
+    return <p className="text-[11px] text-gray-700 dark:text-gray-500 italic">empty</p>;
   }
 
   return (
@@ -257,7 +257,7 @@ export function KeyValueCard({
       <tbody>
         {ordered.map(([k, v], i) => (
           <tr key={k} className={i > 0 ? "border-t border-border" : ""}>
-            <td className="text-gray-500 align-top py-1.5 px-2 font-mono bg-surface-3/60 w-[28%] break-all">
+            <td className="text-gray-700 dark:text-gray-500 align-top py-1.5 px-2 font-mono bg-surface-3/60 w-[28%] break-all">
               {k}
             </td>
             <td className="text-gray-300 align-top py-1.5 px-2">
@@ -271,14 +271,14 @@ export function KeyValueCard({
 }
 
 function ValueCell({ value }: { value: unknown }) {
-  if (value == null) return <span className="text-gray-500 italic">null</span>;
+  if (value == null) return <span className="text-gray-700 dark:text-gray-500 italic">null</span>;
   if (typeof value === "boolean")
     return (
       <span
         className={`inline-block px-2 py-0.5 rounded border text-[11px] font-mono ${
           value
             ? "text-green-400 border-green-500/30 bg-green-500/10"
-            : "text-gray-400 border-gray-500/30 bg-gray-500/10"
+            : "text-gray-600 dark:text-gray-400 border-gray-500/30 bg-gray-500/10"
         }`}
       >
         {String(value)}
@@ -296,7 +296,7 @@ function ValueCell({ value }: { value: unknown }) {
     return <span className="font-mono text-gray-300 break-all">{value}</span>;
   }
   if (Array.isArray(value)) {
-    if (value.length === 0) return <span className="text-gray-500 italic">[]</span>;
+    if (value.length === 0) return <span className="text-gray-700 dark:text-gray-500 italic">[]</span>;
     return (
       <ol className="list-decimal pl-4 space-y-1">
         {value.map((item, i) => (
@@ -325,7 +325,7 @@ function safeStringify(value: unknown): string {
 // ───────────────────────── File list / match list ─────────────────────────
 
 export function FileList({ paths }: { paths: string[] }) {
-  if (paths.length === 0) return <p className="text-[11px] text-gray-500 italic">no files</p>;
+  if (paths.length === 0) return <p className="text-[11px] text-gray-700 dark:text-gray-500 italic">no files</p>;
   return (
     <ul className="divide-y divide-border border border-border rounded overflow-hidden text-[11px] max-h-80 overflow-y-auto">
       {paths.map((p, i) => (
@@ -344,14 +344,14 @@ export type GrepMatch = {
 };
 
 export function MatchList({ matches }: { matches: GrepMatch[] }) {
-  if (matches.length === 0) return <p className="text-[11px] text-gray-500 italic">no matches</p>;
+  if (matches.length === 0) return <p className="text-[11px] text-gray-700 dark:text-gray-500 italic">no matches</p>;
   return (
     <ul className="divide-y divide-border border border-border rounded overflow-hidden text-[11px] max-h-80 overflow-y-auto font-mono">
       {matches.map((m, i) => (
         <li key={i} className="px-3 py-1 text-gray-300 break-all">
           {m.file && <span className="text-cyan-300">{m.file}</span>}
-          {m.line != null && <span className="text-gray-500">:{m.line}</span>}
-          {m.text && <span className="text-gray-400">: {m.text}</span>}
+          {m.line != null && <span className="text-gray-700 dark:text-gray-500">:{m.line}</span>}
+          {m.text && <span className="text-gray-600 dark:text-gray-400">: {m.text}</span>}
         </li>
       ))}
     </ul>

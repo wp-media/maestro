@@ -60,7 +60,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
           </div>
           <div className="min-w-0 overflow-hidden">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{title}</p>
-            <p className="text-[11px] text-gray-500 font-mono truncate">
+            <p className="text-[11px] text-gray-700 dark:text-gray-500 font-mono truncate">
               {session.id.slice(0, 12)}
             </p>
           </div>
@@ -69,12 +69,12 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
       </div>
 
       {session.cwd && (
-        <p className="text-xs text-gray-400 mb-3 truncate font-mono leading-relaxed">
+        <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 truncate font-mono leading-relaxed">
           {session.cwd}
         </p>
       )}
 
-      <div className="flex items-center gap-3 text-[11px] text-gray-500 min-w-0 overflow-hidden flex-wrap">
+      <div className="flex items-center gap-3 text-[11px] text-gray-700 dark:text-gray-500 min-w-0 overflow-hidden flex-wrap">
         <span className="flex items-center gap-1 flex-shrink-0">
           <Bot className="w-3 h-3" />
           {t("session.agentSummary", { count: agentCount })}

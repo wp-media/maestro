@@ -158,12 +158,12 @@ export function DateTimePicker({
         title={title}
         className={`flex items-center gap-2 bg-surface-2 border ${isOpen ? "border-accent" : "border-border"} rounded px-2 py-1.5 min-w-[150px] text-xs focus:outline-none focus:border-accent transition-colors w-full text-left`}
       >
-        <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-        <span className={`flex-1 truncate ${!dateObj ? "text-gray-500" : "text-gray-200"}`}>
+        <Calendar className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 shrink-0" />
+        <span className={`flex-1 truncate ${!dateObj ? "text-gray-700 dark:text-gray-500" : "text-gray-200"}`}>
           {dateObj ? formatDisplay(dateObj) : placeholder}
         </span>
         {dateObj && (
-          <X className="w-3 h-3 text-gray-500 hover:text-white shrink-0" onClick={clearValue} />
+          <X className="w-3 h-3 text-gray-700 dark:text-gray-500 hover:text-white shrink-0" onClick={clearValue} />
         )}
       </button>
 
@@ -178,7 +178,7 @@ export function DateTimePicker({
               onClick={() =>
                 setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))
               }
-              className="p-1 hover:bg-surface-2 rounded text-gray-400 hover:text-white"
+              className="p-1 hover:bg-surface-2 rounded text-gray-600 dark:text-gray-400 hover:text-white"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -190,7 +190,7 @@ export function DateTimePicker({
               onClick={() =>
                 setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))
               }
-              className="p-1 hover:bg-surface-2 rounded text-gray-400 hover:text-white"
+              className="p-1 hover:bg-surface-2 rounded text-gray-600 dark:text-gray-400 hover:text-white"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -200,7 +200,7 @@ export function DateTimePicker({
           <div>
             <div className="grid grid-cols-7 gap-1 mb-1">
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                <div key={day} className="w-6 text-center text-[10px] font-medium text-gray-500">
+                <div key={day} className="w-6 text-center text-[10px] font-medium text-gray-700 dark:text-gray-500">
                   {day}
                 </div>
               ))}
@@ -210,7 +210,7 @@ export function DateTimePicker({
 
           {/* Time Picker */}
           <div className="pt-3 border-t border-border flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-gray-400">
+            <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
               <Clock className="w-3.5 h-3.5" />
               <span className="text-[11px] font-medium">Time</span>
             </div>

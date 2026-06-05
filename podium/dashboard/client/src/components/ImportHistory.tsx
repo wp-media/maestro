@@ -208,10 +208,10 @@ export function ImportHistory() {
   return (
     <section>
       <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
-        <History className="w-4 h-4 text-gray-500" />
+        <History className="w-4 h-4 text-gray-700 dark:text-gray-500" />
         {t("import.title")}
       </h3>
-      <p className="text-xs text-gray-500 mb-4">{t("import.description")}</p>
+      <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("import.description")}</p>
 
       <div className="card p-5 space-y-5">
         {/* Step-by-step instructions */}
@@ -224,15 +224,15 @@ export function ImportHistory() {
               <ListChecks className="w-3.5 h-3.5 text-blue-400" />
               {t("import.instructions")}
             </span>
-            <span className="text-[11px] text-gray-500">{instructionsOpen ? "▾" : "▸"}</span>
+            <span className="text-[11px] text-gray-700 dark:text-gray-500">{instructionsOpen ? "▾" : "▸"}</span>
           </button>
           {instructionsOpen && (
             <div className="px-4 py-4 space-y-4 text-sm text-gray-300 bg-surface-1">
               {/* Default location card */}
               {guide && (
                 <div className="flex flex-wrap items-center gap-2 text-xs bg-surface-2 border border-border rounded-md px-3 py-2">
-                  <HardDrive className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-400">{t("import.defaultLocation")}:</span>
+                  <HardDrive className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-600 dark:text-gray-400">{t("import.defaultLocation")}:</span>
                   <code className="font-mono text-gray-200 truncate">
                     {guide.default_projects_dir_display}
                   </code>
@@ -240,7 +240,7 @@ export function ImportHistory() {
                     <span className="inline-flex items-center gap-1 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                       <CheckCircle2 className="w-3 h-3" />
                       {t("import.locationFound")}
-                      <span className="text-gray-500 ml-1">
+                      <span className="text-gray-700 dark:text-gray-500 ml-1">
                         · {guide.default_projects_dir_stats.projects} {t("import.projectsLabel")},{" "}
                         {guide.default_projects_dir_stats.jsonl_files} {t("import.jsonlLabel")}
                       </span>
@@ -260,13 +260,13 @@ export function ImportHistory() {
                 <Step title={t("import.stepArchive")} body={t("import.stepArchiveBody")}>
                   {guide && (
                     <div className="mt-2 flex items-center gap-2 bg-surface-2 border border-border rounded-md px-3 py-2">
-                      <Terminal className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                      <Terminal className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                       <code className="flex-1 text-xs font-mono text-gray-200 truncate">
                         {guide.archive_command}
                       </code>
                       <button
                         onClick={copyArchiveCmd}
-                        className="text-xs text-gray-400 hover:text-gray-200 flex items-center gap-1 flex-shrink-0"
+                        className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-200 flex items-center gap-1 flex-shrink-0"
                       >
                         {copied ? (
                           <>
@@ -285,7 +285,7 @@ export function ImportHistory() {
                 <Step title={t("import.stepVerify")} body={t("import.stepVerifyBody")} />
               </div>
 
-              <div className="text-[11px] text-gray-500 flex items-start gap-2 pt-2 border-t border-border">
+              <div className="text-[11px] text-gray-700 dark:text-gray-500 flex items-start gap-2 pt-2 border-t border-border">
                 <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
                 <span>{t("import.accuracyNote")}</span>
               </div>
@@ -323,7 +323,7 @@ export function ImportHistory() {
           {mode === "rescan" && (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <FolderOpen className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                <FolderOpen className="w-4 h-4 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                 <code className="font-mono text-xs text-gray-300 truncate">
                   {guide?.default_projects_dir_display || "~/.claude/projects"}
                 </code>
@@ -354,7 +354,7 @@ export function ImportHistory() {
                   className="input w-full text-sm font-mono"
                   spellCheck={false}
                 />
-                <p className="text-[11px] text-gray-500 mt-1.5">{t("import.folderHelper")}</p>
+                <p className="text-[11px] text-gray-700 dark:text-gray-500 mt-1.5">{t("import.folderHelper")}</p>
               </div>
               <div className="flex justify-end">
                 <button
@@ -393,9 +393,9 @@ export function ImportHistory() {
                     : "border-border hover:border-gray-500 bg-surface-1"
                 }`}
               >
-                <UploadCloud className="w-6 h-6 text-gray-500 mx-auto mb-2" />
+                <UploadCloud className="w-6 h-6 text-gray-700 dark:text-gray-500 mx-auto mb-2" />
                 <p className="text-sm text-gray-300">{t("import.dropzoneHint")}</p>
-                <p className="text-[11px] text-gray-500 mt-1">{t("import.dropzoneSub")}</p>
+                <p className="text-[11px] text-gray-700 dark:text-gray-500 mt-1">{t("import.dropzoneSub")}</p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -407,8 +407,8 @@ export function ImportHistory() {
               </div>
               {files.length > 0 && (
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-surface-3 rounded-md px-3 py-2">
-                  <span className="text-gray-400">
-                    <FileArchive className="w-3.5 h-3.5 inline mr-1.5 text-gray-500" />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    <FileArchive className="w-3.5 h-3.5 inline mr-1.5 text-gray-700 dark:text-gray-500" />
                     {t("import.filesSelected", { count: files.length })}
                     <span className="text-gray-600 ml-2">({formatBytes(totalSize)})</span>
                   </span>
@@ -417,7 +417,7 @@ export function ImportHistory() {
                       setFiles([]);
                       if (fileInputRef.current) fileInputRef.current.value = "";
                     }}
-                    className="text-gray-500 hover:text-gray-300 text-[11px]"
+                    className="text-gray-700 dark:text-gray-500 hover:text-gray-300 text-[11px]"
                   >
                     {t("import.clearSelection")}
                   </button>
@@ -443,7 +443,7 @@ export function ImportHistory() {
 
         {/* In-flight progress */}
         {running && progressText && (
-          <div className="flex items-center gap-2 text-xs text-gray-400 bg-surface-2 border border-border rounded-md px-3 py-2">
+          <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 bg-surface-2 border border-border rounded-md px-3 py-2">
             <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400 flex-shrink-0" />
             <span className="truncate">{progressText}</span>
             {progress?.current && (
@@ -483,16 +483,16 @@ export function ImportHistory() {
               <ResultStat
                 label={t("import.result.skipped", { count: result.skipped })}
                 value={result.skipped}
-                color="text-gray-400"
+                color="text-gray-600 dark:text-gray-400"
               />
               <ResultStat
                 label={t("import.result.errors", { count: result.errors })}
                 value={result.errors}
-                color={result.errors > 0 ? "text-red-300" : "text-gray-500"}
+                color={result.errors > 0 ? "text-red-300" : "text-gray-700 dark:text-gray-500"}
               />
             </div>
             {typeof result.files_scanned === "number" && (
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[11px] text-gray-700 dark:text-gray-500">
                 {t("import.result.filesScanned", { count: result.files_scanned })}
                 {result.path ? ` · ${result.path}` : ""}
               </p>
@@ -516,7 +516,7 @@ function Step({
   return (
     <div>
       <p className="text-sm font-medium text-gray-200">{title}</p>
-      <p className="text-xs text-gray-400 mt-1 whitespace-pre-line">{body}</p>
+      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">{body}</p>
       {children}
     </div>
   );
@@ -552,7 +552,7 @@ function ModeButton({
         {icon}
         {title}
       </div>
-      <p className="text-[11px] text-gray-500 leading-snug">{desc}</p>
+      <p className="text-[11px] text-gray-700 dark:text-gray-500 leading-snug">{desc}</p>
     </button>
   );
 }
@@ -561,7 +561,7 @@ function ResultStat({ label, value, color }: { label: string; value: number; col
   return (
     <div className="bg-surface-2 rounded-md px-2.5 py-2">
       <p className={`text-sm font-semibold ${color}`}>{value.toLocaleString()}</p>
-      <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-0.5">{label}</p>
+      <p className="text-[10px] text-gray-700 dark:text-gray-500 uppercase tracking-wider mt-0.5">{label}</p>
     </div>
   );
 }

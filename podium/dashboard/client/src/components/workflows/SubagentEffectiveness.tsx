@@ -93,7 +93,7 @@ function SuccessRing({ rate, color }: SuccessRingProps) {
           {clampedRate.toFixed(0)}%
         </text>
       </svg>
-      <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">
+      <span className="text-[10px] font-medium text-gray-700 dark:text-gray-500 uppercase tracking-wider">
         {t("effectiveness.success")}
       </span>
     </div>
@@ -232,7 +232,7 @@ function SparklineTooltip({
       style={{ left: pos.left, top: pos.top }}
     >
       <span className="font-medium">{label}</span>
-      <span className="text-gray-400 mx-1">·</span>
+      <span className="text-gray-600 dark:text-gray-400 mx-1">·</span>
       <span className="tabular-nums" style={{ color }}>
         {t("effectiveness.sessionCount", { count: value })}
       </span>
@@ -252,7 +252,7 @@ function MetricBox({ label, value }: MetricBoxProps) {
       <span className="text-xs font-semibold text-gray-200 tabular-nums truncate w-full text-center">
         {value}
       </span>
-      <span className="text-[9px] text-gray-500 uppercase tracking-wider truncate w-full text-center">
+      <span className="text-[9px] text-gray-700 dark:text-gray-500 uppercase tracking-wider truncate w-full text-center">
         {label}
       </span>
     </div>
@@ -305,7 +305,7 @@ function ScoreCard({ item, colorIndex }: ScoreCardProps) {
 
       {/* Sparkline */}
       <div className="flex flex-col gap-1">
-        <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+        <span className="text-[10px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
           {t("effectiveness.weeklyActivity")}
         </span>
         <Sparkline data={item.trend} color={color} />
@@ -322,7 +322,7 @@ export function SubagentEffectiveness({ data }: SubagentEffectivenessProps) {
   const { t } = useTranslation("workflows");
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center py-16 text-gray-500 text-sm">
+      <div className="flex items-center justify-center py-16 text-gray-700 dark:text-gray-500 text-sm">
         {t("effectiveness.noData")}
       </div>
     );

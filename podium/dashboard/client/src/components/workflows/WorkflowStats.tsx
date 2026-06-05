@@ -189,7 +189,7 @@ function InfoPopover({ calculationKey, interp, valueDisplay, metricPhraseKey }: 
             <span className="text-base font-semibold text-gray-100 tabular-nums">
               {valueDisplay}
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-gray-500">
+            <span className="text-[10px] uppercase tracking-wider text-gray-700 dark:text-gray-500">
               {metricPhrase}
             </span>
           </div>
@@ -197,12 +197,12 @@ function InfoPopover({ calculationKey, interp, valueDisplay, metricPhraseKey }: 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("stats.tooltip.howCalc")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">{t(calculationKey)}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(calculationKey)}</p>
 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("stats.tooltip.whatItMeans")}
           </p>
-          <p className="text-gray-400 leading-snug">{valueMeans}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug">{valueMeans}</p>
         </div>
       )}
     </>
@@ -233,7 +233,7 @@ function StatCard({
   return (
     <div className="bg-surface-2 border border-border rounded-xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider leading-none">
+        <span className="text-[10px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider leading-none">
           {label}
         </span>
         <Icon className={`w-4 h-4 flex-shrink-0 ${accentClass}`} />

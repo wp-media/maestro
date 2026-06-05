@@ -305,7 +305,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
                   } ${
                     isActive
                       ? "bg-accent/10 text-accent border border-accent/20"
-                      : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3 border border-transparent"
+                      : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3 border border-transparent"
                   }`
                 }
               >
@@ -346,7 +346,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           onClick={onToggle}
           className={`w-full h-10 rounded-lg border border-border bg-surface-2 transition-colors ${
             collapsed
-              ? "flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3"
+              ? "flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3"
               : "flex items-center gap-2.5 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-surface-3"
           }`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -383,7 +383,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           >
             <span
               className={`inline-flex items-center gap-2 ${
-                wsConnected ? "text-emerald-400" : "text-gray-500"
+                wsConnected ? "text-emerald-400" : "text-gray-700 dark:text-gray-500"
               }`}
             >
               {wsConnected ? (
@@ -432,7 +432,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
               href="https://github.com/wp-media"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
+              className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
               title="GitHub"
               aria-label="GitHub"
             >
@@ -442,7 +442,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
               href="https://wp-media.me"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
+              className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
               title={websiteLabel}
               aria-label={websiteLabel}
             >
@@ -575,7 +575,7 @@ function ConnectionStatusModal({
               className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 ${
                 wsConnected
                   ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                  : "bg-surface-3 border-border text-gray-400"
+                  : "bg-surface-3 border-border text-gray-600 dark:text-gray-400"
               }`}
             >
               {wsConnected ? (
@@ -593,7 +593,7 @@ function ConnectionStatusModal({
               </h2>
               <p
                 className={`text-[11px] font-medium inline-flex items-center gap-1.5 leading-tight ${
-                  wsConnected ? "text-emerald-400" : "text-gray-500"
+                  wsConnected ? "text-emerald-400" : "text-gray-700 dark:text-gray-500"
                 }`}
               >
                 {wsConnected && (
@@ -610,7 +610,7 @@ function ConnectionStatusModal({
             type="button"
             onClick={close}
             aria-label="Close"
-            className="p-1.5 -m-1 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 transition-colors flex-shrink-0"
+            className="p-1.5 -m-1 rounded-lg text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 transition-colors flex-shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -654,7 +654,7 @@ function ConnectionStatusModal({
           {/* Top event types */}
           <Section title="Top event types" icon={BarChart3}>
             {topTypes.length === 0 ? (
-              <p className="text-xs text-gray-500 italic">No events yet</p>
+              <p className="text-xs text-gray-700 dark:text-gray-500 italic">No events yet</p>
             ) : (
               <div className="space-y-1.5">
                 {topTypes.map(([type, count]) => (
@@ -667,7 +667,7 @@ function ConnectionStatusModal({
           {/* Recent activity */}
           <Section title="Recent activity" icon={Clock}>
             {recentEvents.length === 0 ? (
-              <p className="text-xs text-gray-500 italic">No events yet</p>
+              <p className="text-xs text-gray-700 dark:text-gray-500 italic">No events yet</p>
             ) : (
               <ul className="space-y-1">
                 {recentEvents.map((evt, i) => (
@@ -676,7 +676,7 @@ function ConnectionStatusModal({
                     className="flex items-center justify-between gap-3 text-[11px] font-mono px-2 py-1 rounded bg-surface-2/50"
                   >
                     <span className="text-gray-700 dark:text-gray-200 truncate">{evt.type}</span>
-                    <span className="text-gray-500 flex-shrink-0">{formatRelative(evt.at)}</span>
+                    <span className="text-gray-700 dark:text-gray-500 flex-shrink-0">{formatRelative(evt.at)}</span>
                   </li>
                 ))}
               </ul>
@@ -685,11 +685,11 @@ function ConnectionStatusModal({
         </div>
 
         <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border bg-surface-2/40">
-          <span className="text-[10px] text-gray-500">Stats persist across reloads</span>
+          <span className="text-[10px] text-gray-700 dark:text-gray-500">Stats persist across reloads</span>
           <button
             type="button"
             onClick={onResetStats}
-            className="text-[11px] font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-surface-3 px-2 py-1 rounded transition-colors"
+            className="text-[11px] font-medium text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-surface-3 px-2 py-1 rounded transition-colors"
           >
             Reset
           </button>
@@ -725,12 +725,12 @@ function Section({
 function KpiTile({ label, value, unit }: { label: string; value: string; unit: string }) {
   return (
     <div className="rounded-lg border border-border bg-surface-2 px-2.5 py-2">
-      <div className="text-[9px] font-semibold uppercase tracking-wider text-gray-500 truncate">
+      <div className="text-[9px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 truncate">
         {label}
       </div>
       <div className="mt-0.5 flex items-baseline gap-1 truncate">
         <span className="text-base font-semibold text-gray-800 dark:text-gray-100 font-mono">{value}</span>
-        <span className="text-[10px] font-medium text-gray-500 truncate">{unit}</span>
+        <span className="text-[10px] font-medium text-gray-700 dark:text-gray-500 truncate">{unit}</span>
       </div>
     </div>
   );
@@ -739,7 +739,7 @@ function KpiTile({ label, value, unit }: { label: string; value: string; unit: s
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-start justify-between gap-3 text-xs">
-      <span className="text-gray-500 font-medium uppercase tracking-wider text-[10px] pt-0.5">
+      <span className="text-gray-700 dark:text-gray-500 font-medium uppercase tracking-wider text-[10px] pt-0.5">
         {label}
       </span>
       <span className={`text-gray-700 dark:text-gray-200 text-right break-all min-w-0 ${mono ? "font-mono" : ""}`}>
@@ -766,7 +766,7 @@ function TypeBar({
     <div className="text-[11px]">
       <div className="flex items-center justify-between gap-2 mb-0.5">
         <span className="font-mono text-gray-700 dark:text-gray-200 truncate">{type}</span>
-        <span className="text-gray-500 flex-shrink-0 font-mono">
+        <span className="text-gray-700 dark:text-gray-500 flex-shrink-0 font-mono">
           {count} · {sharePct}%
         </span>
       </div>
@@ -824,7 +824,7 @@ function Sparkline({
           />
         )}
       </svg>
-      <div className="flex items-center justify-between mt-1.5 text-[10px] text-gray-500 font-mono">
+      <div className="flex items-center justify-between mt-1.5 text-[10px] text-gray-700 dark:text-gray-500 font-mono">
         <span>−60s</span>
         <span>{avgLabel}</span>
         <span>{"now"}</span>

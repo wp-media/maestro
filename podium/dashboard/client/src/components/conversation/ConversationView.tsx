@@ -351,10 +351,10 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           )}
-          <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-500 font-mono bg-surface-2 border border-surface-3 rounded-md px-2 py-1">
+          <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-700 dark:text-gray-500 font-mono bg-surface-2 border border-surface-3 rounded-md px-2 py-1">
             <MessagesSquare className="w-3 h-3" />
             {total} message{total !== 1 ? "s" : ""}
           </span>
@@ -364,7 +364,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
             disabled={refreshing || loading}
             title="Refresh conversation"
             aria-label="Refresh conversation"
-            className="inline-flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-gray-200 bg-surface-2 border border-surface-3 hover:border-violet-500/30 rounded-md px-2 py-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-200 bg-surface-2 border border-surface-3 hover:border-violet-500/30 rounded-md px-2 py-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
@@ -389,8 +389,8 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
         {/* History loading indicator */}
         {loadingHistory && (
           <div className="flex justify-center py-3">
-            <Loader2 className="w-4 h-4 text-gray-500 animate-spin" />
-            <span className="text-xs text-gray-500 ml-2">Loading history...</span>
+            <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-500 animate-spin" />
+            <span className="text-xs text-gray-700 dark:text-gray-500 ml-2">Loading history...</span>
           </div>
         )}
 
@@ -402,16 +402,16 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center py-12 text-gray-500 text-sm">
+          <div className="flex items-center justify-center py-12 text-gray-700 dark:text-gray-500 text-sm">
             Loading conversation...
           </div>
         ) : messages.length === 0 ? (
           <div className="mx-auto max-w-md py-12 text-center">
-            <p className="text-sm text-gray-400">No conversation records found.</p>
-            <p className="mt-2 text-xs leading-relaxed text-gray-500">
+            <p className="text-sm text-gray-600 dark:text-gray-400">No conversation records found.</p>
+            <p className="mt-2 text-xs leading-relaxed text-gray-700 dark:text-gray-500">
               This session's metadata was imported, but its transcript file is no longer on disk.
               Claude Code automatically deletes inactive session transcripts after a retention
-              period (<code className="text-gray-400">cleanupPeriodDays</code>, default 30 days), so
+              period (<code className="text-gray-600 dark:text-gray-400">cleanupPeriodDays</code>, default 30 days), so
               older conversations may already be gone. Sessions imported from now on are snapshotted
               and kept even after Claude Code prunes the originals.
             </p>

@@ -163,13 +163,13 @@ export function Workflows() {
         />
         {selectedNode && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-gray-500">{t("filteredBy")}</span>
+            <span className="text-xs text-gray-700 dark:text-gray-500">{t("filteredBy")}</span>
             <span className="badge bg-accent/15 text-accent border border-accent/20 text-xs">
               {selectedNode}
             </span>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 underline"
+              className="text-xs text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 underline"
             >
               {t("clearFilter")}
             </button>
@@ -412,17 +412,17 @@ function ChartInfoPopover({ infoKey, title }: { infoKey: string; title: string }
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.what")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.what`)}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.what`)}</p>
 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.howToRead")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.howToRead`)}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.howToRead`)}</p>
 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.why")}
           </p>
-          <p className="text-gray-400 leading-snug">{t(`chartInfo.${infoKey}.why`)}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug">{t(`chartInfo.${infoKey}.why`)}</p>
         </div>
       )}
     </>
@@ -466,13 +466,13 @@ function PageHeader({
                 {t("common:live")}
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                 {t("common:offline")}
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-500">{t("subtitle")}</p>
+          <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -486,7 +486,7 @@ function PageHeader({
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 statusFilter === f.value
                   ? "bg-accent/15 text-accent"
-                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {f.label}
@@ -497,14 +497,14 @@ function PageHeader({
         {/* Actions */}
         <button
           onClick={onRefresh}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
+          className="p-2 rounded-lg text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
           title={t("refreshData")}
         >
           <RefreshCw className="w-4 h-4" />
         </button>
         <button
           onClick={onExport}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
+          className="p-2 rounded-lg text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
           title={t("exportJson")}
         >
           <Download className="w-4 h-4" />

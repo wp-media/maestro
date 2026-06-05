@@ -195,7 +195,7 @@ function Toggle({
     <label className="flex items-center justify-between gap-3 cursor-pointer group">
       <div className="min-w-0">
         <p className="text-sm text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">{label}</p>
-        {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
+        {description && <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5">{description}</p>}
       </div>
       <button
         type="button"
@@ -277,7 +277,7 @@ function PricingInfoTooltip() {
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="inline-flex items-center justify-center rounded-full p-0.5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 focus:outline-none focus:ring-1 focus:ring-accent/40"
+        className="inline-flex items-center justify-center rounded-full p-0.5 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 focus:outline-none focus:ring-1 focus:ring-accent/40"
       >
         <Info className="w-3.5 h-3.5" />
       </button>
@@ -293,24 +293,24 @@ function PricingInfoTooltip() {
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.howItWorks")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">{t("pricing.tooltip.howItWorksBody")}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t("pricing.tooltip.howItWorksBody")}</p>
 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.patternsTitle")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">{t("pricing.tooltip.patternsBody")}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t("pricing.tooltip.patternsBody")}</p>
 
           <p className="font-semibold text-amber-300 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.manualUpdates")}
           </p>
-          <p className="text-gray-400 leading-snug mb-2.5">
+          <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">
             {t("pricing.tooltip.manualUpdatesBody")}
           </p>
 
           <p className="font-semibold text-amber-300 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.apiPricing")}
           </p>
-          <p className="text-gray-400 leading-snug">{t("pricing.tooltip.apiPricingBody")}</p>
+          <p className="text-gray-600 dark:text-gray-400 leading-snug">{t("pricing.tooltip.apiPricingBody")}</p>
         </div>
       )}
     </>
@@ -639,7 +639,7 @@ export function Settings() {
           </button>
           <button
             onClick={cancelEdit}
-            className="p-1.5 rounded-md text-gray-400 hover:bg-surface-4 transition-colors"
+            className="p-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:bg-surface-4 transition-colors"
             title={t("common:cancel")}
           >
             <X className="w-4 h-4" />
@@ -713,20 +713,20 @@ export function Settings() {
                   {t("common:live")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 bg-gray-500/10 border border-gray-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                   {t("common:offline")}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500">{t("subtitle")}</p>
+            <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <a
             href={api.settings.exportData()}
             download
-            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-500 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-500 transition-colors"
           >
             <FileDown className="w-3.5 h-3.5" />
             {t("exportData")}
@@ -745,7 +745,7 @@ export function Settings() {
               <DollarSign className="w-6 h-6 text-emerald-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">{t("common:cost.totalEstimatedCost")}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-500">{t("common:cost.totalEstimatedCost")}</p>
               <p className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                 <Tip
                   raw={
@@ -759,7 +759,7 @@ export function Settings() {
               </p>
             </div>
           </div>
-          <div className="text-right text-xs text-gray-500">
+          <div className="text-right text-xs text-gray-700 dark:text-gray-500">
             <p>{t("acrossSessions")}</p>
             <p>{t("basedOnUsage")}</p>
           </div>
@@ -771,11 +771,11 @@ export function Settings() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
             <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-gray-500" />
+              <DollarSign className="w-4 h-4 text-gray-700 dark:text-gray-500" />
               {t("pricing.title")}
               <PricingInfoTooltip />
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">{t("pricing.description")}</p>
+            <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5">{t("pricing.description")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -788,7 +788,7 @@ export function Settings() {
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 ${
                 confirmAction === "reset-pricing"
                   ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4"
               }`}
             >
               <RotateCcw className="w-3 h-3" />
@@ -818,25 +818,25 @@ export function Settings() {
           <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-border text-left">
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                   {t("pricing.pattern")}
                 </th>
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                   {t("common:cost.model")}
                 </th>
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider text-right">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
                   {t("common:token.input")}
                 </th>
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider text-right">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
                   {t("common:token.output")}
                 </th>
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider text-right">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
                   {t("common:token.cacheRead")}
                 </th>
-                <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider text-right">
+                <th className="px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
                   {t("common:token.cacheWrite")}
                 </th>
-                <th className="w-24 px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="w-24 px-4 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                   {t("common:actions")}
                 </th>
               </tr>
@@ -856,16 +856,16 @@ export function Settings() {
                       {rule.model_pattern}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{rule.display_name}</td>
-                    <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-right font-mono">
                       ${rule.input_per_mtok}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-right font-mono">
                       ${rule.output_per_mtok}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-right font-mono">
                       ${rule.cache_read_per_mtok}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-right font-mono">
                       ${rule.cache_write_per_mtok}
                     </td>
                     <td className="px-4 py-3">
@@ -873,7 +873,7 @@ export function Settings() {
                         <button
                           onClick={() => startEdit(rule)}
                           disabled={isEditing}
-                          className="p-1.5 rounded-md text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors disabled:opacity-30"
+                          className="p-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors disabled:opacity-30"
                           title={t("common:edit")}
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -881,7 +881,7 @@ export function Settings() {
                         <button
                           onClick={() => deleteRule(rule.model_pattern)}
                           disabled={isEditing}
-                          className="p-1.5 rounded-md text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30"
+                          className="p-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30"
                           title={t("common:delete")}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -907,10 +907,10 @@ export function Settings() {
       {/* ─── HOOK CONFIGURATION ─── */}
       <section>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
-          <Plug className="w-4 h-4 text-gray-500" />
+          <Plug className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("hooks.title")}
         </h3>
-        <p className="text-xs text-gray-500 mb-4">{t("hooks.description")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("hooks.description")}</p>
 
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -954,7 +954,7 @@ export function Settings() {
                     ) : (
                       <XCircle className="w-3 h-3 text-red-400 flex-shrink-0" />
                     )}
-                    <span className="text-gray-400 truncate">{hook}</span>
+                    <span className="text-gray-600 dark:text-gray-400 truncate">{hook}</span>
                   </div>
                 ))}
               </div>
@@ -967,10 +967,10 @@ export function Settings() {
       {/* ─── CLAUDE HOME ─── */}
       <section>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
-          <FolderOpen className="w-4 h-4 text-gray-500" />
+          <FolderOpen className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("claudeHome.title")}
         </h3>
-        <p className="text-xs text-gray-500 mb-4">{t("claudeHome.description")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("claudeHome.description")}</p>
 
         <div className="card p-5 space-y-4">
           <div className="flex items-center gap-3">
@@ -994,8 +994,8 @@ export function Settings() {
           </div>
           {claudeHomeError && <p className="text-xs text-red-400">{claudeHomeError}</p>}
           {claudeHome && (
-            <p className="text-xs text-gray-500">
-              {t("claudeHome.current")} <code className="text-gray-400">{claudeHome}</code>
+            <p className="text-xs text-gray-700 dark:text-gray-500">
+              {t("claudeHome.current")} <code className="text-gray-600 dark:text-gray-400">{claudeHome}</code>
             </p>
           )}
         </div>
@@ -1007,10 +1007,10 @@ export function Settings() {
       {/* ─── NOTIFICATIONS ─── */}
       <section>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
-          <Bell className="w-4 h-4 text-gray-500" />
+          <Bell className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("notifications.title")}
         </h3>
-        <p className="text-xs text-gray-500 mb-4">{t("notifications.description")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("notifications.description")}</p>
 
         <div className="card p-5 space-y-5">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -1025,7 +1025,7 @@ export function Settings() {
                 {notifPrefs.enabled ? (
                   <BellRing className="w-5 h-5 text-blue-400" />
                 ) : (
-                  <BellOff className="w-5 h-5 text-gray-500" />
+                  <BellOff className="w-5 h-5 text-gray-700 dark:text-gray-500" />
                 )}
               </div>
               <Toggle
@@ -1074,7 +1074,7 @@ export function Settings() {
 
           {notifPrefs.enabled && (
             <div className="space-y-3 pt-4 border-t border-border">
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
+              <p className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider font-semibold">
                 {t("notifications.notifyWhen")}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1126,7 +1126,7 @@ export function Settings() {
                       }),
                     });
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 border border-border transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 border border-border transition-colors"
                 >
                   <Zap className="w-3 h-3" />
                   {t("notifications.sendTest")}
@@ -1136,7 +1136,7 @@ export function Settings() {
           )}
 
           {!notifPrefs.enabled && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-500">
               <BellOff className="w-3.5 h-3.5" />
               {t("notifications.disabledInfo")}
             </div>
@@ -1147,15 +1147,15 @@ export function Settings() {
       {/* ─── DATA MANAGEMENT ─── */}
       <section>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
-          <Database className="w-4 h-4 text-gray-500" />
+          <Database className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("data.title")}
         </h3>
-        <p className="text-xs text-gray-500 mb-4">{t("data.description")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("data.description")}</p>
 
         <div className="space-y-4">
           <div className="card p-5 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold flex-shrink-0">
+              <p className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider font-semibold flex-shrink-0">
                 {t("data.dbOverview")}
               </p>
               {sysInfo && (
@@ -1196,8 +1196,8 @@ export function Settings() {
                       className={`bg-surface-2 rounded-lg px-3 py-3 border-l-2 ${tableColors[table] || "border-gray-500/20"}`}
                     >
                       <div className="flex items-center gap-2 mb-1.5">
-                        {tableIcons[table] || <Database className="w-4 h-4 text-gray-500" />}
-                        <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                        {tableIcons[table] || <Database className="w-4 h-4 text-gray-700 dark:text-gray-500" />}
+                        <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                           {tableLabels[table] || table.replace(/_/g, " ")}
                         </p>
                       </div>
@@ -1210,7 +1210,7 @@ export function Settings() {
                 <div className="bg-surface-2 rounded-lg px-3 py-3 border-l-2 border-indigo-500/20">
                   <div className="flex items-center gap-2 mb-1.5">
                     <HardDrive className="w-4 h-4 text-indigo-400" />
-                    <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                    <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                       {t("data.dbSize")}
                     </p>
                   </div>
@@ -1220,7 +1220,7 @@ export function Settings() {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-gray-500">{t("data.loadingDb")}</p>
+              <p className="text-xs text-gray-700 dark:text-gray-500">{t("data.loadingDb")}</p>
             )}
           </div>
 
@@ -1232,13 +1232,13 @@ export function Settings() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("data.sessionCleanup")}</p>
-                <p className="text-xs text-gray-500">{t("data.cleanupDesc")}</p>
+                <p className="text-xs text-gray-700 dark:text-gray-500">{t("data.cleanupDesc")}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-surface-2 rounded-lg px-4 py-3">
-                <label className="text-xs text-gray-400 block mb-2">{t("data.abandonAfter")}</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-2">{t("data.abandonAfter")}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1247,11 +1247,11 @@ export function Settings() {
                     onChange={(e) => setAbandonHours(e.target.value)}
                     className="input w-20 text-sm text-right font-mono"
                   />
-                  <span className="text-xs text-gray-500">{t("common:hours")}</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-500">{t("common:hours")}</span>
                 </div>
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
-                <label className="text-xs text-gray-400 block mb-2">{t("data.purgeAfter")}</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-2">{t("data.purgeAfter")}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -1260,7 +1260,7 @@ export function Settings() {
                     onChange={(e) => setPurgeDays(e.target.value)}
                     className="input w-20 text-sm text-right font-mono"
                   />
-                  <span className="text-xs text-gray-500">{t("common:days")}</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-500">{t("common:days")}</span>
                 </div>
               </div>
             </div>
@@ -1273,7 +1273,7 @@ export function Settings() {
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
                 confirmAction === "cleanup"
                   ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4 border border-border"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4 border border-border"
               }`}
             >
               {actionLoading === "cleanup" ? (
@@ -1295,7 +1295,7 @@ export function Settings() {
               </div>
               <div>
                 <p className="text-sm font-medium text-red-400">{t("danger.title")}</p>
-                <p className="text-xs text-gray-500">{t("danger.description")}</p>
+                <p className="text-xs text-gray-700 dark:text-gray-500">{t("danger.description")}</p>
               </div>
             </div>
 
@@ -1315,7 +1315,7 @@ export function Settings() {
                   </button>
                   <button
                     onClick={() => setConfirmAction(null)}
-                    className="text-xs px-3 py-1.5 rounded-md text-gray-400 hover:bg-surface-4 transition-colors"
+                    className="text-xs px-3 py-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:bg-surface-4 transition-colors"
                   >
                     {t("common:cancel")}
                   </button>
@@ -1340,10 +1340,10 @@ export function Settings() {
       {/* ─── ABOUT ─── */}
       <section>
         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
-          <Server className="w-4 h-4 text-gray-500" />
+          <Server className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("about.title")}
         </h3>
-        <p className="text-xs text-gray-500 mb-4">{t("about.description")}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("about.description")}</p>
 
         {sysInfo ? (
           <div className="card p-5">
@@ -1351,7 +1351,7 @@ export function Settings() {
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Clock className="w-4 h-4 text-blue-400" />
-                  <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                  <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.uptime")}
                   </p>
                 </div>
@@ -1362,7 +1362,7 @@ export function Settings() {
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Cpu className="w-4 h-4 text-emerald-400" />
-                  <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                  <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.nodejs")}
                   </p>
                 </div>
@@ -1373,7 +1373,7 @@ export function Settings() {
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Globe className="w-4 h-4 text-violet-400" />
-                  <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                  <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.platform")}
                   </p>
                 </div>
@@ -1382,7 +1382,7 @@ export function Settings() {
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Wifi className="w-4 h-4 text-amber-400" />
-                  <p className="text-[11px] text-gray-500 uppercase tracking-wider">
+                  <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.wsClients")}
                   </p>
                 </div>
@@ -1393,7 +1393,7 @@ export function Settings() {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-gray-500">{t("about.loadingInfo")}</p>
+          <p className="text-xs text-gray-700 dark:text-gray-500">{t("about.loadingInfo")}</p>
         )}
       </section>
     </div>
