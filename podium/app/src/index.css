@@ -44,3 +44,16 @@ body { background: var(--bg); color: var(--text); font-family: 'Whitney HTF Medi
 }
 .animate-pulse-brand { animation: pulse-brand 1.8s ease-in-out infinite; }
 .animate-pulse-green { animation: pulse-green 2s infinite; }
+
+/* Fix 1: phantom fork/join nodes must be completely invisible wrappers */
+.react-flow__node-phantomNode {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+.react-flow__node-phantomNode .react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+}
