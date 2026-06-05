@@ -374,6 +374,7 @@ fields — prose is for human readability only.
   "smoke_tests": [{ "area": "string", "result": "PASS|FAIL", "evidence": "string" }],
   "tests_authored": ["string"],
   "pr_comment_url": "string",
+  "existing_comment_url": "string — URL of prior QA comment if re-run, empty string on first run",
   "blockers": ["string"],
   "recommendations": [{ "description": "string", "severity": "MUST_HAVE|SHOULD_HAVE|COULD_HAVE|NICE_TO_HAVE" }]
 }
@@ -604,6 +605,21 @@ Log a ROUTING DECISION event: "Editions: {EDITIONS} — scope partitioned per ed
 
 ---
 
+### Step 4d — Anti-scope-creep gate *(mandatory before implementation)*
+
+Before spawning any implementation agent, run a 4-point scope check. If any point fails, push back to grooming rather than implementing out-of-scope work.
+
+| Point | Check | Pass condition |
+|---|---|---|
+| Scope match | Does the dispatch plan map 1:1 to what the ticket asks for? | Every implementation step traces to an acceptance criterion |
+| Complexity ceiling | Is the implementation within the groomed effort estimate? | Actual file count and change size match `effort` (XS/S/M/L/XL) |
+| Agent count | Are we spawning only the agents the spec requires? | No extra agents added beyond backend/frontend as needed |
+| Unnecessary additions | Are we adding flags, options, or abstractions the ticket doesn't ask for? | Zero additions not traceable to an acceptance criterion |
+
+If any point fails: **do not start implementation**. Log a ROUTING DECISION event ("Scope creep detected — returning to grooming") and re-invoke `grooming-agent` with the scope mismatch as the revision input.
+
+---
+
 ### Step 5 — Implementation
 
 Each agent runs the `docs` skill, `e2e` skill (basic tier), and `dod` skill (layer 1)
@@ -794,11 +810,27 @@ has no HIGH/CRITICAL blockers (or is skipped), QA is PASS (or skipped or carried
 3. Move PR out of draft — this step is **mandatory and must be verified**:
    ```bash
    gh pr ready <PR#>
-   # Verify — must return "false"
-   gh pr view <PR#> --json isDraft -q .isDraft
+   # Verify isDraft == false
+   gh pr view <PR#> --json isDraft,labels -q '{isDraft: .isDraft, labels: [.labels[].name]}'
    ```
    If `isDraft` is still `true`, run `gh pr ready <PR#>` again and re-verify. Do not proceed
-   to Step 4 until the PR is confirmed out of draft.
+   until the PR is confirmed out of draft.
+
+   Also verify `Made by AI` is still on the PR labels. If it is missing, re-apply it:
+   ```bash
+   gh pr edit <PR#> --add-label "Made by AI"
+   ```
+
+   Then transition the linked issue label from `In Progress` → `Ready for review` (best-effort — log the skip if the label does not exist rather than failing the pipeline):
+   ```bash
+   ISSUE_N=<N>
+   # Remove "In Progress" label if present
+   gh issue edit $ISSUE_N --remove-label "In Progress" 2>/dev/null || true
+   # Add "Ready for review" label (create it if missing)
+   gh label list --repo {REPO} --json name -q '.[].name' | grep -q "^Ready for review$" \
+     || gh label create "Ready for review" --repo {REPO} --color "0e8a16" --description "Ready for human review" 2>/dev/null || true
+   gh issue edit $ISSUE_N --add-label "Ready for review" 2>/dev/null || true
+   ```
 4. Post final summary to the GitHub issue as a comment. The table is the entire body — no prose before or after it. Lead Review and QA details live on the PR; the issue comment must not repeat them.
 5. Log final ROUTING DECISION event: "Pipeline complete — READY FOR REVIEW"
 
