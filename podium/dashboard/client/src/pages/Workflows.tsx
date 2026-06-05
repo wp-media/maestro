@@ -169,7 +169,7 @@ export function Workflows() {
             </span>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-xs text-gray-500 hover:text-gray-300 underline"
+              className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 underline"
             >
               {t("clearFilter")}
             </button>
@@ -309,7 +309,7 @@ function Section({
           <span className="w-5 h-5 rounded-md bg-accent/15 text-accent text-[11px] font-bold flex items-center justify-center">
             {number}
           </span>
-          <h2 className="text-sm font-semibold text-gray-100">{title}</h2>
+          <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{title}</h2>
           <ChartInfoPopover infoKey={infoKey} title={title} />
         </div>
         <span className="text-[11px] text-gray-600 hidden lg:block">{subtitle}</span>
@@ -459,7 +459,7 @@ function PageHeader({
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+            <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
             {wsConnected ? (
               <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -486,7 +486,7 @@ function PageHeader({
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 statusFilter === f.value
                   ? "bg-accent/15 text-accent"
-                  : "text-gray-500 hover:text-gray-300"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {f.label}
@@ -497,14 +497,14 @@ function PageHeader({
         {/* Actions */}
         <button
           onClick={onRefresh}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-surface-3 transition-colors"
+          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
           title={t("refreshData")}
         >
           <RefreshCw className="w-4 h-4" />
         </button>
         <button
           onClick={onExport}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-surface-3 transition-colors"
+          className="p-2 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-3 transition-colors"
           title={t("exportJson")}
         >
           <Download className="w-4 h-4" />

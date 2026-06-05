@@ -241,7 +241,7 @@ function SummaryBlock({
           <span className="text-base leading-none" aria-hidden="true">
             {summary.icon}
           </span>
-          <span className="text-[12px] text-gray-100 font-medium break-words">
+          <span className="text-[12px] text-gray-800 dark:text-gray-100 font-medium break-words">
             {summary.headline}
           </span>
         </div>
@@ -307,7 +307,7 @@ function FieldRow({
     return (
       <div className="grid grid-cols-[160px_1fr] gap-x-4 items-start text-[11px]">
         <div className="text-gray-500 font-mono pt-0.5">{label}</div>
-        <div className="text-gray-300 font-mono break-all">
+        <div className="text-gray-600 dark:text-gray-300 font-mono break-all">
           <ScalarValue value={value} />
         </div>
       </div>

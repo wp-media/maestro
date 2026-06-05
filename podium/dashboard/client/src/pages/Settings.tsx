@@ -194,7 +194,7 @@ function Toggle({
   return (
     <label className="flex items-center justify-between gap-3 cursor-pointer group">
       <div className="min-w-0">
-        <p className="text-sm text-gray-300 group-hover:text-gray-200 transition-colors">{label}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">{label}</p>
         {description && <p className="text-xs text-gray-500 mt-0.5">{description}</p>}
       </div>
       <button
@@ -277,7 +277,7 @@ function PricingInfoTooltip() {
         onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="inline-flex items-center justify-center rounded-full p-0.5 text-gray-500 hover:text-gray-300 focus:outline-none focus:ring-1 focus:ring-accent/40"
+        className="inline-flex items-center justify-center rounded-full p-0.5 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 focus:outline-none focus:ring-1 focus:ring-accent/40"
       >
         <Info className="w-3.5 h-3.5" />
       </button>
@@ -706,7 +706,7 @@ export function Settings() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
                 <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -726,7 +726,7 @@ export function Settings() {
           <a
             href={api.settings.exportData()}
             download
-            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border text-gray-400 hover:text-gray-200 hover:border-gray-500 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:border-gray-500 transition-colors"
           >
             <FileDown className="w-3.5 h-3.5" />
             {t("exportData")}
@@ -746,7 +746,7 @@ export function Settings() {
             </div>
             <div>
               <p className="text-sm text-gray-500">{t("common:cost.totalEstimatedCost")}</p>
-              <p className="text-2xl font-semibold text-gray-100">
+              <p className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
                 <Tip
                   raw={
                     totalCost !== null
@@ -770,7 +770,7 @@ export function Settings() {
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2">
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-gray-500" />
               {t("pricing.title")}
               <PricingInfoTooltip />
@@ -788,7 +788,7 @@ export function Settings() {
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 ${
                 confirmAction === "reset-pricing"
                   ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-gray-400 hover:text-gray-300 hover:bg-surface-4"
+                  : "text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4"
               }`}
             >
               <RotateCcw className="w-3 h-3" />
@@ -852,10 +852,10 @@ export function Settings() {
                     key={rule.model_pattern}
                     className="hover:bg-surface-4 transition-colors group"
                   >
-                    <td className="px-4 py-3 text-sm font-mono text-gray-300">
+                    <td className="px-4 py-3 text-sm font-mono text-gray-600 dark:text-gray-300">
                       {rule.model_pattern}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-300">{rule.display_name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{rule.display_name}</td>
                     <td className="px-4 py-3 text-sm text-gray-400 text-right font-mono">
                       ${rule.input_per_mtok}
                     </td>
@@ -906,7 +906,7 @@ export function Settings() {
 
       {/* ─── HOOK CONFIGURATION ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
           <Plug className="w-4 h-4 text-gray-500" />
           {t("hooks.title")}
         </h3>
@@ -966,7 +966,7 @@ export function Settings() {
 
       {/* ─── CLAUDE HOME ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
           <FolderOpen className="w-4 h-4 text-gray-500" />
           {t("claudeHome.title")}
         </h3>
@@ -981,7 +981,7 @@ export function Settings() {
                 setClaudeHomeInput(e.target.value);
                 setClaudeHomeError(null);
               }}
-              className="flex-1 bg-surface-4 border border-surface-3 rounded-lg px-3 py-2 text-sm text-gray-200 font-mono focus:outline-none focus:border-violet-500/50"
+              className="flex-1 bg-surface-4 border border-surface-3 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono focus:outline-none focus:border-violet-500/50"
               placeholder={t("claudeHome.placeholder")}
             />
             <button
@@ -1006,7 +1006,7 @@ export function Settings() {
 
       {/* ─── NOTIFICATIONS ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
           <Bell className="w-4 h-4 text-gray-500" />
           {t("notifications.title")}
         </h3>
@@ -1126,7 +1126,7 @@ export function Settings() {
                       }),
                     });
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-surface-4 border border-border transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 border border-border transition-colors"
                 >
                   <Zap className="w-3 h-3" />
                   {t("notifications.sendTest")}
@@ -1146,7 +1146,7 @@ export function Settings() {
 
       {/* ─── DATA MANAGEMENT ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
           <Database className="w-4 h-4 text-gray-500" />
           {t("data.title")}
         </h3>
@@ -1201,7 +1201,7 @@ export function Settings() {
                           {tableLabels[table] || table.replace(/_/g, " ")}
                         </p>
                       </div>
-                      <p className="text-xl font-semibold text-gray-200">
+                      <p className="text-xl font-semibold text-gray-700 dark:text-gray-200">
                         <Tip raw={count.toLocaleString()}>{fmt(count)}</Tip>
                       </p>
                     </div>
@@ -1214,7 +1214,7 @@ export function Settings() {
                       {t("data.dbSize")}
                     </p>
                   </div>
-                  <p className="text-xl font-semibold text-gray-200">
+                  <p className="text-xl font-semibold text-gray-700 dark:text-gray-200">
                     {formatBytes(sysInfo.db.size)}
                   </p>
                 </div>
@@ -1231,7 +1231,7 @@ export function Settings() {
                 <Eraser className="w-4 h-4 text-amber-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-300">{t("data.sessionCleanup")}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("data.sessionCleanup")}</p>
                 <p className="text-xs text-gray-500">{t("data.cleanupDesc")}</p>
               </div>
             </div>
@@ -1273,7 +1273,7 @@ export function Settings() {
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
                 confirmAction === "cleanup"
                   ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  : "text-gray-400 hover:text-gray-300 hover:bg-surface-4 border border-border"
+                  : "text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4 border border-border"
               }`}
             >
               {actionLoading === "cleanup" ? (
@@ -1339,7 +1339,7 @@ export function Settings() {
 
       {/* ─── ABOUT ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
           <Server className="w-4 h-4 text-gray-500" />
           {t("about.title")}
         </h3>
@@ -1355,7 +1355,7 @@ export function Settings() {
                     {t("about.uptime")}
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-gray-200">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                   {formatUptime(sysInfo.server.uptime)}
                 </p>
               </div>
@@ -1366,7 +1366,7 @@ export function Settings() {
                     {t("about.nodejs")}
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-gray-200 font-mono">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200 font-mono">
                   {sysInfo.server.node_version}
                 </p>
               </div>
@@ -1377,7 +1377,7 @@ export function Settings() {
                     {t("about.platform")}
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-gray-200">{sysInfo.server.platform}</p>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">{sysInfo.server.platform}</p>
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
@@ -1386,7 +1386,7 @@ export function Settings() {
                     {t("about.wsClients")}
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-gray-200">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                   {sysInfo.server.ws_connections}
                 </p>
               </div>

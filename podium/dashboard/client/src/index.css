@@ -10,20 +10,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme tokens ──────────────────────────────────────────
+ * Values are space-separated RGB *channels* (not hex) so Tailwind's
+ * `rgb(var(--x) / <alpha-value>)` color definitions can apply opacity
+ * modifiers (e.g. bg-accent/15, border-border/40). See tailwind.config.js.
+ * `--accent-muted` stays a ready-made rgba for the few direct references.
+ * ──────────────────────────────────────────────────────── */
+
+/* ── Light theme (default) ─────────────────────────────── */
 :root {
-  --accent: #fed23a;
-  --accent-hover: #e0bb35;
+  --surface-0: 245 245 243;
+  --surface-1: 255 255 255;
+  --surface-2: 240 240 237;
+  --surface-3: 232 232 228;
+  --surface-4: 221 221 216;
+  --surface-5: 212 212 206;
+  --border: 212 212 206;
+  --border-light: 224 224 219;
+  --text-primary: 21 25 33;
+  --text-muted: 102 102 102;
+  --text-dim: 155 155 155;
+  --accent: 254 210 58;
+  --accent-hover: 224 187 53;
+  --accent-muted: rgba(254,210,58,0.15);
+}
+
+/* ── Dark theme ────────────────────────────────────────── */
+.dark {
+  --surface-0: 10 14 20;
+  --surface-1: 15 19 24;
+  --surface-2: 21 25 33;
+  --surface-3: 28 36 51;
+  --surface-4: 36 48 72;
+  --surface-5: 46 58 80;
+  --border: 46 50 67;
+  --border-light: 58 77 104;
+  --text-primary: 240 244 252;
+  --text-muted: 155 155 155;
+  --text-dim: 90 111 140;
+  --accent: 254 210 58;
+  --accent-hover: 224 187 53;
   --accent-muted: rgba(254,210,58,0.15);
 }
 
 body {
   font-family: 'Whitney HTF Medium', 'Inter', system-ui, sans-serif;
+  color: rgb(var(--text-primary));
+  background-color: rgb(var(--surface-0));
 }
 
 @layer base {
   * {
     scrollbar-width: thin;
-    scrollbar-color: #2e3243 #0f1318;
+    scrollbar-color: rgb(var(--border)) rgb(var(--surface-1));
   }
 
   *::-webkit-scrollbar {
@@ -32,28 +71,32 @@ body {
   }
 
   *::-webkit-scrollbar-track {
-    background: #0f1318;
+    background: rgb(var(--surface-1));
   }
 
   *::-webkit-scrollbar-thumb {
-    background: #2e3243;
+    background: rgb(var(--border));
     border-radius: 3px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: #3a4d68;
+    background: rgb(var(--border-light));
   }
 
   ::selection {
     background: rgba(254,210,58,0.3);
-    color: #f0f4fc;
+    color: rgb(var(--text-primary));
   }
 
   ::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(0.8);
     cursor: pointer;
     opacity: 0.7;
     transition: opacity 0.2s;
+  }
+
+  /* The icon ships dark; inverting it only makes sense on a dark surface. */
+  .dark ::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.8);
   }
 
   ::-webkit-calendar-picker-indicator:hover {
@@ -80,7 +123,7 @@ body {
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-gray-200 hover:bg-surface-4 rounded-lg transition-colors duration-150;
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-4 rounded-lg transition-colors duration-150;
   }
 
   .badge {
@@ -88,7 +131,7 @@ body {
   }
 
   .input {
-    @apply bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors;
+    @apply bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors;
   }
 }
 

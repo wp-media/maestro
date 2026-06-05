@@ -223,7 +223,7 @@ function SystemHealthTab() {
           <div className="space-y-2.5">
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-400 w-28 flex-shrink-0">Uptime</span>
-              <span className="text-xs text-gray-200 font-mono ml-auto">
+              <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
                 {formatUptime(info.server.uptime)}
               </span>
             </div>
@@ -233,7 +233,7 @@ function SystemHealthTab() {
                 {(info.server.cpu_load || []).slice(0, 3).map((load, i) => (
                   <span
                     key={i}
-                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${i === 0 && load > info.server.cpus ? "bg-red-500/20 text-red-400" : "bg-surface-3 text-gray-300"}`}
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${i === 0 && load > info.server.cpus ? "bg-red-500/20 text-red-400" : "bg-surface-3 text-gray-600 dark:text-gray-300"}`}
                   >
                     {load.toFixed(2)}
                   </span>
@@ -242,7 +242,7 @@ function SystemHealthTab() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-400 w-28 flex-shrink-0">Node RSS</span>
-              <span className="text-xs text-gray-200 font-mono ml-auto">
+              <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
                 {formatBytes(info.server.memory.rss)}
               </span>
             </div>
@@ -305,7 +305,7 @@ function SystemHealthTab() {
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-400 w-28 flex-shrink-0">Database</span>
-            <span className="text-xs text-gray-200 font-mono ml-auto">
+            <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">
               {formatBytes(info.db.size)} · {info.db.pragmas?.journal_mode?.toUpperCase() || "WAL"}
             </span>
           </div>
@@ -643,7 +643,7 @@ function SystemHealthTab() {
             <Tip block raw={`Peak: ${maxLaneCount} sessions running simultaneously.`}>
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Peak</p>
-                <p className="text-sm font-mono font-bold text-gray-200">{maxLaneCount}</p>
+                <p className="text-sm font-mono font-bold text-gray-700 dark:text-gray-200">{maxLaneCount}</p>
               </div>
             </Tip>
             <Tip
@@ -807,7 +807,7 @@ function SystemHealthTab() {
                     <div
                       className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? "bg-emerald-400" : "bg-gray-600"}`}
                     />
-                    <span className="text-xs text-gray-300 truncate font-mono">
+                    <span className="text-xs text-gray-600 dark:text-gray-300 truncate font-mono">
                       {cwd.split("/").pop() || cwd}
                     </span>
                   </div>
@@ -870,7 +870,7 @@ function SystemHealthTab() {
             ].map((row) => (
               <div key={row.label} className="flex items-center gap-3">
                 <span className="text-xs text-gray-400 w-28 flex-shrink-0">{row.label}</span>
-                <span className="text-xs text-gray-200 font-mono ml-auto">{row.value}</span>
+                <span className="text-xs text-gray-700 dark:text-gray-200 font-mono ml-auto">{row.value}</span>
               </div>
             ))}
           </div>
@@ -1084,7 +1084,7 @@ export function Dashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
                 <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -1108,7 +1108,7 @@ export function Dashboard() {
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "monitor"
                   ? "bg-accent/15 text-accent shadow-sm"
-                  : "text-gray-500 hover:text-gray-300"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               <Activity className="w-3.5 h-3.5" /> Monitor
@@ -1118,7 +1118,7 @@ export function Dashboard() {
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "health"
                   ? "bg-accent/15 text-accent shadow-sm"
-                  : "text-gray-500 hover:text-gray-300"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               <Server className="w-3.5 h-3.5" /> Health
@@ -1191,7 +1191,7 @@ export function Dashboard() {
             {/* Active agents */}
             <div ref={agentsContainerRef} className="min-w-0 overflow-y-auto pr-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">{t("activeAgentsSection")}</h3>
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("activeAgentsSection")}</h3>
                 <button onClick={() => navigate("/kanban")} className="btn-ghost text-xs">
                   {t("viewBoard")} <ArrowRight className="w-3 h-3" />
                 </button>
@@ -1225,7 +1225,7 @@ export function Dashboard() {
                             {hasChildren && (
                               <button
                                 onClick={toggleExpanded}
-                                className="p-1 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
+                                className="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 transition-colors flex-shrink-0"
                                 aria-label={isExpanded ? "Collapse subagents" : "Expand subagents"}
                                 aria-expanded={isExpanded}
                               >
@@ -1338,7 +1338,7 @@ export function Dashboard() {
             {/* Recent activity */}
             <div ref={activityContainerRef} className="min-w-0 overflow-y-auto pl-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">{t("recentActivity")}</h3>
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("recentActivity")}</h3>
                 <button onClick={() => navigate("/activity")} className="btn-ghost text-xs">
                   {t("viewAll")} <ArrowRight className="w-3 h-3" />
                 </button>
@@ -1371,7 +1371,7 @@ export function Dashboard() {
                                 : "waiting"
                         }
                       />
-                      <span className="text-sm text-gray-300 truncate flex-1">
+                      <span className="text-sm text-gray-600 dark:text-gray-300 truncate flex-1">
                         {event.summary || event.event_type}
                       </span>
                       {event.tool_name && (

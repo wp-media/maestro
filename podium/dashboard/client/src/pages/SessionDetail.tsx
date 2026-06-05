@@ -510,7 +510,7 @@ export function SessionDetail() {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-xl font-semibold text-gray-100">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
               {session.name || `${t("defaultName")}${session.id.slice(0, 8)}`}
             </h2>
             <SessionStatusBadge status={effectiveSessionStatus(session)} />
@@ -586,7 +586,7 @@ export function SessionDetail() {
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "agents"
               ? "border-violet-500 text-violet-400"
-              : "border-transparent text-gray-500 hover:text-gray-300"
+              : "border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
           <Bot className="w-4 h-4" />
@@ -600,7 +600,7 @@ export function SessionDetail() {
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "conversation"
               ? "border-violet-500 text-violet-400"
-              : "border-transparent text-gray-500 hover:text-gray-300"
+              : "border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
           <MessageSquare className="w-4 h-4" />
@@ -614,7 +614,7 @@ export function SessionDetail() {
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "timeline"
               ? "border-violet-500 text-violet-400"
-              : "border-transparent text-gray-500 hover:text-gray-300"
+              : "border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
           <List className="w-4 h-4" />
@@ -702,7 +702,7 @@ export function SessionDetail() {
                           {hasChildren && (
                             <button
                               onClick={toggleExpanded}
-                              className="p-1 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
+                              className="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 transition-colors flex-shrink-0"
                               aria-label={isExpanded ? "Collapse subagents" : "Expand subagents"}
                               aria-expanded={isExpanded}
                             >
@@ -792,7 +792,7 @@ export function SessionDetail() {
           {/* Cost Breakdown — shown under Agents tab */}
           {cost && cost.breakdown.length > 0 && cost.total_cost > 0 && (
             <div className="mt-8">
-              <h3 className="text-sm font-medium text-gray-300 mb-4 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-4 flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
                 {t("detail.costBreakdown")}
               </h3>
@@ -823,7 +823,7 @@ export function SessionDetail() {
                   <tbody className="divide-y divide-border">
                     {cost.breakdown.map((row) => (
                       <tr key={row.model} className="hover:bg-surface-4 transition-colors">
-                        <td className="px-5 py-2.5 text-sm font-mono text-gray-300">
+                        <td className="px-5 py-2.5 text-sm font-mono text-gray-600 dark:text-gray-300">
                           {formatModelName(row.model)}
                         </td>
                         <td className="px-5 py-2.5 text-sm text-gray-400 text-right font-mono">
@@ -844,7 +844,7 @@ export function SessionDetail() {
                       </tr>
                     ))}
                     <tr className="bg-surface-2">
-                      <td className="px-5 py-2.5 text-sm font-medium text-gray-200" colSpan={5}>
+                      <td className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200" colSpan={5}>
                         {t("common:total")}
                       </td>
                       <td className="px-5 py-2.5 text-sm text-emerald-400 text-right font-mono font-semibold">
@@ -891,7 +891,7 @@ export function SessionDetail() {
                 className={`text-[11px] px-3 py-1 cursor-pointer ${
                   grouped
                     ? "bg-accent/20 text-accent"
-                    : "bg-surface-2 text-gray-400 hover:text-gray-200"
+                    : "bg-surface-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
                 {t("common:eventFilters.grouped")}
@@ -903,7 +903,7 @@ export function SessionDetail() {
                 className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
                   !grouped
                     ? "bg-accent/20 text-accent"
-                    : "bg-surface-2 text-gray-400 hover:text-gray-200"
+                    : "bg-surface-2 text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
                 {t("common:eventFilters.flat")}
@@ -963,7 +963,7 @@ export function SessionDetail() {
                                 agentOriginLabel(event.agent_id, agentInfoById)
                               );
                               return (
-                                <span className="text-sm text-gray-300 flex-1 truncate">
+                                <span className="text-sm text-gray-600 dark:text-gray-300 flex-1 truncate">
                                   {origin && (
                                     <span
                                       className="text-gray-500 mr-1"

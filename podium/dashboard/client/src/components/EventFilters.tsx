@@ -157,7 +157,7 @@ export function EventFilters({
             onChange={(e) => setSearchDraft(e.target.value)}
             placeholder={t("eventFilters.searchPlaceholder")}
             aria-label={t("eventFilters.searchPlaceholder")}
-            className="w-full bg-surface-2 border border-border rounded pl-7 pr-2 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="w-full bg-surface-2 border border-border rounded pl-7 pr-2 py-1.5 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent"
           />
         </div>
         <DateTimePicker
@@ -179,7 +179,7 @@ export function EventFilters({
           <button
             type="button"
             onClick={() => onChange(EMPTY_FILTERS)}
-            className="flex items-center gap-1 text-[11px] px-2 py-1 rounded text-gray-400 hover:text-gray-200 hover:bg-surface-2 cursor-pointer"
+            className="flex items-center gap-1 text-[11px] px-2 py-1 rounded text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-2 cursor-pointer"
             aria-label={t("eventFilters.clearAll")}
           >
             <X className="w-3 h-3" />
@@ -275,7 +275,7 @@ function ChipGroup({
         className={`text-[11px] px-2 py-1 rounded border cursor-pointer flex items-center gap-1.5 ${
           selectedCount > 0
             ? "border-accent/40 bg-accent/10 text-accent"
-            : "border-border bg-surface-2 text-gray-400 hover:text-gray-200"
+            : "border-border bg-surface-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
         }`}
       >
         <span>{label}</span>
@@ -300,7 +300,7 @@ function ChipGroup({
               return (
                 <label
                   key={opt}
-                  className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-300 rounded hover:bg-surface-3 cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 rounded hover:bg-surface-3 cursor-pointer"
                 >
                   <input
                     type="checkbox"
