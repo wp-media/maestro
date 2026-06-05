@@ -1,0 +1,28 @@
+{
+  "id": "podium-maestro-agent-observer",
+  "name": "Podium",
+  "short_name": "Podium",
+  "description": "Maestro agent observer dashboard — WP Media",
+  "author": "WP Media",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "theme_color": "#fed23a",
+  "background_color": "#0a0e14",
+  "orientation": "any",
+  "categories": ["developer-tools", "productivity"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
