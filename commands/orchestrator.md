@@ -154,13 +154,17 @@ user can see what mode you picked.
 
 ## Run log
 
-**Check config first:** read `.ai.html_log` from `.claude/maestro.json`.
+**Determine run log mode at startup:**
 
-- `html_log: false` (default) — **skip all workflow-log.html writes entirely**.
-  Podium captures every agent event via zero-token Claude Code hooks — no token cost,
-  no context bloat from writing HTML on every step. Use Podium at `http://localhost:4820`.
-- `html_log: true` — enable the legacy HTML log (described below). Set this only if
-  Podium is not set up and you need a static log file.
+```bash
+curl -s --max-time 1 http://localhost:4820/health
+```
+
+- HTTP 200 → Podium is running. Skip all `workflow-log.html` writes entirely.
+  Podium captures every agent event via zero-token hooks. Use `http://localhost:4820`.
+- No response → Podium not running. Check `.ai.html_log` in `.claude/maestro.json`:
+  - `html_log: true` — enable the legacy HTML log (described below).
+  - `html_log: false` (default) — skip the HTML log too; maintain state in context only.
 
 **When `html_log: false` (default):** still maintain in context:
 - Which agents have been invoked and their return JSON
