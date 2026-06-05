@@ -17,7 +17,7 @@
 
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-blueviolet?style=flat-square)](https://claude.ai/code)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.4.0-orange?style=flat-square)](https://github.com/wp-media/maestro/releases)
+[![Version](https://img.shields.io/badge/version-0.4.1-orange?style=flat-square)](https://github.com/wp-media/maestro/releases)
 
 </div>
 
@@ -231,19 +231,20 @@ One file, everything tunable:
 |---|---|
 | `/maestro` | Show the full command map — quick reference for new users |
 | `/maestro:onboard-project` | Wire a new project — writes `maestro.json`, scaffolds dirs |
-| `/issue-workflow 42` | Run the full delivery pipeline from a GitHub issue |
-| `/orchestrator` | Jump straight into routing if the issue is already loaded |
-| `/dod` | Run the Definition of Done checklist on the current branch |
-| `/pr` | Generate a PR description for the current branch |
-| `/test` | Write PHPUnit tests for PHP source files |
-| `/docs` | Update developer documentation |
-| `/e2e` | Run E2E smoke tests manually |
-| `/knowledge-graph` | Explore codebase dependencies |
-| `/compliance` | Check a change against WordPress.org rules |
-| `/changelog` | Generate a PO-ready grouped changelog from merged PRs |
-| `/sprint` | Plan and estimate issues for a sprint |
+| `/maestro:issue-workflow 42` | Run the full delivery pipeline from a GitHub issue |
+| `/maestro:orchestrator` | Jump straight into routing if the issue is already loaded |
+| `/maestro:dod` | Run the Definition of Done checklist on the current branch |
+| `/maestro:pr` | Generate a PR description for the current branch |
+| `/maestro:test` | Write PHPUnit tests for PHP source files |
+| `/maestro:docs` | Update developer documentation |
+| `/maestro:e2e` | Run E2E smoke tests manually |
+| `/maestro:knowledge-graph` | Explore codebase dependencies |
+| `/maestro:compliance` | Check a change against WordPress.org rules |
+| `/maestro:changelog` | Generate a PO-ready grouped changelog from merged PRs |
+| `/maestro:sprint` | Plan and estimate issues for a sprint |
+| `/maestro:retrospective` | Analyse a completed pipeline run |
 
-**Autonomy flags** — pass on any `/issue-workflow` run:
+**Autonomy flags** — pass on any `/maestro:issue-workflow` run:
 
 | Flag | Effect |
 |---|---|
