@@ -57,7 +57,7 @@ function ensureSession(sessionId, data) {
   if (!session) {
     stmts.insertSession.run(
       sessionId,
-      data.session_name || `Session ${sessionId.slice(0, 8)}`,
+      data.session_name || (data.cwd ? require("path").basename(data.cwd) : null) || `Session ${sessionId.slice(0, 8)}`,
       "active",
       data.cwd || null,
       data.model || null,
@@ -72,7 +72,7 @@ function ensureSession(sessionId, data) {
 
     // Create main agent for new session
     const mainAgentId = `${sessionId}-main`;
-    const sessionLabel = session.name || `Session ${sessionId.slice(0, 8)}`;
+    const sessionLabel = session.name || (data.cwd ? require("path").basename(data.cwd) : null) || `Session ${sessionId.slice(0, 8)}`;
     stmts.insertAgent.run(
       mainAgentId,
       sessionId,
