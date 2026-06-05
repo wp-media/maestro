@@ -450,9 +450,9 @@ export const STATUS_CONFIG: Record<
   },
   waiting: {
     labelKey: "common:status.waiting",
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/10 border-yellow-500/20",
-    dot: "bg-yellow-400",
+    color: "text-amber-600 dark:text-yellow-400",
+    bg: "bg-amber-50 dark:bg-yellow-500/10 border-amber-200 dark:border-yellow-500/20",
+    dot: "bg-amber-500 dark:bg-yellow-400",
   },
   completed: {
     labelKey: "common:status.completed",
@@ -526,9 +526,9 @@ export const SESSION_STATUS_CONFIG: Record<
   },
   waiting: {
     labelKey: "common:status.waiting",
-    color: "text-yellow-400",
-    bg: "bg-yellow-500/10 border-yellow-500/20",
-    dot: "bg-yellow-400",
+    color: "text-amber-600 dark:text-yellow-400",
+    bg: "bg-amber-50 dark:bg-yellow-500/10 border-amber-200 dark:border-yellow-500/20",
+    dot: "bg-amber-500 dark:bg-yellow-400",
   },
   completed: {
     labelKey: "common:status.completed",

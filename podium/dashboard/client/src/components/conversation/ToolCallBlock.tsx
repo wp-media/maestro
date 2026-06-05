@@ -133,7 +133,7 @@ function renderInput(toolUse: TranscriptContent) {
   // Read: just show the path with offset/limit
   if (tool === "read" && typeof obj.file_path === "string") {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-gray-300 bg-surface-4/40 border border-surface-3 rounded-md px-3 py-2">
+      <div className="flex items-center gap-1.5 text-xs text-gray-700 dark:text-gray-300 bg-surface-4/40 border border-surface-3 rounded-md px-3 py-2">
         <FileText className="w-3.5 h-3.5 text-sky-400 flex-shrink-0" />
         <span className="font-mono break-all">{obj.file_path}</span>
         {(typeof obj.offset === "number" || typeof obj.limit === "number") && (
@@ -163,7 +163,7 @@ function renderInput(toolUse: TranscriptContent) {
             <span className="text-gray-700 dark:text-gray-500 font-mono uppercase tracking-wider text-[10px]">
               Path
             </span>
-            <code className="font-mono text-gray-300">{obj.path}</code>
+            <code className="font-mono text-gray-700 dark:text-gray-300">{obj.path}</code>
           </div>
         )}
         {typeof obj.glob === "string" && (
@@ -171,7 +171,7 @@ function renderInput(toolUse: TranscriptContent) {
             <span className="text-gray-700 dark:text-gray-500 font-mono uppercase tracking-wider text-[10px]">
               Glob
             </span>
-            <code className="font-mono text-gray-300">{obj.glob}</code>
+            <code className="font-mono text-gray-700 dark:text-gray-300">{obj.glob}</code>
           </div>
         )}
       </div>
