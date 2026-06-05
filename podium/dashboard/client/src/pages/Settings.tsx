@@ -285,7 +285,7 @@ function PricingInfoTooltip() {
         <div
           ref={popoverRef}
           role="tooltip"
-          className="fixed z-50 p-3 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-700 dark:text-gray-300 pointer-events-none"
+          className="fixed z-50 p-3 bg-white dark:bg-[#12121f] border border-gray-200 dark:border-[#2a2a4a] shadow-lg rounded-lg shadow-2xl text-[11px] text-gray-700 dark:text-gray-300 pointer-events-none"
           style={{ left: pos.left, top: pos.top, width: 320 }}
         >
           <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("pricing.tooltip.title")}</p>

@@ -557,7 +557,7 @@ export function AgentCollaborationNetwork({
         ref={tooltipRef}
         role="tooltip"
         aria-hidden="true"
-        className="fixed z-50 px-3 py-2 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl pointer-events-none"
+        className="fixed z-50 px-3 py-2 bg-white dark:bg-[#12121f] border border-gray-200 dark:border-[#2a2a4a] shadow-lg rounded-lg shadow-2xl pointer-events-none"
         style={{
           opacity: 0,
           left: 0,
