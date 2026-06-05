@@ -227,7 +227,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
     const codeM = rest.match(/^`([^`\n]+)`/);
     if (codeM) {
       push(
-        <code className="rounded bg-surface-4 border border-surface-3 px-1.5 py-0.5 font-mono text-[12.5px] text-amber-200">
+        <code className="rounded bg-surface-4 border border-surface-3 px-1.5 py-0.5 font-mono text-[12.5px] text-amber-800 dark:text-amber-200">
           {codeM[1]}
         </code>
       );
@@ -239,7 +239,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
     const boldM = rest.match(/^(\*\*|__)(.+?)\1/);
     if (boldM) {
       push(
-        <strong className="font-semibold text-gray-50">
+        <strong className="font-semibold text-gray-950 dark:text-gray-50">
           {renderInline(boldM[2]!, `${baseKey}-b${n}`)}
         </strong>
       );
@@ -277,7 +277,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
           href={linkM[2]!}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70"
+          className="text-violet-700 dark:text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70"
         >
           {renderInline(linkM[1]!, `${baseKey}-l${n}`)}
         </a>
@@ -294,7 +294,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
           href={urlM[0]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70 break-all"
+          className="text-violet-700 dark:text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70 break-all"
         >
           {urlM[0]}
         </a>
@@ -339,10 +339,10 @@ interface MarkdownContentProps {
 }
 
 const HEADING_STYLES = [
-  "text-[18px] font-semibold text-gray-50 mt-2 pb-1 border-b border-surface-3",
-  "text-[16px] font-semibold text-gray-50 mt-2",
-  "text-[15px] font-semibold text-gray-100",
-  "text-sm font-semibold text-gray-100",
+  "text-[18px] font-semibold text-gray-950 dark:text-gray-50 mt-2 pb-1 border-b border-surface-3",
+  "text-[16px] font-semibold text-gray-950 dark:text-gray-50 mt-2",
+  "text-[15px] font-semibold text-gray-900 dark:text-gray-100",
+  "text-sm font-semibold text-gray-900 dark:text-gray-100",
   "text-sm font-medium text-gray-200",
   "text-xs font-medium text-gray-300 uppercase tracking-wider",
 ];

@@ -374,7 +374,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
 
       {/* Error alert */}
       {error && (
-        <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 flex-shrink-0">
+        <div className="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg px-4 py-3 flex-shrink-0">
           {error}
         </div>
       )}
@@ -390,7 +390,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
         {loadingHistory && (
           <div className="flex justify-center py-3">
             <Loader2 className="w-4 h-4 text-gray-700 dark:text-gray-500 animate-spin" />
-            <span className="text-xs text-gray-700 dark:text-gray-500 ml-2">Loading history...</span>
+            <span className="text-sm text-gray-600 dark:text-gray-500 ml-2">Loading history...</span>
           </div>
         )}
 
@@ -428,7 +428,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
             scrollToBottom();
             setShowNewMsg(false);
           }}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg transition-colors z-10"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-accent hover:bg-accent-hover text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg transition-colors z-10"
         >
           <ArrowDown className="w-3 h-3" />
           New messages

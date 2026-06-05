@@ -22,7 +22,7 @@ export function NotFound() {
         <p className="text-xs uppercase tracking-[0.18em] text-gray-700 dark:text-gray-500 mb-2">
           {t("notFound.code")}
         </p>
-        <h2 className="text-2xl font-semibold text-gray-100 mb-2">{t("notFound.title")}</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("notFound.title")}</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-8">{t("notFound.description")}</p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">

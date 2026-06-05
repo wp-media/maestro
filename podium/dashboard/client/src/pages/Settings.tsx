@@ -195,7 +195,7 @@ function Toggle({
     <label className="flex items-center justify-between gap-3 cursor-pointer group">
       <div className="min-w-0">
         <p className="text-sm text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">{label}</p>
-        {description && <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5">{description}</p>}
+        {description && <p className="text-sm text-gray-600 dark:text-gray-500 mt-0.5">{description}</p>}
       </div>
       <button
         type="button"
@@ -288,7 +288,7 @@ function PricingInfoTooltip() {
           className="fixed z-50 p-3 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-300 pointer-events-none"
           style={{ left: pos.left, top: pos.top, width: 320 }}
         >
-          <p className="text-xs font-semibold text-gray-100 mb-2">{t("pricing.tooltip.title")}</p>
+          <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("pricing.tooltip.title")}</p>
 
           <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.howItWorks")}
@@ -300,14 +300,14 @@ function PricingInfoTooltip() {
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t("pricing.tooltip.patternsBody")}</p>
 
-          <p className="font-semibold text-amber-300 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.manualUpdates")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">
             {t("pricing.tooltip.manualUpdatesBody")}
           </p>
 
-          <p className="font-semibold text-amber-300 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wider text-[9px] mb-1">
             {t("pricing.tooltip.apiPricing")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug">{t("pricing.tooltip.apiPricingBody")}</p>
@@ -632,7 +632,7 @@ export function Settings() {
           <button
             onClick={saveEdit}
             disabled={saving}
-            className="p-1.5 rounded-md text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+            className="p-1.5 rounded-md text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
             title={t("common:save")}
           >
             <Check className="w-4 h-4" />
@@ -656,8 +656,8 @@ export function Settings() {
       <div
         className={`px-3 py-2 rounded-lg text-xs ${
           match.isError
-            ? "bg-red-500/10 border border-red-500/20 text-red-400"
-            : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400"
+            ? "bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400"
+            : "bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400"
         }`}
       >
         {match.message}
@@ -706,9 +706,9 @@ export function Settings() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
-                <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                   {t("common:live")}
                 </span>
@@ -719,7 +719,7 @@ export function Settings() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-500">{t("subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -741,8 +741,8 @@ export function Settings() {
       <div className="card p-6">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-emerald-400" />
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-emerald-700 dark:text-emerald-400" />
             </div>
             <div>
               <p className="text-sm text-gray-700 dark:text-gray-500">{t("common:cost.totalEstimatedCost")}</p>
@@ -759,7 +759,7 @@ export function Settings() {
               </p>
             </div>
           </div>
-          <div className="text-right text-xs text-gray-700 dark:text-gray-500">
+          <div className="text-right text-sm text-gray-600 dark:text-gray-500">
             <p>{t("acrossSessions")}</p>
             <p>{t("basedOnUsage")}</p>
           </div>
@@ -775,7 +775,7 @@ export function Settings() {
               {t("pricing.title")}
               <PricingInfoTooltip />
             </h3>
-            <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5">{t("pricing.description")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-500 mt-0.5">{t("pricing.description")}</p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -787,7 +787,7 @@ export function Settings() {
               disabled={isEditing || actionLoading !== null}
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 inline-flex items-center gap-1.5 ${
                 confirmAction === "reset-pricing"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4"
               }`}
             >
@@ -807,7 +807,7 @@ export function Settings() {
         </div>
 
         {error && (
-          <div className="mb-4 px-4 py-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400">
+          <div className="mb-4 px-4 py-2.5 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg text-sm text-red-700 dark:text-red-400">
             {error}
           </div>
         )}
@@ -910,17 +910,17 @@ export function Settings() {
           <Plug className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("hooks.title")}
         </h3>
-        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("hooks.description")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 mb-4">{t("hooks.description")}</p>
 
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               {sysInfo?.hooks.installed ? (
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-full">
                   <CheckCircle className="w-3.5 h-3.5" /> {t("hooks.allInstalled")}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2.5 py-1 rounded-full">
                   <AlertTriangle className="w-3.5 h-3.5" /> {t("hooks.incomplete")}
                 </span>
               )}
@@ -950,9 +950,9 @@ export function Settings() {
                     className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md bg-surface-2"
                   >
                     {active ? (
-                      <CheckCircle className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle className="w-3 h-3 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
                     ) : (
-                      <XCircle className="w-3 h-3 text-red-400 flex-shrink-0" />
+                      <XCircle className="w-3 h-3 text-red-700 dark:text-red-400 flex-shrink-0" />
                     )}
                     <span className="text-gray-600 dark:text-gray-400 truncate">{hook}</span>
                   </div>
@@ -970,7 +970,7 @@ export function Settings() {
           <FolderOpen className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("claudeHome.title")}
         </h3>
-        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("claudeHome.description")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 mb-4">{t("claudeHome.description")}</p>
 
         <div className="card p-5 space-y-4">
           <div className="flex items-center gap-3">
@@ -992,9 +992,9 @@ export function Settings() {
               {claudeHomeSaving ? t("claudeHome.saving") : t("claudeHome.save")}
             </button>
           </div>
-          {claudeHomeError && <p className="text-xs text-red-400">{claudeHomeError}</p>}
+          {claudeHomeError && <p className="text-xs text-red-700 dark:text-red-400">{claudeHomeError}</p>}
           {claudeHome && (
-            <p className="text-xs text-gray-700 dark:text-gray-500">
+            <p className="text-sm text-gray-600 dark:text-gray-500">
               {t("claudeHome.current")} <code className="text-gray-600 dark:text-gray-400">{claudeHome}</code>
             </p>
           )}
@@ -1010,7 +1010,7 @@ export function Settings() {
           <Bell className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("notifications.title")}
         </h3>
-        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("notifications.description")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 mb-4">{t("notifications.description")}</p>
 
         <div className="card p-5 space-y-5">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -1018,12 +1018,12 @@ export function Settings() {
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                   notifPrefs.enabled
-                    ? "bg-blue-500/10 border border-blue-500/20"
+                    ? "bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20"
                     : "bg-surface-2 border border-border"
                 }`}
               >
                 {notifPrefs.enabled ? (
-                  <BellRing className="w-5 h-5 text-blue-400" />
+                  <BellRing className="w-5 h-5 text-blue-700 dark:text-blue-400" />
                 ) : (
                   <BellOff className="w-5 h-5 text-gray-700 dark:text-gray-500" />
                 )}
@@ -1050,10 +1050,10 @@ export function Settings() {
               <span
                 className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
                   Notification.permission === "granted"
-                    ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20"
+                    ? "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20"
                     : Notification.permission === "denied"
-                      ? "text-red-400 bg-red-500/10 border border-red-500/20"
-                      : "text-amber-400 bg-amber-500/10 border border-amber-500/20"
+                      ? "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20"
+                      : "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20"
                 }`}
               >
                 {Notification.permission === "granted" ? (
@@ -1074,12 +1074,12 @@ export function Settings() {
 
           {notifPrefs.enabled && (
             <div className="space-y-3 pt-4 border-t border-border">
-              <p className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider font-semibold">
+              <p className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider font-semibold">
                 {t("notifications.notifyWhen")}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div className="flex items-center gap-3 bg-surface-2 rounded-lg px-3.5 py-3">
-                  <Play className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <Play className="w-4 h-4 text-emerald-700 dark:text-emerald-400 flex-shrink-0" />
                   <Toggle
                     checked={notifPrefs.onNewSession}
                     onChange={(v) => updateNotifPrefs({ onNewSession: v })}
@@ -1087,7 +1087,7 @@ export function Settings() {
                   />
                 </div>
                 <div className="flex items-center gap-3 bg-surface-2 rounded-lg px-3.5 py-3">
-                  <CheckCircle className="w-4 h-4 text-violet-400 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-violet-700 dark:text-violet-400 flex-shrink-0" />
                   <Toggle
                     checked={notifPrefs.onSessionComplete}
                     onChange={(v) => updateNotifPrefs({ onSessionComplete: v })}
@@ -1095,7 +1095,7 @@ export function Settings() {
                   />
                 </div>
                 <div className="flex items-center gap-3 bg-surface-2 rounded-lg px-3.5 py-3">
-                  <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-red-700 dark:text-red-400 flex-shrink-0" />
                   <Toggle
                     checked={notifPrefs.onSessionError}
                     onChange={(v) => updateNotifPrefs({ onSessionError: v })}
@@ -1103,7 +1103,7 @@ export function Settings() {
                   />
                 </div>
                 <div className="flex items-center gap-3 bg-surface-2 rounded-lg px-3.5 py-3">
-                  <GitBranch className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <GitBranch className="w-4 h-4 text-blue-700 dark:text-blue-400 flex-shrink-0" />
                   <Toggle
                     checked={notifPrefs.onSubagentSpawn}
                     onChange={(v) => updateNotifPrefs({ onSubagentSpawn: v })}
@@ -1136,7 +1136,7 @@ export function Settings() {
           )}
 
           {!notifPrefs.enabled && (
-            <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-500">
               <BellOff className="w-3.5 h-3.5" />
               {t("notifications.disabledInfo")}
             </div>
@@ -1150,12 +1150,12 @@ export function Settings() {
           <Database className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("data.title")}
         </h3>
-        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("data.description")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 mb-4">{t("data.description")}</p>
 
         <div className="space-y-4">
           <div className="card p-5 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider font-semibold flex-shrink-0">
+              <p className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider font-semibold flex-shrink-0">
                 {t("data.dbOverview")}
               </p>
               {sysInfo && (
@@ -1170,11 +1170,11 @@ export function Settings() {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                 {(() => {
                   const tableIcons: Record<string, React.ReactNode> = {
-                    sessions: <Layers className="w-4 h-4 text-blue-400" />,
-                    agents: <Users className="w-4 h-4 text-emerald-400" />,
-                    events: <Activity className="w-4 h-4 text-violet-400" />,
-                    token_usage: <Coins className="w-4 h-4 text-amber-400" />,
-                    model_pricing: <BarChart3 className="w-4 h-4 text-cyan-400" />,
+                    sessions: <Layers className="w-4 h-4 text-blue-700 dark:text-blue-400" />,
+                    agents: <Users className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />,
+                    events: <Activity className="w-4 h-4 text-violet-700 dark:text-violet-400" />,
+                    token_usage: <Coins className="w-4 h-4 text-amber-700 dark:text-amber-400" />,
+                    model_pricing: <BarChart3 className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />,
                   };
                   const tableLabels: Record<string, string> = {
                     sessions: t("tables.sessions"),
@@ -1184,11 +1184,11 @@ export function Settings() {
                     model_pricing: t("tables.pricingRules"),
                   };
                   const tableColors: Record<string, string> = {
-                    sessions: "border-blue-500/20",
-                    agents: "border-emerald-500/20",
-                    events: "border-violet-500/20",
-                    token_usage: "border-amber-500/20",
-                    model_pricing: "border-cyan-500/20",
+                    sessions: "border-blue-200 dark:border-blue-500/20",
+                    agents: "border-emerald-200 dark:border-emerald-500/20",
+                    events: "border-violet-200 dark:border-violet-500/20",
+                    token_usage: "border-amber-200 dark:border-amber-500/20",
+                    model_pricing: "border-cyan-200 dark:border-cyan-500/20",
                   };
                   return Object.entries(sysInfo.db.counts).map(([table, count]) => (
                     <div
@@ -1207,9 +1207,9 @@ export function Settings() {
                     </div>
                   ));
                 })()}
-                <div className="bg-surface-2 rounded-lg px-3 py-3 border-l-2 border-indigo-500/20">
+                <div className="bg-surface-2 rounded-lg px-3 py-3 border-l-2 border-indigo-200 dark:border-indigo-500/20">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <HardDrive className="w-4 h-4 text-indigo-400" />
+                    <HardDrive className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
                     <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                       {t("data.dbSize")}
                     </p>
@@ -1220,19 +1220,19 @@ export function Settings() {
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-gray-700 dark:text-gray-500">{t("data.loadingDb")}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-500">{t("data.loadingDb")}</p>
             )}
           </div>
 
           {/* Session Cleanup */}
           <div className="card p-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <Eraser className="w-4 h-4 text-amber-400" />
+              <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 flex items-center justify-center">
+                <Eraser className="w-4 h-4 text-amber-700 dark:text-amber-400" />
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t("data.sessionCleanup")}</p>
-                <p className="text-xs text-gray-700 dark:text-gray-500">{t("data.cleanupDesc")}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-500">{t("data.cleanupDesc")}</p>
               </div>
             </div>
 
@@ -1247,7 +1247,7 @@ export function Settings() {
                     onChange={(e) => setAbandonHours(e.target.value)}
                     className="input w-20 text-sm text-right font-mono"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-500">{t("common:hours")}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-500">{t("common:hours")}</span>
                 </div>
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
@@ -1260,7 +1260,7 @@ export function Settings() {
                     onChange={(e) => setPurgeDays(e.target.value)}
                     className="input w-20 text-sm text-right font-mono"
                   />
-                  <span className="text-xs text-gray-700 dark:text-gray-500">{t("common:days")}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-500">{t("common:days")}</span>
                 </div>
               </div>
             </div>
@@ -1272,7 +1272,7 @@ export function Settings() {
               disabled={actionLoading !== null}
               className={`text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
                 confirmAction === "cleanup"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  ? "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:bg-surface-4 border border-border"
               }`}
             >
@@ -1290,23 +1290,23 @@ export function Settings() {
           {/* Danger zone */}
           <div className="card p-5 space-y-4 border-red-500/10">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
+              <div className="w-9 h-9 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 text-red-700 dark:text-red-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-red-400">{t("danger.title")}</p>
-                <p className="text-xs text-gray-700 dark:text-gray-500">{t("danger.description")}</p>
+                <p className="text-sm font-medium text-red-700 dark:text-red-400">{t("danger.title")}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-500">{t("danger.description")}</p>
               </div>
             </div>
 
             {confirmAction === "clear" ? (
-              <div className="bg-red-500/5 border border-red-500/20 rounded-lg px-4 py-3 flex items-center justify-between flex-wrap gap-3">
-                <span className="text-xs text-amber-400">{t("danger.warning")}</span>
+              <div className="bg-red-500/5 border border-red-200 dark:border-red-500/20 rounded-lg px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+                <span className="text-xs text-amber-700 dark:text-amber-400">{t("danger.warning")}</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleClearData}
                     disabled={actionLoading !== null}
-                    className="text-xs px-3 py-1.5 rounded-md bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                    className="text-xs px-3 py-1.5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/30 hover:bg-red-500/30 transition-colors disabled:opacity-50"
                   >
                     {actionLoading === "clear" ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin inline mr-1" />
@@ -1325,7 +1325,7 @@ export function Settings() {
               <button
                 onClick={() => setConfirmAction("clear")}
                 disabled={actionLoading !== null}
-                className="text-xs px-3 py-1.5 rounded-md text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors disabled:opacity-50"
+                className="text-xs px-3 py-1.5 rounded-md text-red-700 dark:text-red-400 hover:bg-red-500/10 border border-red-200 dark:border-red-500/20 transition-colors disabled:opacity-50"
               >
                 <AlertTriangle className="w-3.5 h-3.5 inline mr-1" />
                 {t("danger.clearAllData")}
@@ -1343,14 +1343,14 @@ export function Settings() {
           <Server className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("about.title")}
         </h3>
-        <p className="text-xs text-gray-700 dark:text-gray-500 mb-4">{t("about.description")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 mb-4">{t("about.description")}</p>
 
         {sysInfo ? (
           <div className="card p-5">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Clock className="w-4 h-4 text-blue-400" />
+                  <Clock className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                   <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.uptime")}
                   </p>
@@ -1361,7 +1361,7 @@ export function Settings() {
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Cpu className="w-4 h-4 text-emerald-400" />
+                  <Cpu className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                   <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.nodejs")}
                   </p>
@@ -1372,7 +1372,7 @@ export function Settings() {
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Globe className="w-4 h-4 text-violet-400" />
+                  <Globe className="w-4 h-4 text-violet-700 dark:text-violet-400" />
                   <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.platform")}
                   </p>
@@ -1381,7 +1381,7 @@ export function Settings() {
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Wifi className="w-4 h-4 text-amber-400" />
+                  <Wifi className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                   <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.wsClients")}
                   </p>
@@ -1393,7 +1393,7 @@ export function Settings() {
             </div>
           </div>
         ) : (
-          <p className="text-xs text-gray-700 dark:text-gray-500">{t("about.loadingInfo")}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-500">{t("about.loadingInfo")}</p>
         )}
       </section>
     </div>

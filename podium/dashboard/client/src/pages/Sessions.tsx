@@ -189,9 +189,9 @@ export function Sessions() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
-                <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                   {t("common:live")}
                 </span>
@@ -202,7 +202,7 @@ export function Sessions() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-700 dark:text-gray-500">
+            <p className="text-sm text-gray-600 dark:text-gray-500">
               {t("sessionCount", { count: total })}
               {filter ? ` ${filter}` : ""}
             </p>
@@ -350,7 +350,7 @@ export function Sessions() {
                             <Link
                               to={`/run?session=${encodeURIComponent(session.id)}`}
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:text-emerald-200 px-1.5 py-0.5 rounded-full transition-colors"
+                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 hover:text-emerald-200 px-1.5 py-0.5 rounded-full transition-colors"
                               title={t("dashboardRunBadge", "Driven by Run page · click to open")}
                             >
                               <Play className="w-2.5 h-2.5" />
@@ -396,7 +396,7 @@ export function Sessions() {
           </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-xs text-gray-700 dark:text-gray-500">
+              <span className="text-sm text-gray-600 dark:text-gray-500">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
@@ -411,7 +411,7 @@ export function Sessions() {
                 >
                   {t("common:pagination.previous")}
                 </button>
-                <span className="px-3 py-1.5 text-xs text-gray-700 dark:text-gray-500">
+                <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-500">
                   {page + 1} / {totalPages}
                 </span>
                 <button

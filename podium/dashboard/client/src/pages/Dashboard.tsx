@@ -314,8 +314,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Server className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Runtime</span>
+              <Server className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Runtime</span>
             </div>
             <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">
               {info.server.cpus} cores · {info.server.arch}
@@ -335,7 +335,7 @@ function SystemHealthTab() {
                 {(info.server.cpu_load || []).slice(0, 3).map((load, i) => (
                   <span
                     key={i}
-                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${i === 0 && load > info.server.cpus ? "bg-red-500/20 text-red-400" : "bg-surface-3 text-gray-600 dark:text-gray-300"}`}
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${i === 0 && load > info.server.cpus ? "bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400" : "bg-surface-3 text-gray-600 dark:text-gray-300"}`}
                   >
                     {load.toFixed(2)}
                   </span>
@@ -395,13 +395,13 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Database className="w-4 h-4 text-blue-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Storage</span>
+              <Database className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Storage</span>
             </div>
             <Tip
               raw={`Write velocity (events):\n5 min: ${info.db.load_stats?.m5 ?? 0}\n15 min: ${info.db.load_stats?.m15 ?? 0}\n1 hr: ${info.db.load_stats?.h1 ?? 0}`}
             >
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10 cursor-default">
+              <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/10 cursor-default">
                 ⚡ {info.db.load_stats?.m5 ?? 0}/{info.db.load_stats?.m15 ?? 0}/
                 {info.db.load_stats?.h1 ?? 0}
               </span>
@@ -532,8 +532,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Health Score</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Health Score</span>
             </div>
             <Tip
               raw={`Composite Index formula:\n0.4 × Success Rate (${successRate.toFixed(1)}%)\n+ 0.25 × Cache Hit (${cacheHitRate.toFixed(1)}%)\n+ 0.25 × (100 − Error Rate) (${(100 - errorRate).toFixed(1)}%)\n+ 0.10 × (100 − Heap%) (${(100 - heapUsedPct).toFixed(1)}%)\n= ${healthScore.toFixed(1)}`}
@@ -598,7 +598,7 @@ function SystemHealthTab() {
             >
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Cache</p>
-                <p className="text-xs font-mono font-bold text-blue-400">
+                <p className="text-xs font-mono font-bold text-blue-700 dark:text-blue-400">
                   {cacheHitRate.toFixed(0)}%
                 </p>
               </div>
@@ -610,7 +610,7 @@ function SystemHealthTab() {
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Errors</p>
                 <p
-                  className={`text-xs font-mono font-bold ${errorRate < 5 ? "text-emerald-400" : errorRate < 15 ? "text-amber-400" : "text-red-400"}`}
+                  className={`text-xs font-mono font-bold ${errorRate < 5 ? "text-emerald-700 dark:text-emerald-400" : errorRate < 15 ? "text-amber-700 dark:text-amber-400" : "text-red-700 dark:text-red-400"}`}
                 >
                   {errorRate.toFixed(1)}%
                 </p>
@@ -622,7 +622,7 @@ function SystemHealthTab() {
             >
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Compact</p>
-                <p className="text-xs font-mono font-bold text-violet-400">
+                <p className="text-xs font-mono font-bold text-violet-700 dark:text-violet-400">
                   {workflow.compaction?.totalCompactions ?? 0}
                 </p>
               </div>
@@ -633,7 +633,7 @@ function SystemHealthTab() {
             >
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Saved</p>
-                <p className="text-xs font-mono font-bold text-emerald-400">
+                <p className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   {((workflow.compaction?.tokensRecovered ?? 0) / 1000).toFixed(1)}K
                 </p>
               </div>
@@ -648,8 +648,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Bot className="w-4 h-4 text-blue-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Token Usage</span>
+              <Bot className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Token Usage</span>
             </div>
             <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">
               {(totalTokens / 1000).toFixed(1)}K total
@@ -687,7 +687,7 @@ function SystemHealthTab() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-700 dark:text-gray-500 w-12 text-right flex-shrink-0 font-mono">
+                    <span className="text-sm text-gray-600 dark:text-gray-500 w-12 text-right flex-shrink-0 font-mono">
                       {pct.toFixed(1)}%
                     </span>
                   </div>
@@ -707,8 +707,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <BarChart3 className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Concurrency</span>
+              <BarChart3 className="w-4 h-4 text-violet-700 dark:text-violet-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Concurrency</span>
             </div>
             <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">{lanes.length} intervals</span>
           </div>
@@ -763,7 +763,7 @@ function SystemHealthTab() {
             >
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Active</p>
-                <p className="text-sm font-mono font-bold text-emerald-400">
+                <p className="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400">
                   {lanes.filter((l) => l.count > 0).length}
                 </p>
               </div>
@@ -771,7 +771,7 @@ function SystemHealthTab() {
             <Tip block raw={`Average concurrency across all intervals.`}>
               <div className="text-center cursor-default">
                 <p className="text-[9px] text-gray-600 uppercase">Avg</p>
-                <p className="text-sm font-mono font-bold text-blue-400">
+                <p className="text-sm font-mono font-bold text-blue-700 dark:text-blue-400">
                   {lanes.length > 0
                     ? (lanes.reduce((s, l) => s + l.count, 0) / lanes.length).toFixed(1)
                     : "0"}
@@ -788,8 +788,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Zap className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Tool Usage</span>
+              <Zap className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Tool Usage</span>
             </div>
             <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">top {topTools.length}</span>
           </div>
@@ -826,7 +826,7 @@ function SystemHealthTab() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-700 dark:text-gray-500 w-10 text-right flex-shrink-0 font-mono">
+                    <span className="text-sm text-gray-600 dark:text-gray-500 w-10 text-right flex-shrink-0 font-mono">
                       {tool.count > 999 ? `${(tool.count / 1000).toFixed(1)}K` : tool.count}
                     </span>
                   </div>
@@ -846,8 +846,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <GitBranch className="w-4 h-4 text-violet-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+              <GitBranch className="w-4 h-4 text-violet-700 dark:text-violet-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">
                 Subagent Effectiveness
               </span>
             </div>
@@ -878,7 +878,7 @@ function SystemHealthTab() {
                       />
                     </div>
                     <span
-                      className={`text-xs w-12 text-right flex-shrink-0 font-mono ${item.successRate >= 90 ? "text-emerald-400" : item.successRate >= 70 ? "text-amber-400" : "text-red-400"}`}
+                      className={`text-xs w-12 text-right flex-shrink-0 font-mono ${item.successRate >= 90 ? "text-emerald-700 dark:text-emerald-400" : item.successRate >= 70 ? "text-amber-700 dark:text-amber-400" : "text-red-700 dark:text-red-400"}`}
                     >
                       {item.successRate.toFixed(0)}%
                     </span>
@@ -899,11 +899,11 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Plug className="w-4 h-4 text-amber-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Integration</span>
+              <Plug className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Integration</span>
             </div>
             <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded ${info.hooks.installed ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-surface-3 text-gray-700 dark:text-gray-500 border border-border"}`}
+              className={`text-[10px] font-mono px-2 py-0.5 rounded ${info.hooks.installed ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20" : "bg-surface-3 text-gray-700 dark:text-gray-500 border border-border"}`}
             >
               {info.hooks.installed ? "Active" : "Offline"}
             </span>
@@ -931,7 +931,7 @@ function SystemHealthTab() {
           ) : (
             <div className="flex flex-col items-center justify-center py-6 border border-dashed border-border/40 rounded-lg">
               <Search className="w-4 h-4 text-gray-600 mb-2" />
-              <p className="text-xs text-gray-700 dark:text-gray-500">No project hooks registered</p>
+              <p className="text-sm text-gray-600 dark:text-gray-500">No project hooks registered</p>
             </div>
           )}
 
@@ -940,9 +940,9 @@ function SystemHealthTab() {
             raw={`WebSocket connections: ${info.server.ws_connections}\nProtocol: RFC 6455`}
           >
             <div className="flex items-center gap-3 bg-emerald-500/5 px-3 py-2.5 rounded-lg border border-emerald-500/10 cursor-default">
-              <Activity className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <Activity className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 animate-pulse" />
               <div>
-                <p className="text-[10px] text-emerald-400 font-medium">WebSocket Active</p>
+                <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">WebSocket Active</p>
                 <p className="text-[10px] text-gray-700 dark:text-gray-500">
                   {info.server.ws_connections} connection
                   {info.server.ws_connections !== 1 ? "s" : ""}
@@ -959,8 +959,8 @@ function SystemHealthTab() {
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Cpu className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">Platform</span>
+              <Cpu className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
+              <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">Platform</span>
             </div>
             <span className="text-[10px] font-mono text-gray-700 dark:text-gray-500">{info.server.node_version}</span>
           </div>
@@ -1205,7 +1205,7 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="text-center py-20">
-        <p className="text-red-400 mb-2">{t("failedConnect")}</p>
+        <p className="text-red-700 dark:text-red-400 mb-2">{t("failedConnect")}</p>
         <p className="text-sm text-gray-700 dark:text-gray-500">{error}</p>
         <button onClick={load} className="btn-primary mt-4">
           {t("common:retry")}
@@ -1223,9 +1223,9 @@ export function Dashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
-                <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                   {t("common:live")}
                 </span>
@@ -1236,7 +1236,7 @@ export function Dashboard() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-500">{t("subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -1246,7 +1246,7 @@ export function Dashboard() {
               onClick={() => setActiveTab("monitor")}
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "monitor"
-                  ? "bg-accent/15 text-accent shadow-sm"
+                  ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent shadow-sm"
                   : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
@@ -1256,7 +1256,7 @@ export function Dashboard() {
               onClick={() => setActiveTab("health")}
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-2 ${
                 activeTab === "health"
-                  ? "bg-accent/15 text-accent shadow-sm"
+                  ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent shadow-sm"
                   : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
@@ -1285,14 +1285,14 @@ export function Dashboard() {
               label={t("activeAgents")}
               value={stats?.active_agents ?? ""}
               icon={Bot}
-              accentColor="text-emerald-400"
+              accentColor="text-emerald-700 dark:text-emerald-400"
               loading={!stats}
             />
             <StatCard
               label={t("activeSubagents")}
               value={stats ? allSubagents.filter((a) => a.status === "working").length : ""}
               icon={GitBranch}
-              accentColor="text-violet-400"
+              accentColor="text-violet-700 dark:text-violet-400"
               trend={stats ? `${allSubagents.length}${t("totalTrend")}` : undefined}
               loading={!stats}
             />
@@ -1309,7 +1309,7 @@ export function Dashboard() {
               value={stats ? fmt(stats.total_events) : ""}
               raw={stats ? stats.total_events.toLocaleString() : undefined}
               icon={Activity}
-              accentColor="text-violet-400"
+              accentColor="text-violet-700 dark:text-violet-400"
               loading={!stats}
             />
             <StatCard
@@ -1321,7 +1321,7 @@ export function Dashboard() {
                   : undefined
               }
               icon={DollarSign}
-              accentColor="text-emerald-400"
+              accentColor="text-emerald-700 dark:text-emerald-400"
               loading={totalCost === null}
             />
           </div>
@@ -1386,7 +1386,7 @@ export function Dashboard() {
                                 empty rather than as a misalignment. */}
                             {!hasChildren && !isSubagent && (
                               <span
-                                className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-violet-400/70"
+                                className="w-6 h-6 flex-shrink-0 flex items-center justify-center text-violet-700 dark:text-violet-400/70"
                                 aria-hidden="true"
                                 title={t("common:noSubagents", "No subagents")}
                               >
@@ -1394,7 +1394,7 @@ export function Dashboard() {
                               </span>
                             )}
                             {isSubagent && (
-                              <GitBranch className="w-3 h-3 text-violet-400 flex-shrink-0" />
+                              <GitBranch className="w-3 h-3 text-violet-700 dark:text-violet-400 flex-shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
                               <AgentCard
@@ -1405,7 +1405,7 @@ export function Dashboard() {
                           </div>
 
                           {hasChildren && isExpanded && (
-                            <div className="ml-6 mt-1 space-y-1 border-l-2 border-violet-500/20 pl-3">
+                            <div className="ml-6 mt-1 space-y-1 border-l-2 border-violet-200 dark:border-violet-500/20 pl-3">
                               {children.map((child) => renderAgentNode(child, depth + 1))}
                             </div>
                           )}
@@ -1415,11 +1415,11 @@ export function Dashboard() {
                               onClick={() =>
                                 setExpandedAgents((prev) => new Set([...prev, agent.id]))
                               }
-                              className="ml-7 mt-1 text-[11px] text-violet-400 hover:text-violet-300 transition-colors"
+                              className="ml-7 mt-1 text-[11px] text-violet-700 dark:text-violet-400 hover:text-violet-300 transition-colors"
                             >
                               {totalDesc} {t("common:subagent", { count: totalDesc })}
                               {activeDesc > 0 && (
-                                <span className="text-emerald-400 ml-1">
+                                <span className="text-emerald-700 dark:text-emerald-400 ml-1">
                                   ({activeDesc} {t("common:active")})
                                 </span>
                               )}

@@ -1034,19 +1034,19 @@ export function Run() {
       />
 
       {binaryStatus && !binaryStatus.found && (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200 flex items-center gap-2">
+        <div className="rounded-lg border border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-800 dark:text-red-200 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{t("binary.missing")}</span>
         </div>
       )}
 
       {error && (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200 flex items-center gap-2">
+        <div className="rounded-lg border border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-800 dark:text-red-200 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span className="flex-1 break-all">{error}</span>
           <button
             onClick={() => setError(null)}
-            className="text-red-200/70 hover:text-red-100 p-0.5"
+            className="text-red-800 dark:text-red-200/70 hover:text-red-100 p-0.5"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -1147,8 +1147,8 @@ function LimitationsBanner() {
         aria-label={t("limitations.restore", "Show in-browser run notes")}
         title={t("limitations.restore", "Show in-browser run notes")}
       >
-        <span className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/30 inline-flex items-center justify-center flex-shrink-0">
-          <Lightbulb className="w-3 h-3 text-amber-300" />
+        <span className="w-5 h-5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 inline-flex items-center justify-center flex-shrink-0">
+          <Lightbulb className="w-3 h-3 text-amber-700 dark:text-amber-300" />
         </span>
         <span className="text-[11.5px] text-gray-600 dark:text-gray-400 truncate">
           <span className="text-gray-200 font-medium">{t("limitations.title")}</span>
@@ -1175,11 +1175,11 @@ function LimitationsBanner() {
         <Minus className="w-3.5 h-3.5" />
       </button>
       <div className="flex items-start gap-3 pr-8">
-        <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
-          <Lightbulb className="w-4 h-4 text-amber-300" />
+        <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center flex-shrink-0">
+          <Lightbulb className="w-4 h-4 text-amber-700 dark:text-amber-300" />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-semibold text-gray-100 leading-tight">
+          <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-tight">
             {t("limitations.title")}
           </div>
           <div className="mt-1 inline-flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
@@ -1193,8 +1193,8 @@ function LimitationsBanner() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-3.5 pl-12 pr-1">
-        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/[0.05] px-3.5 py-2.5">
-          <div className="text-[11px] font-semibold text-emerald-300 mb-1.5 inline-flex items-center gap-1.5 uppercase tracking-wide">
+        <div className="rounded-lg border border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/[0.05] px-3.5 py-2.5">
+          <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 mb-1.5 inline-flex items-center gap-1.5 uppercase tracking-wide">
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t("limitations.supported")}
           </div>
@@ -1213,8 +1213,8 @@ function LimitationsBanner() {
             </li>
           </ul>
         </div>
-        <div className="rounded-lg border border-rose-500/20 bg-rose-500/[0.05] px-3.5 py-2.5">
-          <div className="text-[11px] font-semibold text-rose-300 mb-1.5 inline-flex items-center gap-1.5 uppercase tracking-wide">
+        <div className="rounded-lg border border-rose-200 dark:border-rose-500/20 bg-rose-500/[0.05] px-3.5 py-2.5">
+          <div className="text-[11px] font-semibold text-rose-700 dark:text-rose-300 mb-1.5 inline-flex items-center gap-1.5 uppercase tracking-wide">
             <XCircle className="w-3.5 h-3.5" />
             {t("limitations.limited")}
           </div>
@@ -1482,7 +1482,7 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
           {formatNum(total)} / {formatNum(cap)}
         </span>
         <span
-          className={`font-mono ${tone === "red" ? "text-red-300" : tone === "amber" ? "text-amber-300" : "text-gray-700 dark:text-gray-500"}`}
+          className={`font-mono ${tone === "red" ? "text-red-700 dark:text-red-300" : tone === "amber" ? "text-amber-700 dark:text-amber-300" : "text-gray-700 dark:text-gray-500"}`}
         >
           ({pct}%)
         </span>
@@ -1505,7 +1505,7 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
         {stats.cacheReadTokens > 0 && (
           <span>
             <span className="text-gray-700 dark:text-gray-500">{t("tokens.cacheRead")}:</span>{" "}
-            <span className="font-mono text-emerald-300">{formatNum(stats.cacheReadTokens)}</span>
+            <span className="font-mono text-emerald-700 dark:text-emerald-300">{formatNum(stats.cacheReadTokens)}</span>
           </span>
         )}
         {stats.costUsd != null && (
@@ -1568,10 +1568,10 @@ function commandSourceTone(s: SlashCommand["source"]): string {
   return s === "builtin"
     ? "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/30"
     : s === "user"
-      ? "bg-sky-500/10 text-sky-300 border-sky-500/30"
+      ? "bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
       : s === "project"
-        ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-        : "bg-violet-500/10 text-violet-300 border-violet-500/30";
+        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
+        : "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/30";
 }
 
 /**
@@ -1837,7 +1837,7 @@ function PromptEditor({
         placeholder={placeholder}
         rows={rows}
         spellCheck={false}
-        className="w-full bg-surface-2 border border-border rounded-md px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50 resize-y font-sans leading-relaxed"
+        className="w-full bg-surface-2 border border-border rounded-md px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50 resize-y font-sans leading-relaxed"
       />
       {state && (
         <div className="absolute z-30 left-0 right-0 bottom-full mb-1 rounded-md border border-border bg-surface-1 shadow-lg shadow-black/40 max-h-72 overflow-auto py-1">
@@ -1869,7 +1869,7 @@ function PromptEditor({
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[12px] text-gray-100">/{c.name}</span>
+                  <span className="font-mono text-[12px] text-gray-900 dark:text-gray-100">/{c.name}</span>
                   <span
                     className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${commandSourceTone(c.source)}`}
                   >
@@ -1934,9 +1934,9 @@ function Header({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("title")}</h1>
           {wsConnected ? (
-            <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
               {tCommon("live")}
             </span>
@@ -1947,7 +1947,7 @@ function Header({
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-700 dark:text-gray-500 max-w-3xl">{t("subtitle")}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-500 max-w-3xl">{t("subtitle")}</p>
       </div>
       <ActiveRunsSwitcher
         activeRuns={activeRuns}
@@ -2074,7 +2074,7 @@ function ActiveRunsSwitcher({
         disabled={totalCount === 0}
         className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
           liveCount > 0
-            ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/15"
+            ? "border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-500/15"
             : "border-border bg-surface-2 text-gray-300 hover:bg-surface-3"
         }`}
       >
@@ -2203,7 +2203,7 @@ function RunsModal({
             <ListOrdered className="w-4 h-4 text-accent" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-gray-100">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {t("runs.modalTitle", "Dashboard runs")}
             </h2>
             <p className="text-[11px] text-gray-700 dark:text-gray-500">
@@ -2246,7 +2246,7 @@ function RunsModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("runs.searchPlaceholder", "Search prompt, cwd, model, or session id…")}
-              className="flex-1 bg-transparent text-[12px] text-gray-100 placeholder:text-gray-600 focus:outline-none"
+              className="flex-1 bg-transparent text-[12px] text-gray-900 dark:text-gray-100 placeholder:text-gray-600 focus:outline-none"
             />
             {search && (
               <button
@@ -2407,7 +2407,7 @@ function UnifiedRunRowView({
         <StatusPill status={row.status} />
         <ModeBadge mode={row.mode} />
         {row.isLive && (
-          <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+          <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-500/25 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {t("runs.liveBadge", "live")}
           </span>
@@ -2421,7 +2421,7 @@ function UnifiedRunRowView({
           {row.isLive && !isCurrent && (
             <button
               onClick={onAttach}
-              className="inline-flex items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200 px-2 py-0.5 text-[10.5px] font-medium transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-200 px-2 py-0.5 text-[10.5px] font-medium transition-colors"
             >
               <Play className="w-3 h-3" />
               {t("runs.attachLabel", "Attach")}
@@ -2653,7 +2653,7 @@ function ConfigCard(props: ConfigCardProps) {
       </div>
 
       {props.permissionMode === "bypassPermissions" && (
-        <div className="mx-4 mb-3 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-[11px] text-red-200 flex items-start gap-2">
+        <div className="mx-4 mb-3 rounded-md border border-red-500/40 bg-red-50 dark:bg-red-500/10 px-3 py-2 text-[11px] text-red-800 dark:text-red-200 flex items-start gap-2">
           <ShieldAlert className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
           <span>{t("hint.permissionWarning")}</span>
         </div>
@@ -2663,7 +2663,7 @@ function ConfigCard(props: ConfigCardProps) {
       <div className="border-t border-border px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 text-[11px] min-w-0">
           {atCap ? (
-            <span className="inline-flex items-center gap-1.5 text-amber-300">
+            <span className="inline-flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
               <AlertCircle className="w-3.5 h-3.5" />
               {t("concurrency.atCap", { max: props.activeRuns?.maxConcurrent ?? 0 })}
             </span>
@@ -2836,7 +2836,7 @@ function CwdAutocomplete({
           placeholder={t("fields.cwdPlaceholder")}
           autoComplete="off"
           spellCheck={false}
-          className="w-full bg-surface-2 border border-border rounded-md pl-7 pr-3 py-1.5 text-[11px] font-mono text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
+          className="w-full bg-surface-2 border border-border rounded-md pl-7 pr-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
         />
       </div>
       {open && (
@@ -2938,7 +2938,7 @@ function SessionPicker({
         <RotateCcw className="w-3.5 h-3.5 text-accent flex-shrink-0 mt-0.5" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/15 text-accent border border-accent/30">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border border-accent/30">
               {t("resume.selectedBadge")}
             </span>
             <span className="font-mono text-[11px] text-gray-200 truncate">{selected.id}</span>
@@ -2975,7 +2975,7 @@ function SessionPicker({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("resume.search")}
-              className="bg-transparent text-[11px] text-gray-100 placeholder:text-gray-500 focus:outline-none w-full"
+              className="bg-transparent text-[11px] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none w-full"
             />
           </div>
           <div className="max-h-72 overflow-auto py-1">
@@ -2998,11 +2998,11 @@ function SessionPicker({
                     <span
                       className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
                         s.status === "active"
-                          ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+                          ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
                           : s.status === "completed"
-                            ? "bg-sky-500/10 text-sky-300 border-sky-500/30"
+                            ? "bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
                             : s.status === "error"
-                              ? "bg-red-500/10 text-red-300 border-red-500/30"
+                              ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/30"
                               : "bg-surface-3 text-gray-600 dark:text-gray-400 border-border"
                       }`}
                     >
@@ -3128,7 +3128,7 @@ function Select<T extends string>({
         type="button"
         onClick={() => setOpen((v) => !v)}
         onKeyDown={onKey}
-        className="w-full flex items-center justify-between gap-2 bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] text-gray-100 focus:outline-none focus:border-accent/50 hover:bg-surface-3 transition-colors"
+        className="w-full flex items-center justify-between gap-2 bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] text-gray-900 dark:text-gray-100 focus:outline-none focus:border-accent/50 hover:bg-surface-3 transition-colors"
       >
         <span className="truncate">{current?.label ?? "—"}</span>
         <ChevronDown className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
@@ -3223,7 +3223,7 @@ function ModelPicker({ value, onChange }: { value: string; onChange: (s: string)
           placeholder={t("fields.modelCustomPlaceholder")}
           autoComplete="off"
           spellCheck={false}
-          className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
+          className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
         />
       )}
     </div>
@@ -3306,7 +3306,7 @@ function RunSession(props: RunSessionProps) {
           <button
             onClick={props.onStop}
             disabled={props.busy === "stop"}
-            className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-red-500/10 hover:bg-red-500/20 text-red-200 px-2.5 py-1 text-[11px] font-medium disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-red-50 dark:bg-red-500/10 hover:bg-red-500/20 text-red-800 dark:text-red-200 px-2.5 py-1 text-[11px] font-medium disabled:opacity-60 transition-colors"
           >
             <Square className="w-3 h-3" />
             {props.busy === "stop" ? t("actions.stopping") : t("actions.stop")}
@@ -3390,7 +3390,7 @@ function EmptyStream({ isLive }: { isLive: boolean }) {
     <div className="text-center py-12 flex flex-col items-center gap-2">
       <Sparkles className="w-6 h-6 text-gray-600" />
       <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("empty.title")}</div>
-      <div className="text-xs text-gray-700 dark:text-gray-500 max-w-md">{t("empty.body")}</div>
+      <div className="text-sm text-gray-600 dark:text-gray-500 max-w-md">{t("empty.body")}</div>
     </div>
   );
 }
@@ -3399,16 +3399,16 @@ function StatusPill({ status }: { status: string }) {
   const { t } = useTranslation("run");
   const idle = { color: "bg-surface-3 text-gray-600 dark:text-gray-400 border-border", icon: Clock as typeof Play };
   const config: Record<string, { color: string; icon: typeof Play }> = {
-    spawning: { color: "bg-amber-500/15 text-amber-300 border-amber-500/30", icon: RefreshCw },
-    running: { color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: Sparkles },
+    spawning: { color: "bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30", icon: RefreshCw },
+    running: { color: "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30", icon: Sparkles },
     completed: {
-      color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+      color: "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30",
       icon: CheckCircle2,
     },
-    error: { color: "bg-red-500/15 text-red-300 border-red-500/30", icon: XCircle },
+    error: { color: "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/30", icon: XCircle },
     killed: { color: "bg-gray-500/15 text-gray-600 dark:text-gray-400 border-gray-500/30", icon: Square },
     abandoned: {
-      color: "bg-orange-500/10 text-orange-300 border-orange-500/30",
+      color: "bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-500/30",
       icon: Square,
     },
     idle,
@@ -3499,8 +3499,8 @@ function UserTurn({ env }: { env: UserMessage }) {
     <div className="flex gap-3">
       <Avatar tone="indigo" letter={t("events.you").charAt(0)} />
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-semibold text-indigo-300 mb-1">{t("events.you")}</div>
-        <div className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-sm text-gray-200 whitespace-pre-wrap break-words">
+        <div className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 mb-1">{t("events.you")}</div>
+        <div className="rounded-lg border border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-sm text-gray-200 whitespace-pre-wrap break-words">
           {text || "—"}
         </div>
       </div>
@@ -3553,17 +3553,17 @@ function ThinkingBlock({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   if (!text) return null;
   return (
-    <div className="rounded-md border border-violet-500/20 bg-violet-500/5">
+    <div className="rounded-md border border-violet-200 dark:border-violet-500/20 bg-violet-500/5">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium text-violet-300 hover:bg-violet-500/10 transition-colors"
+        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 transition-colors"
       >
         {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
         <Sparkles className="w-3 h-3" />
         {t("events.thinking")}
       </button>
       {open && (
-        <pre className="px-3 py-2 text-[11px] font-mono text-violet-200/80 whitespace-pre-wrap break-words border-t border-violet-500/20">
+        <pre className="px-3 py-2 text-[11px] font-mono text-violet-800 dark:text-violet-200/80 whitespace-pre-wrap break-words border-t border-violet-200 dark:border-violet-500/20">
           {text}
         </pre>
       )}
@@ -3576,23 +3576,23 @@ function ToolUseBlock({ toolUse }: { toolUse: Extract<ContentBlock, { type: "too
   const [open, setOpen] = useState(false);
   const summary = describeToolInput(toolUse.input);
   return (
-    <div className="rounded-md border border-amber-500/30 bg-amber-500/5">
+    <div className="rounded-md border border-amber-200 dark:border-amber-500/30 bg-amber-500/5">
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium hover:bg-amber-500/10 transition-colors text-left"
       >
         {open ? (
-          <ChevronDown className="w-3 h-3 text-amber-300 flex-shrink-0" />
+          <ChevronDown className="w-3 h-3 text-amber-700 dark:text-amber-300 flex-shrink-0" />
         ) : (
-          <ChevronRight className="w-3 h-3 text-amber-300 flex-shrink-0" />
+          <ChevronRight className="w-3 h-3 text-amber-700 dark:text-amber-300 flex-shrink-0" />
         )}
-        <Wrench className="w-3 h-3 text-amber-300 flex-shrink-0" />
-        <span className="font-mono text-amber-200">{toolUse.name}</span>
+        <Wrench className="w-3 h-3 text-amber-700 dark:text-amber-300 flex-shrink-0" />
+        <span className="font-mono text-amber-800 dark:text-amber-200">{toolUse.name}</span>
         {summary && <span className="text-gray-700 dark:text-gray-500 truncate">· {summary}</span>}
         <span className="text-[10px] text-gray-600 ml-auto">{t("events.tool")}</span>
       </button>
       {open && (
-        <pre className="px-3 py-2 text-[11px] font-mono text-gray-300 whitespace-pre-wrap break-words border-t border-amber-500/30 max-h-72 overflow-auto">
+        <pre className="px-3 py-2 text-[11px] font-mono text-gray-300 whitespace-pre-wrap break-words border-t border-amber-200 dark:border-amber-500/30 max-h-72 overflow-auto">
           {JSON.stringify(toolUse.input, null, 2)}
         </pre>
       )}
@@ -3618,8 +3618,8 @@ function ToolResultBlock({ result }: { result: Extract<ContentBlock, { type: "to
         : JSON.stringify(result.content);
   const lines = text.split("\n").length;
   const tone = result.is_error
-    ? "border-red-500/30 bg-red-500/5 text-red-200"
-    : "border-emerald-500/20 bg-emerald-500/5 text-emerald-200";
+    ? "border-red-200 dark:border-red-500/30 bg-red-500/5 text-red-800 dark:text-red-200"
+    : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200";
   return (
     <div className={`rounded-md border ${tone}`}>
       <button
@@ -3666,8 +3666,8 @@ function UnknownTurn({ env }: { env: Envelope }) {
 function Avatar({ tone, letter }: { tone: "accent" | "indigo"; letter: string }) {
   const cls =
     tone === "accent"
-      ? "bg-accent/15 text-accent border-accent/30"
-      : "bg-indigo-500/15 text-indigo-300 border-indigo-500/30";
+      ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border-accent/30"
+      : "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/30";
   return (
     <div
       className={`w-7 h-7 rounded-md border flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${cls}`}
@@ -3695,8 +3695,8 @@ function ResultFooter({ result }: { result: ResultEnvelope }) {
     <div
       className={`border-t px-4 py-2.5 flex items-center gap-4 flex-wrap text-[11px] ${
         isError
-          ? "border-red-500/30 bg-red-500/5 text-red-200"
-          : "border-emerald-500/20 bg-emerald-500/5 text-emerald-200"
+          ? "border-red-200 dark:border-red-500/30 bg-red-500/5 text-red-800 dark:text-red-200"
+          : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200"
       }`}
     >
       {isError ? (

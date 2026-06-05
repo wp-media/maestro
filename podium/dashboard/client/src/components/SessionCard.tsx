@@ -55,7 +55,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
     >
       <div className="flex items-start justify-between gap-2 mb-3 min-w-0">
         <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-          <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 bg-accent/15 text-accent">
+          <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent">
             <FolderOpen className="w-3.5 h-3.5" />
           </div>
           <div className="min-w-0 overflow-hidden">

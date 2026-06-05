@@ -392,7 +392,7 @@ function BarRow({
         />
       </div>
       <Tip raw={count.toLocaleString()}>
-        <span className="text-xs text-gray-700 dark:text-gray-500 w-10 text-right flex-shrink-0">{fmt(count)}</span>
+        <span className="text-sm text-gray-600 dark:text-gray-500 w-10 text-right flex-shrink-0">{fmt(count)}</span>
       </Tip>
     </div>
   );
@@ -421,7 +421,7 @@ function CostBarRow({
           style={{ width: `${width}%` }}
         />
       </div>
-      <span className="text-xs text-emerald-400 font-mono w-16 text-right flex-shrink-0">
+      <span className="text-xs text-emerald-700 dark:text-emerald-400 font-mono w-16 text-right flex-shrink-0">
         <Tip raw={fmtCostFull(cost)}>{fmtCost(cost)}</Tip>
       </span>
     </div>
@@ -440,7 +440,7 @@ function DonutChart({
   const { t } = useTranslation(["analytics", "common"]);
   const { show, move, hide, node } = useTooltip();
   const total = segments.reduce((s, g) => s + g.value, 0);
-  if (total === 0) return <div className="text-xs text-gray-700 dark:text-gray-500">{t("common:noData")}</div>;
+  if (total === 0) return <div className="text-sm text-gray-600 dark:text-gray-500">{t("common:noData")}</div>;
 
   const r = 52;
   const cx = 64;
@@ -533,7 +533,7 @@ function StatPill({
   return (
     <div className="card p-5 flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-700 dark:text-gray-500 uppercase tracking-wider">{label}</span>
+        <span className="text-sm text-gray-600 dark:text-gray-500 uppercase tracking-wider">{label}</span>
         <Icon className={`w-4 h-4 ${color}`} />
       </div>
       {loading ? (
@@ -797,9 +797,9 @@ export function Analytics() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
                 {wsConnected ? (
-                  <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                  <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                     {t("common:live")}
                   </span>
@@ -810,7 +810,7 @@ export function Analytics() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-700 dark:text-gray-500 flex items-center gap-2">
+              <p className="text-sm text-gray-600 dark:text-gray-500 flex items-center gap-2">
                 {t("subtitle")}
                 <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-700 dark:text-gray-500 bg-surface-2 border border-border px-2 py-0.5 rounded-md font-mono ml-2">
                   <Clock className="w-3 h-3" />
@@ -840,7 +840,7 @@ export function Analytics() {
           raw={data ? data.overview.total_sessions.toLocaleString() : undefined}
           sub={data ? `${data.overview.active_sessions} ${t("common:active")}` : undefined}
           icon={FolderOpen}
-          color="text-blue-400"
+          color="text-blue-700 dark:text-blue-400"
           loading={!data}
         />
         <StatPill
@@ -849,7 +849,7 @@ export function Analytics() {
           raw={data ? data.overview.total_agents.toLocaleString() : undefined}
           sub={data ? `${data.overview.active_agents} ${t("common:active")}` : undefined}
           icon={Bot}
-          color="text-emerald-400"
+          color="text-emerald-700 dark:text-emerald-400"
           loading={!data}
         />
         <StatPill
@@ -858,7 +858,7 @@ export function Analytics() {
           raw={data ? totalTokens.toLocaleString() : undefined}
           sub={data ? `${cacheHitPct}${t("cacheHitRate")}` : undefined}
           icon={Cpu}
-          color="text-violet-400"
+          color="text-violet-700 dark:text-violet-400"
           loading={!data}
         />
         <StatPill
@@ -871,7 +871,7 @@ export function Analytics() {
               : undefined
           }
           icon={DollarSign}
-          color="text-emerald-400"
+          color="text-emerald-700 dark:text-emerald-400"
           loading={!costData}
         />
         <StatPill
@@ -989,15 +989,15 @@ export function Analytics() {
                 ))}
               </div>
               <div className="mt-6 pt-4 border-t border-border space-y-1.5">
-                <div className="flex justify-between text-xs text-gray-700 dark:text-gray-500">
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
                   <span>{t("common:token.totalTokens")}</span>
                   <Tip raw={totalTokens.toLocaleString()}>
                     <span className="text-gray-600 dark:text-gray-300 font-mono">{fmt(totalTokens)}</span>
                   </Tip>
                 </div>
-                <div className="flex justify-between text-xs text-gray-700 dark:text-gray-500">
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
                   <span>{t("cacheEfficiency")}</span>
-                  <span className="text-violet-400 font-mono">{cacheHitPct}%</span>
+                  <span className="text-violet-700 dark:text-violet-400 font-mono">{cacheHitPct}%</span>
                 </div>
               </div>
             </div>
@@ -1010,17 +1010,17 @@ export function Analytics() {
                   {
                     label: t("common:token.input"),
                     value: data?.tokens.total_input ?? 0,
-                    color: "text-blue-400",
+                    color: "text-blue-700 dark:text-blue-400",
                   },
                   {
                     label: t("common:token.output"),
                     value: data?.tokens.total_output ?? 0,
-                    color: "text-emerald-400",
+                    color: "text-emerald-700 dark:text-emerald-400",
                   },
                   {
                     label: t("common:token.cacheRead"),
                     value: data?.tokens.total_cache_read ?? 0,
-                    color: "text-violet-400",
+                    color: "text-violet-700 dark:text-violet-400",
                   },
                   {
                     label: t("common:token.cacheWrite"),
@@ -1087,7 +1087,7 @@ export function Analytics() {
                   <div className="mt-4 pt-4 border-t border-border space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-700 dark:text-gray-500">{t("peakCostDay")}</span>
-                      <span className="text-emerald-400 font-mono">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-mono">
                         <Tip raw={`${peakCostDay.date} • ${fmtCostFull(peakCostDay.cost)}`}>
                           {fmtCost(peakCostDay.cost)}
                         </Tip>
@@ -1095,7 +1095,7 @@ export function Analytics() {
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-gray-700 dark:text-gray-500">{t("totalCost30d")}</span>
-                      <span className="text-emerald-400 font-mono">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-mono">
                         <Tip raw={fmtCostFull(totalCost30d)}>{fmtCost(totalCost30d)}</Tip>
                       </span>
                     </div>
@@ -1125,14 +1125,14 @@ export function Analytics() {
                         <span className="text-gray-600 dark:text-gray-400 font-mono truncate">
                           {formatModelName(b.model)}
                         </span>
-                        <span className="text-emerald-400 font-mono font-medium ml-2">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-mono font-medium ml-2">
                           <Tip raw={fmtCostFull(b.cost)}>{fmtCost(b.cost)}</Tip>
                         </span>
                       </div>
                     ))}
                     <div className="flex justify-between text-xs pt-2 border-t border-border">
                       <span className="text-gray-600 dark:text-gray-300 font-medium">{t("common:total")}</span>
-                      <span className="text-emerald-400 font-mono font-semibold">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-mono font-semibold">
                         <Tip raw={fmtCostFull(costData?.total_cost ?? 0)}>
                           {fmtCost(costData?.total_cost ?? 0)}
                         </Tip>
@@ -1166,7 +1166,7 @@ export function Analytics() {
                   </div>
                   <div className="mt-4 pt-4 border-t border-border text-xs flex justify-between">
                     <span className="text-gray-700 dark:text-gray-500">{t("common:total")}</span>
-                    <span className="text-cyan-400 font-mono">
+                    <span className="text-cyan-700 dark:text-cyan-400 font-mono">
                       <Tip raw={fmtCostFull(totalCost30d)}>{fmtCost(totalCost30d)}</Tip>
                     </span>
                   </div>
@@ -1203,7 +1203,7 @@ export function Analytics() {
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("agentStatus")}</h3>
               <DonutChart segments={agentStatusSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
-                <div className="flex justify-between text-xs text-gray-700 dark:text-gray-500">
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
                   <span>{t("totalAgentsLabel")}</span>
                   <Tip raw={(data?.overview.total_agents ?? 0).toLocaleString()}>
                     <span className="text-gray-600 dark:text-gray-300 font-mono">
@@ -1214,7 +1214,7 @@ export function Analytics() {
                 {agentStatusSegments.map((s) => (
                   <div
                     key={s.label}
-                    className="flex items-center justify-between text-xs text-gray-700 dark:text-gray-500"
+                    className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-500"
                   >
                     <span className="flex items-center gap-1.5">
                       <span
@@ -1280,7 +1280,7 @@ export function Analytics() {
               <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("sessionOutcomes")}</h3>
               <DonutChart segments={sessionOutcomeSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
-                <div className="flex justify-between text-xs text-gray-700 dark:text-gray-500">
+                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
                   <span>{t("totalSessionsLabel")}</span>
                   <Tip raw={(data?.overview.total_sessions ?? 0).toLocaleString()}>
                     <span className="text-gray-600 dark:text-gray-300 font-mono">
@@ -1291,7 +1291,7 @@ export function Analytics() {
                 {sessionOutcomeSegments.map((s) => (
                   <div
                     key={s.label}
-                    className="flex items-center justify-between text-xs text-gray-700 dark:text-gray-500"
+                    className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-500"
                   >
                     <span className="flex items-center gap-1.5">
                       <span

@@ -85,7 +85,7 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
         <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
           <div
             className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${
-              isMain ? "bg-accent/15 text-accent" : "bg-violet-500/15 text-violet-400"
+              isMain ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent" : "bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-400"
             }`}
           >
             {isMain ? <Bot className="w-3.5 h-3.5" /> : <GitBranch className="w-3.5 h-3.5" />}

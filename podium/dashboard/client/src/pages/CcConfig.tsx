@@ -399,7 +399,7 @@ export function CcConfig() {
       />
 
       {error && (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200 flex items-center gap-2">
+        <div className="rounded-lg border border-red-500/40 bg-red-50 dark:bg-red-500/10 px-4 py-3 text-sm text-red-800 dark:text-red-200 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{t("loadError", { message: error })}</span>
         </div>
@@ -415,7 +415,7 @@ export function CcConfig() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("common.search")}
-              className="bg-transparent text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none flex-1"
+              className="bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none flex-1"
             />
             {isMutable(tab) && tab !== "memory" && (
               <button
@@ -494,9 +494,9 @@ function Header({
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("title")}</h1>
             {wsConnected ? (
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                 {tCommon("live")}
               </span>
@@ -507,7 +507,7 @@ function Header({
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-700 dark:text-gray-500 max-w-2xl">{t("subtitle")}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-500 max-w-2xl">{t("subtitle")}</p>
         </div>
       </div>
       <div className="flex flex-col items-stretch lg:items-end gap-2 flex-shrink-0">
@@ -684,7 +684,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
               onClick={() => onSelect(key)}
               className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex-shrink-0 whitespace-nowrap ${
                 active
-                  ? "bg-accent/15 text-accent border border-accent/30"
+                  ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border border-accent/30"
                   : "text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-surface-3 border border-transparent"
               }`}
             >
@@ -854,74 +854,74 @@ type Tone =
   | "rose";
 const TONES: Record<Tone, { iconBg: string; iconText: string; bar: string; ring: string }> = {
   sky: {
-    iconBg: "bg-sky-500/10",
-    iconText: "text-sky-300",
+    iconBg: "bg-sky-50 dark:bg-sky-500/10",
+    iconText: "text-sky-700 dark:text-sky-300",
     bar: "bg-sky-500/40",
     ring: "ring-sky-500/20",
   },
   emerald: {
-    iconBg: "bg-emerald-500/10",
-    iconText: "text-emerald-300",
+    iconBg: "bg-emerald-50 dark:bg-emerald-500/10",
+    iconText: "text-emerald-700 dark:text-emerald-300",
     bar: "bg-emerald-500/40",
     ring: "ring-emerald-500/20",
   },
   violet: {
-    iconBg: "bg-violet-500/10",
-    iconText: "text-violet-300",
+    iconBg: "bg-violet-50 dark:bg-violet-500/10",
+    iconText: "text-violet-700 dark:text-violet-300",
     bar: "bg-violet-500/40",
     ring: "ring-violet-500/20",
   },
   amber: {
-    iconBg: "bg-amber-500/10",
-    iconText: "text-amber-300",
+    iconBg: "bg-amber-50 dark:bg-amber-500/10",
+    iconText: "text-amber-700 dark:text-amber-300",
     bar: "bg-amber-500/40",
     ring: "ring-amber-500/20",
   },
   fuchsia: {
     iconBg: "bg-fuchsia-500/10",
-    iconText: "text-fuchsia-300",
+    iconText: "text-fuchsia-700 dark:text-fuchsia-300",
     bar: "bg-fuchsia-500/40",
     ring: "ring-fuchsia-500/20",
   },
   cyan: {
-    iconBg: "bg-cyan-500/10",
-    iconText: "text-cyan-300",
+    iconBg: "bg-cyan-50 dark:bg-cyan-500/10",
+    iconText: "text-cyan-700 dark:text-cyan-300",
     bar: "bg-cyan-500/40",
     ring: "ring-cyan-500/20",
   },
   pink: {
-    iconBg: "bg-pink-500/10",
-    iconText: "text-pink-300",
+    iconBg: "bg-pink-50 dark:bg-pink-500/10",
+    iconText: "text-pink-700 dark:text-pink-300",
     bar: "bg-pink-500/40",
     ring: "ring-pink-500/20",
   },
   indigo: {
-    iconBg: "bg-indigo-500/10",
-    iconText: "text-indigo-300",
+    iconBg: "bg-indigo-50 dark:bg-indigo-500/10",
+    iconText: "text-indigo-700 dark:text-indigo-300",
     bar: "bg-indigo-500/40",
     ring: "ring-indigo-500/20",
   },
   orange: {
-    iconBg: "bg-orange-500/10",
-    iconText: "text-orange-300",
+    iconBg: "bg-orange-50 dark:bg-orange-500/10",
+    iconText: "text-orange-700 dark:text-orange-300",
     bar: "bg-orange-500/40",
     ring: "ring-orange-500/20",
   },
   teal: {
-    iconBg: "bg-teal-500/10",
-    iconText: "text-teal-300",
+    iconBg: "bg-teal-50 dark:bg-teal-500/10",
+    iconText: "text-teal-700 dark:text-teal-300",
     bar: "bg-teal-500/40",
     ring: "ring-teal-500/20",
   },
   slate: {
     iconBg: "bg-slate-500/10",
-    iconText: "text-slate-300",
+    iconText: "text-slate-700 dark:text-slate-300",
     bar: "bg-slate-500/40",
     ring: "ring-slate-500/20",
   },
   rose: {
-    iconBg: "bg-rose-500/10",
-    iconText: "text-rose-300",
+    iconBg: "bg-rose-50 dark:bg-rose-500/10",
+    iconText: "text-rose-700 dark:text-rose-300",
     bar: "bg-rose-500/40",
     ring: "ring-rose-500/20",
   },
@@ -1073,7 +1073,7 @@ function SummaryStat({ tone, icon: Icon, label, value, user, project }: SummaryS
           </span>
         </div>
         <div className="mt-1.5 flex items-baseline gap-2">
-          <span className="text-xl font-semibold text-gray-100 tabular-nums">{total}</span>
+          <span className="text-xl font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{total}</span>
           {showBreakdown && (
             <span className="text-[10px] text-gray-700 dark:text-gray-500 truncate">
               {user} {t("overview.user")} · {project} {t("overview.project")}
@@ -1200,10 +1200,10 @@ function MdItemCard({ item, onOpen, onEdit, onDelete, kind }: MdItemCardProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-sm text-gray-100 truncate">{item.name}</span>
+            <span className="font-mono text-sm text-gray-900 dark:text-gray-100 truncate">{item.name}</span>
             <ScopeBadge scope={item.scope} />
             {item.frontmatter.model && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/10 text-accent border border-accent/20">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border border-accent/20">
                 {item.frontmatter.model}
               </span>
             )}
@@ -1238,7 +1238,7 @@ function MdItemCard({ item, onOpen, onEdit, onDelete, kind }: MdItemCardProps) {
           </button>
           <button
             onClick={() => onDelete(artifactType, item.scope, item.name, filePath)}
-            className="text-[11px] font-medium px-2 py-1 rounded-md border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-300 inline-flex items-center gap-1.5"
+            className="text-[11px] font-medium px-2 py-1 rounded-md border border-red-200 dark:border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-700 dark:text-red-300 inline-flex items-center gap-1.5"
           >
             <Trash2 className="w-3 h-3" />
             {t("edit.deleteButton")}
@@ -1270,7 +1270,7 @@ function PluginsPanel({ data, search }: { data: CcPluginsResponse | null; search
         <FileText className="w-3.5 h-3.5" />
         <span className="font-mono truncate">{data.manifestPath}</span>
         {!data.manifestExists && (
-          <span className="ml-auto text-amber-400">
+          <span className="ml-auto text-amber-700 dark:text-amber-400">
             {t("plugins.manifestMissing", { path: "" })}
           </span>
         )}
@@ -1326,20 +1326,20 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-mono text-sm text-gray-100">{p.name}</span>
+            <span className="font-mono text-sm text-gray-900 dark:text-gray-100">{p.name}</span>
             {p.marketplace && (
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
                 {p.marketplace}
               </span>
             )}
             {p.version && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/10 text-accent border border-accent/20">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border border-accent/20">
                 v{p.version}
               </span>
             )}
             <ScopeBadge scope={p.scope} />
             {p.enabled === true && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 inline-flex items-center gap-1">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 inline-flex items-center gap-1">
                 <CircleDot className="w-3 h-3" />
                 {t("plugins.enabled")}
               </span>
@@ -1351,7 +1351,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
               </span>
             )}
             {!p.installPathExists && (
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 inline-flex items-center gap-1">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 inline-flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 {t("plugins.missing")}
               </span>
@@ -1497,7 +1497,7 @@ function McpCard({ server }: { server: CcMcpServer }) {
   return (
     <div className="rounded-lg border border-border bg-surface-2 px-4 py-3">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="font-mono text-sm text-gray-100">{server.name}</span>
+        <span className="font-mono text-sm text-gray-900 dark:text-gray-100">{server.name}</span>
         <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
           {server.kind}
         </span>
@@ -1606,7 +1606,7 @@ function HooksPanel({
             </div>
             <div className="p-3">
               {filteredEvents.length === 0 ? (
-                <div className="text-xs text-gray-700 dark:text-gray-500 px-1 py-2">{t("hooks.noHooks")}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-500 px-1 py-2">{t("hooks.noHooks")}</div>
               ) : (
                 <div className="space-y-3">
                   {filteredEvents.map(([event, entries]) => (
@@ -1652,7 +1652,7 @@ function HooksPanel({
       {scripts && scripts.items.length > 0 && (
         <div className="rounded-lg border border-border bg-surface-2">
           <div className="border-b border-border px-4 py-2.5">
-            <div className="text-sm font-medium text-gray-100">{t("hookScripts.title")}</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("hookScripts.title")}</div>
             <p className="mt-1 text-[11px] text-gray-700 dark:text-gray-500 leading-relaxed">
               {t("hookScripts.subtitle")}
             </p>
@@ -1707,7 +1707,7 @@ function SettingsPanel({
           { cmd: t("explain.settings.cmd3"), note: t("explain.settings.cmd3Note") },
         ]}
       />
-      <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-300/90 flex items-center gap-2">
+      <div className="rounded-md border border-amber-200 dark:border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-700 dark:text-amber-300/90 flex items-center gap-2">
         <Info className="w-3.5 h-3.5 flex-shrink-0" />
         {t("common.redactedNotice")}
       </div>
@@ -1726,7 +1726,7 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
   return (
     <div className="rounded-lg border border-border bg-surface-2">
       <div className="border-b border-border px-4 py-2.5">
-        <div className="text-sm font-medium text-gray-100">{t("statusline.title")}</div>
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t("statusline.title")}</div>
       </div>
       <div className="p-3 space-y-3">
         {data.config ? (
@@ -1745,7 +1745,7 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
             </div>
           </div>
         ) : (
-          <div className="text-xs text-gray-700 dark:text-gray-500">{t("statusline.noStatusline")}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-500">{t("statusline.noStatusline")}</div>
         )}
         {data.scripts.length > 0 && (
           <div>
@@ -1824,11 +1824,11 @@ function SettingsBlock({
 
 function SettingsKeyValueList({ data }: { data: Record<string, unknown> | null | undefined }) {
   if (!data || typeof data !== "object") {
-    return <div className="p-3 text-xs text-gray-700 dark:text-gray-500">—</div>;
+    return <div className="p-3 text-sm text-gray-600 dark:text-gray-500">—</div>;
   }
   const entries = Object.entries(data);
   if (entries.length === 0) {
-    return <div className="p-3 text-xs text-gray-700 dark:text-gray-500">{}</div>;
+    return <div className="p-3 text-sm text-gray-600 dark:text-gray-500">{}</div>;
   }
   return (
     <div className="divide-y divide-border">
@@ -1855,7 +1855,7 @@ function SettingsValue({ value }: { value: unknown }) {
       <span
         className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
           value
-            ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+            ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
             : "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/30"
         }`}
       >
@@ -1953,7 +1953,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
             </button>
             <button
               onClick={() => onDelete("memory", m.scope, undefined, m.file)}
-              className="text-[11px] font-medium px-2 py-1 rounded-md border border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-300 inline-flex items-center gap-1.5"
+              className="text-[11px] font-medium px-2 py-1 rounded-md border border-red-200 dark:border-red-500/30 bg-red-500/5 hover:bg-red-500/15 text-red-700 dark:text-red-300 inline-flex items-center gap-1.5"
             >
               <Trash2 className="w-3 h-3" />
               {t("edit.deleteButton")}
@@ -1978,7 +1978,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
         >
           <div className="flex items-center gap-2">
             <ScopeBadge scope={s} />
-            <span className="text-xs text-gray-700 dark:text-gray-500">{t("memory.missing")}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-500">{t("memory.missing")}</span>
           </div>
           <button
             onClick={() => onCreate(s)}
@@ -2031,14 +2031,14 @@ function MarketplacesPanel({
           <div key={m.name} className="rounded-lg border border-border bg-surface-2 px-4 py-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Store className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500" />
-              <span className="font-mono text-sm text-gray-100">{m.name}</span>
+              <span className="font-mono text-sm text-gray-900 dark:text-gray-100">{m.name}</span>
               {m.marketplaceName && m.marketplaceName !== m.name && (
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
                   {m.marketplaceName}
                 </span>
               )}
               {m.pluginCount != null && (
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/10 text-accent border border-accent/20">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border border-accent/20">
                   {t("marketplaces.pluginCount")}: {m.pluginCount}
                 </span>
               )}
@@ -2129,7 +2129,7 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
         return (
           <div key={g.context} className="rounded-lg border border-border bg-surface-2">
             <div className="border-b border-border px-4 py-2 text-xs font-medium text-gray-300">
-              {t("keybindings.context")}: <span className="text-gray-100">{g.context}</span>
+              {t("keybindings.context")}: <span className="text-gray-900 dark:text-gray-100">{g.context}</span>
               <span className="ml-2 text-[10px] text-gray-600">({filtered.length})</span>
             </div>
             <div className="divide-y divide-border">
@@ -2155,11 +2155,11 @@ function ScopeBadge({ scope }: { scope: string }) {
   const { t } = useTranslation("ccConfig");
   const color =
     scope === "user"
-      ? "bg-sky-500/10 text-sky-300 border-sky-500/30"
+      ? "bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
       : scope === "project"
-        ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
         : scope === "project-local"
-          ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
+          ? "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/30"
           : "bg-surface-3 text-gray-600 dark:text-gray-400 border-border";
   const label =
     scope === "project-local"
@@ -2261,7 +2261,7 @@ function FileViewer({
         </div>
         <div className="overflow-auto p-4">
           {state.error ? (
-            <div className="text-sm text-red-300 inline-flex items-center gap-2">
+            <div className="text-sm text-red-700 dark:text-red-300 inline-flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
               {state.error}
             </div>
@@ -2371,7 +2371,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
           <Pencil className="w-4 h-4 text-gray-700 dark:text-gray-500" />
-          <span className="text-sm font-medium text-gray-100 flex-1 truncate">{titleText}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1 truncate">{titleText}</span>
           <button
             onClick={onClose}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
@@ -2393,7 +2393,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t("edit.namePlaceholder")}
                   pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,63}"
-                  className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-sm font-mono text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
+                  className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
                 />
                 <p className="mt-1 text-[10px] text-gray-700 dark:text-gray-500">{t("edit.nameHelp")}</p>
               </div>
@@ -2431,13 +2431,13 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 spellCheck={false}
-                className="w-full h-72 bg-surface-2 border border-border rounded-md px-3 py-2 text-[11px] font-mono text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50 resize-y"
+                className="w-full h-72 bg-surface-2 border border-border rounded-md px-3 py-2 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50 resize-y"
               />
             )}
           </div>
 
           {error && (
-            <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200 inline-flex items-center gap-2">
+            <div className="rounded-md border border-red-500/40 bg-red-50 dark:bg-red-500/10 px-3 py-2 text-xs text-red-800 dark:text-red-200 inline-flex items-center gap-2">
               <AlertCircle className="w-3.5 h-3.5" />
               {error}
             </div>
@@ -2504,8 +2504,8 @@ function ConfirmDeleteModal({ state, onCancel, onConfirm }: ConfirmDeleteModalPr
         onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-border px-4 py-2.5 flex items-center gap-2">
-          <ShieldAlert className="w-4 h-4 text-red-300" />
-          <span className="text-sm font-medium text-gray-100 flex-1">
+          <ShieldAlert className="w-4 h-4 text-red-700 dark:text-red-300" />
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1">
             {t("edit.confirmDelete")}
           </span>
         </div>
@@ -2526,7 +2526,7 @@ function ConfirmDeleteModal({ state, onCancel, onConfirm }: ConfirmDeleteModalPr
           <button
             onClick={handleConfirm}
             disabled={busy}
-            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-red-500/50 bg-red-500/15 hover:bg-red-500/25 text-red-200 inline-flex items-center gap-1.5 disabled:opacity-60"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-red-500/50 bg-red-50 dark:bg-red-500/15 hover:bg-red-500/25 text-red-800 dark:text-red-200 inline-flex items-center gap-1.5 disabled:opacity-60"
           >
             <Trash2 className="w-3.5 h-3.5" />
             {busy ? t("edit.deleting") : t("edit.confirmDeleteAction")}
@@ -2546,8 +2546,8 @@ function ToastNotice({ toast, onDismiss }: { toast: NonNullable<Toast>; onDismis
       <div
         className={`rounded-lg border px-3 py-2 shadow-lg flex items-start gap-2 ${
           isErr
-            ? "border-red-500/50 bg-red-500/15 text-red-100"
-            : "border-emerald-500/40 bg-emerald-500/10 text-emerald-100"
+            ? "border-red-500/50 bg-red-50 dark:bg-red-500/15 text-red-100"
+            : "border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-100"
         }`}
       >
         {isErr ? (
@@ -2579,9 +2579,9 @@ interface ExplainerBannerProps {
 
 function ExplainerBanner({ title, body, howTo, commands }: ExplainerBannerProps) {
   return (
-    <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-4 py-3">
+    <div className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-500/[0.04] px-4 py-3">
       <div className="flex items-start gap-2">
-        <Lock className="w-4 h-4 text-amber-300 flex-shrink-0 mt-0.5" />
+        <Lock className="w-4 h-4 text-amber-700 dark:text-amber-300 flex-shrink-0 mt-0.5" />
         <div className="min-w-0 flex-1 space-y-2">
           <div className="text-sm font-medium text-amber-100">{title}</div>
           <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{body}</p>
@@ -2668,7 +2668,7 @@ function BackupsModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
           <History className="w-4 h-4 text-gray-700 dark:text-gray-500" />
-          <span className="text-sm font-medium text-gray-100 flex-1">{t("backups.title")}</span>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1">{t("backups.title")}</span>
           <button
             onClick={onClose}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-200 p-1 rounded-md hover:bg-surface-3"
@@ -2682,7 +2682,7 @@ function BackupsModal({ onClose }: { onClose: () => void }) {
         </div>
         <div className="overflow-auto p-4 space-y-2">
           {error && (
-            <div className="text-sm text-red-300 inline-flex items-center gap-2">
+            <div className="text-sm text-red-700 dark:text-red-300 inline-flex items-center gap-2">
               <AlertCircle className="w-4 h-4" />
               {error}
             </div>
@@ -2715,7 +2715,7 @@ function BackupRow({ backup }: { backup: CcBackup }) {
         <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-600 dark:text-gray-400 border border-border">
           {backup.type}
         </span>
-        <span className="font-mono text-xs text-gray-100 truncate flex-1 min-w-0">
+        <span className="font-mono text-xs text-gray-900 dark:text-gray-100 truncate flex-1 min-w-0">
           {backup.name}
         </span>
         <span className="text-[10px] text-gray-700 dark:text-gray-500">{new Date(backup.mtime).toLocaleString()}</span>

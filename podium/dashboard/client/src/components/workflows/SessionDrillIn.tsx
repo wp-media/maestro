@@ -26,13 +26,13 @@ type AgentNode = SessionDrillInData["tree"][number];
 function statusColor(status: string): string {
   switch (status) {
     case "completed":
-      return "text-violet-400 bg-violet-500/10 border-violet-500/20";
+      return "text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20";
     case "working":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+      return "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20";
     case "error":
-      return "text-red-400 bg-red-500/10 border-red-500/20";
+      return "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20";
     case "active":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+      return "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20";
     case "waiting":
       return "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
     default:
@@ -85,7 +85,7 @@ function TabBar({ active, onChange }: TabBarProps) {
           className={[
             "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150",
             active === tab.id
-              ? "bg-surface-5 text-gray-100 shadow-sm"
+              ? "bg-surface-5 text-gray-900 dark:text-gray-100 shadow-sm"
               : "text-gray-700 dark:text-gray-500 hover:text-gray-300",
           ].join(" ")}
         >
@@ -137,14 +137,14 @@ function TreeNode({ node, depth }: TreeNodeProps) {
 
         {/* Name */}
         <span
-          className={`text-sm font-medium truncate ${isMain ? "text-indigo-300" : "text-gray-200"}`}
+          className={`text-sm font-medium truncate ${isMain ? "text-indigo-700 dark:text-indigo-300" : "text-gray-200"}`}
         >
           {node.name}
         </span>
 
         {/* Subagent type */}
         {node.subagent_type && (
-          <span className="text-xs text-gray-700 dark:text-gray-500 truncate flex-shrink-0">
+          <span className="text-sm text-gray-600 dark:text-gray-500 truncate flex-shrink-0">
             [{node.subagent_type}]
           </span>
         )}
@@ -206,7 +206,7 @@ function ToolTimeline({ events }: ToolTimelineProps) {
             className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/5 transition-colors"
           >
             {/* Tool pill */}
-            <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/20 whitespace-nowrap">
+            <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/20 whitespace-nowrap">
               {ev.tool_name ?? ev.event_type}
             </span>
 
@@ -233,12 +233,12 @@ interface EventSequenceProps {
 }
 
 const EVENT_TYPE_COLOR: Record<string, string> = {
-  tool_use: "text-blue-400",
-  tool_result: "text-emerald-400",
-  agent_start: "text-indigo-400",
-  agent_stop: "text-violet-400",
-  compaction: "text-amber-400",
-  error: "text-red-400",
+  tool_use: "text-blue-700 dark:text-blue-400",
+  tool_result: "text-emerald-700 dark:text-emerald-400",
+  agent_start: "text-indigo-700 dark:text-indigo-400",
+  agent_stop: "text-violet-700 dark:text-violet-400",
+  compaction: "text-amber-700 dark:text-amber-400",
+  error: "text-red-700 dark:text-red-400",
 };
 
 function eventTypeColor(type: string): string {
@@ -310,10 +310,10 @@ function ErrorState({ message }: ErrorStateProps) {
   const { t } = useTranslation("workflows");
   return (
     <div className="flex flex-col items-center justify-center py-10 text-center px-4">
-      <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-3">
-        <X className="w-4 h-4 text-red-400" />
+      <div className="w-9 h-9 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-center mb-3">
+        <X className="w-4 h-4 text-red-700 dark:text-red-400" />
       </div>
-      <p className="text-sm font-medium text-red-400">{t("drillIn.failedLoad")}</p>
+      <p className="text-sm font-medium text-red-700 dark:text-red-400">{t("drillIn.failedLoad")}</p>
       <p className="text-xs text-gray-600 mt-1 max-w-xs">{message}</p>
     </div>
   );
@@ -389,10 +389,10 @@ function SessionHeader({ drillIn, onClose, activeTab, onTabChange }: SessionHead
     <div className="flex flex-col gap-3 mb-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-gray-100 truncate">
+          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
             {session.name ?? session.id}
           </p>
-          <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5 truncate">
+          <p className="text-sm text-gray-600 dark:text-gray-500 mt-0.5 truncate">
             {formatModelName(session.model) ?? t("drillIn.unknownModel")} &middot;{" "}
             {t(`common:status.${session.status}`, { defaultValue: session.status })}
             {session.started_at && ` \u00b7 ${safeTimestamp(session.started_at)}`}
@@ -601,7 +601,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
                 type="button"
                 onClick={handleLoadMore}
                 disabled={loading}
-                className="w-full px-3 py-2 text-xs text-gray-700 dark:text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors border-t border-border/50 disabled:opacity-50"
+                className="w-full px-3 py-2 text-sm text-gray-600 dark:text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors border-t border-border/50 disabled:opacity-50"
               >
                 {loading ? t("drillIn.loading") : t("drillIn.loadMore")}
               </button>

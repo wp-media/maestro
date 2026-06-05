@@ -39,7 +39,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
   if (!hasErrors) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-center justify-center">
           <svg
             width="24"
             height="24"
@@ -54,7 +54,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
         </div>
-        <span className="text-sm text-emerald-400 font-medium">
+        <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
           {t("errorPropagation.noErrors")}
         </span>
         <span className="text-xs text-gray-600">{t("errorPropagation.allSuccess")}</span>
@@ -72,13 +72,13 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
     <div className="flex flex-col gap-4">
       {/* Error rate summary bar */}
       <div className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 border border-red-500/15">
-        <div className="flex-shrink-0 min-w-[2.75rem] h-10 px-2 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-          <span className="text-[13px] font-bold text-red-400 tabular-nums whitespace-nowrap">
+        <div className="flex-shrink-0 min-w-[2.75rem] h-10 px-2 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-center">
+          <span className="text-[13px] font-bold text-red-700 dark:text-red-400 tabular-nums whitespace-nowrap">
             {errorRatePct}%
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-red-300">
+          <p className="text-xs font-medium text-red-700 dark:text-red-300">
             {t("errorPropagation.sessionsErrorSummary", {
               errorSessions: data.sessionsWithErrors,
               totalSessions: data.totalSessions,
@@ -166,7 +166,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
                       style={{ width: `${Math.max(pct, 8)}%` }}
                     />
                   </div>
-                  <span className="text-[11px] font-semibold text-red-300 tabular-nums w-5 text-right flex-shrink-0">
+                  <span className="text-[11px] font-semibold text-red-700 dark:text-red-300 tabular-nums w-5 text-right flex-shrink-0">
                     {t.count}
                   </span>
                 </div>
@@ -206,7 +206,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
                 <span className="text-xs text-gray-300 truncate flex-1 min-w-0" title={e.summary}>
                   {e.summary}
                 </span>
-                <span className="flex-shrink-0 text-[11px] font-semibold text-amber-400 tabular-nums">
+                <span className="flex-shrink-0 text-[11px] font-semibold text-amber-700 dark:text-amber-400 tabular-nums">
                   {e.count}x
                 </span>
               </div>

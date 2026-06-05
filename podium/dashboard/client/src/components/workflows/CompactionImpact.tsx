@@ -213,7 +213,7 @@ export function CompactionImpact({ data }: CompactionImpactProps) {
         <StatBox
           label={t("compaction.tokensRecovered")}
           value={fmtTokens(data.tokensRecovered)}
-          accent="text-emerald-400"
+          accent="text-emerald-700 dark:text-emerald-400"
         />
       </div>
 
@@ -232,7 +232,7 @@ export function CompactionImpact({ data }: CompactionImpactProps) {
       </div>
 
       {/* Summary line */}
-      <p className="text-xs text-gray-700 dark:text-gray-500">{t("compaction.hadCompactions", { pct: sessionPct })}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-500">{t("compaction.hadCompactions", { pct: sessionPct })}</p>
     </div>
   );
 }

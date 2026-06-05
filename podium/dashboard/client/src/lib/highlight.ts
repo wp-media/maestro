@@ -608,35 +608,35 @@ export function tokenClass(type: TokenType): string {
     case "comment":
       return "text-gray-700 dark:text-gray-500 italic";
     case "string":
-      return "text-emerald-300";
+      return "text-emerald-700 dark:text-emerald-300";
     case "number":
-      return "text-orange-300";
+      return "text-orange-700 dark:text-orange-300";
     case "keyword":
-      return "text-violet-300";
+      return "text-violet-700 dark:text-violet-300";
     case "builtin":
-      return "text-sky-300";
+      return "text-sky-700 dark:text-sky-300";
     case "function":
       return "text-yellow-200";
     case "operator":
-      return "text-pink-300";
+      return "text-pink-700 dark:text-pink-300";
     case "punctuation":
       return "text-gray-600 dark:text-gray-400";
     case "property":
-      return "text-cyan-300";
+      return "text-cyan-700 dark:text-cyan-300";
     case "tag":
-      return "text-rose-300";
+      return "text-rose-700 dark:text-rose-300";
     case "attr":
       return "text-yellow-200";
     case "variable":
-      return "text-amber-300";
+      return "text-amber-700 dark:text-amber-300";
     case "boolean":
-      return "text-orange-300";
+      return "text-orange-700 dark:text-orange-300";
     case "diff-add":
-      return "text-emerald-300 bg-emerald-500/10";
+      return "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10";
     case "diff-del":
-      return "text-red-300 bg-red-500/10";
+      return "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-500/10";
     case "diff-meta":
-      return "text-violet-300";
+      return "text-violet-700 dark:text-violet-300";
     case "plain":
     default:
       return "text-gray-200";

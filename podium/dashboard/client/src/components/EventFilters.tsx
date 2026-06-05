@@ -274,7 +274,7 @@ function ChipGroup({
         aria-expanded={open}
         className={`text-[11px] px-2 py-1 rounded border cursor-pointer flex items-center gap-1.5 ${
           selectedCount > 0
-            ? "border-accent/40 bg-accent/10 text-accent"
+            ? "border-accent/40 bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent"
             : "border-border bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
         }`}
       >

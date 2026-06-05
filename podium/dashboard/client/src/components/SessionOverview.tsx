@@ -49,22 +49,22 @@ function StatTile({
 }) {
   const palette = {
     default: "border-surface-3 bg-surface-2 text-gray-200",
-    violet: "border-violet-500/20 bg-violet-500/5 text-violet-200",
-    emerald: "border-emerald-500/20 bg-emerald-500/5 text-emerald-200",
-    amber: "border-amber-500/20 bg-amber-500/5 text-amber-200",
-    rose: "border-rose-500/20 bg-rose-500/5 text-rose-200",
-    cyan: "border-cyan-500/20 bg-cyan-500/5 text-cyan-200",
-    blue: "border-blue-500/20 bg-blue-500/5 text-blue-200",
+    violet: "border-violet-200 dark:border-violet-500/20 bg-violet-500/5 text-violet-800 dark:text-violet-200",
+    emerald: "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
+    amber: "border-amber-200 dark:border-amber-500/20 bg-amber-500/5 text-amber-800 dark:text-amber-200",
+    rose: "border-rose-200 dark:border-rose-500/20 bg-rose-500/5 text-rose-800 dark:text-rose-200",
+    cyan: "border-cyan-200 dark:border-cyan-500/20 bg-cyan-500/5 text-cyan-800 dark:text-cyan-200",
+    blue: "border-blue-200 dark:border-blue-500/20 bg-blue-500/5 text-blue-800 dark:text-blue-200",
   }[tone];
 
   const iconTone = {
     default: "text-gray-700 dark:text-gray-500",
-    violet: "text-violet-400",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
-    rose: "text-rose-400",
-    cyan: "text-cyan-400",
-    blue: "text-blue-400",
+    violet: "text-violet-700 dark:text-violet-400",
+    emerald: "text-emerald-700 dark:text-emerald-400",
+    amber: "text-amber-700 dark:text-amber-400",
+    rose: "text-rose-700 dark:text-rose-400",
+    cyan: "text-cyan-700 dark:text-cyan-400",
+    blue: "text-blue-700 dark:text-blue-400",
   }[tone];
 
   return (
@@ -73,7 +73,7 @@ function StatTile({
         <span className={iconTone}>{icon}</span>
         {label}
       </div>
-      <div className="mt-1 font-mono text-lg font-semibold text-gray-100 leading-tight">
+      <div className="mt-1 font-mono text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
         {value}
       </div>
       {hint && <div className="text-[10px] text-gray-700 dark:text-gray-500 mt-0.5">{hint}</div>}
@@ -226,19 +226,19 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
     <div className="space-y-5 mb-6">
       {/* Active-agent banner — only shows when session is running */}
       {activeAgent && (
-        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5">
           <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
           </span>
-          <Bot className="w-3.5 h-3.5 text-emerald-300 flex-shrink-0" />
-          <span className="text-xs text-emerald-200 font-medium flex-shrink-0">
+          <Bot className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300 flex-shrink-0" />
+          <span className="text-xs text-emerald-800 dark:text-emerald-200 font-medium flex-shrink-0">
             {activeAgent.name || "Agent"}
           </span>
           {activeAgent.current_tool && (
             <span className="text-[11px] text-gray-600 dark:text-gray-400 font-mono inline-flex items-center gap-1">
               <span className="text-gray-600">running</span>
-              <span className="text-emerald-300">{activeAgent.current_tool}</span>
+              <span className="text-emerald-700 dark:text-emerald-300">{activeAgent.current_tool}</span>
             </span>
           )}
           {activeAgent.task && (
@@ -302,7 +302,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
         <div className="lg:col-span-2 rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Wrench className="w-3.5 h-3.5 text-violet-400" />
+              <Wrench className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400" />
               Top tools
             </h3>
             <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono">
@@ -310,7 +310,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
             </span>
           </div>
           {stats.tools_used.length === 0 ? (
-            <div className="text-center py-6 text-xs text-gray-700 dark:text-gray-500">No tool calls yet.</div>
+            <div className="text-center py-6 text-sm text-gray-600 dark:text-gray-500">No tool calls yet.</div>
           ) : (
             <div className="space-y-1.5">
               {stats.tools_used.slice(0, 8).map((t) => (
@@ -361,13 +361,13 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
               <>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <GitBranch className="w-3.5 h-3.5 text-cyan-400" />
+                    <GitBranch className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
                     Subagents
                   </h3>
                   <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono">{totalRuns} runs</span>
                 </div>
                 {rows.length === 0 ? (
-                  <div className="text-center py-6 text-xs text-gray-700 dark:text-gray-500">
+                  <div className="text-center py-6 text-sm text-gray-600 dark:text-gray-500">
                     No subagents in this session.
                   </div>
                 ) : (
@@ -379,7 +379,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
                         <div key={r.key} className="flex items-center gap-2">
                           <span
                             className={`font-mono text-xs truncate flex-1 min-w-0 ${
-                              r.isCompaction ? "text-amber-300" : "text-gray-300"
+                              r.isCompaction ? "text-amber-700 dark:text-amber-300" : "text-gray-300"
                             }`}
                             title={r.label}
                           >
@@ -410,7 +410,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
         <div className="rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
           <div className="flex items-center justify-between mb-2.5">
             <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Coins className="w-3.5 h-3.5 text-amber-400" />
+              <Coins className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
               Token flow
             </h3>
             <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono">{fmt(totalTokens)} total</span>
@@ -451,28 +451,28 @@ function TokenFlowBar({ tokens, total }: { tokens: SessionStats["tokens"]; total
       label: "Cache read",
       value: tokens.cache_read_tokens,
       cls: "bg-sky-500",
-      text: "text-sky-300",
+      text: "text-sky-700 dark:text-sky-300",
     },
     {
       key: "cache_write",
       label: "Cache write",
       value: tokens.cache_write_tokens,
       cls: "bg-violet-500",
-      text: "text-violet-300",
+      text: "text-violet-700 dark:text-violet-300",
     },
     {
       key: "input",
       label: "Input",
       value: tokens.input_tokens,
       cls: "bg-emerald-500",
-      text: "text-emerald-300",
+      text: "text-emerald-700 dark:text-emerald-300",
     },
     {
       key: "output",
       label: "Output",
       value: tokens.output_tokens,
       cls: "bg-orange-500",
-      text: "text-orange-300",
+      text: "text-orange-700 dark:text-orange-300",
     },
   ];
 

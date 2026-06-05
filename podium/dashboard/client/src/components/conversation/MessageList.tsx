@@ -66,7 +66,7 @@ function formatLocalTime(iso: string): string {
 /** Compact pill for /command invocations parsed out of TUI markup. */
 function CommandPill({ display }: { display: string }) {
   return (
-    <div className="inline-flex items-center gap-2 text-sm text-emerald-300 font-mono bg-emerald-500/10 border border-emerald-500/20 rounded-md px-3 py-1.5 max-w-full">
+    <div className="inline-flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300 font-mono bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md px-3 py-1.5 max-w-full">
       <span className="text-emerald-500/70">›</span>
       <span className="break-all">{display}</span>
     </div>
@@ -78,9 +78,9 @@ function TerminalBlock({ text, stream }: { text: string; stream: "stdout" | "std
   const cleaned = stripAnsi(text).replace(/^\n+|\n+$/g, "");
   const isErr = stream === "stderr";
   const accent = isErr
-    ? "border-red-500/30 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-200/90"
+    ? "border-red-200 dark:border-red-500/30 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-200/90"
     : "border-surface-3 bg-surface-4/60 text-gray-700 dark:text-gray-200";
-  const labelColor = isErr ? "text-red-300/80" : "text-gray-600 dark:text-gray-400";
+  const labelColor = isErr ? "text-red-700 dark:text-red-300/80" : "text-gray-600 dark:text-gray-400";
   return (
     <div className={`rounded-lg border ${accent} overflow-hidden`}>
       <div
@@ -99,7 +99,7 @@ function TerminalBlock({ text, stream }: { text: string; stream: "stdout" | "std
 /** Subtle inline note for the local-command-caveat banner. */
 function CaveatBlock({ text }: { text: string }) {
   return (
-    <div className="flex items-start gap-2 rounded-md border border-amber-500/15 bg-amber-500/[0.05] px-3 py-1.5 text-[11px] text-amber-200/70">
+    <div className="flex items-start gap-2 rounded-md border border-amber-500/15 bg-amber-500/[0.05] px-3 py-1.5 text-[11px] text-amber-800 dark:text-amber-200/70">
       <Info className="w-3.5 h-3.5 mt-px flex-shrink-0 opacity-60" />
       <span className="leading-relaxed italic">{stripAnsi(text).trim()}</span>
     </div>
@@ -122,11 +122,11 @@ function renderSegment(seg: TuiSegment, key: number): React.ReactNode {
         <CollapsibleBlock
           key={key}
           text={seg.text}
-          icon={<AlertTriangle className="w-3.5 h-3.5 text-amber-400/70 flex-shrink-0" />}
+          icon={<AlertTriangle className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400/70 flex-shrink-0" />}
           title="System reminder"
-          borderClass="border-amber-500/20"
+          borderClass="border-amber-200 dark:border-amber-500/20"
           bgClass="bg-amber-500/5"
-          textClass="text-amber-300/80"
+          textClass="text-amber-700 dark:text-amber-300/80"
         />
       );
     case "persisted-output":
@@ -134,11 +134,11 @@ function renderSegment(seg: TuiSegment, key: number): React.ReactNode {
         <CollapsibleBlock
           key={key}
           text={seg.text}
-          icon={<ScrollText className="w-3.5 h-3.5 text-violet-400/60 flex-shrink-0" />}
+          icon={<ScrollText className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400/60 flex-shrink-0" />}
           title="Persisted output"
-          borderClass="border-violet-500/20"
+          borderClass="border-violet-200 dark:border-violet-500/20"
           bgClass="bg-violet-500/5"
-          textClass="text-violet-300/80"
+          textClass="text-violet-700 dark:text-violet-300/80"
         />
       );
     case "text": {
@@ -238,7 +238,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
         const accentBar = isAssistant ? "before:bg-violet-500/40" : "before:bg-blue-500/40";
         const avatarRing = isAssistant
           ? "bg-accent/20 text-accent border border-accent/30"
-          : "bg-gradient-to-br from-blue-500/30 to-cyan-500/20 text-blue-200 ring-1 ring-blue-400/30";
+          : "bg-gradient-to-br from-blue-500/30 to-cyan-500/20 text-blue-800 dark:text-blue-200 ring-1 ring-blue-400/30";
 
         return (
           <div
@@ -272,9 +272,9 @@ export function MessageList({ messages, loading }: MessageListProps) {
                 )}
                 {msg.usage && (
                   <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono inline-flex items-center gap-1">
-                    <span className="text-emerald-300/70">↓ {fmt(msg.usage.input_tokens)}</span>
+                    <span className="text-emerald-700 dark:text-emerald-300/70">↓ {fmt(msg.usage.input_tokens)}</span>
                     <span className="text-gray-700">·</span>
-                    <span className="text-orange-300/70">↑ {fmt(msg.usage.output_tokens)}</span>
+                    <span className="text-orange-700 dark:text-orange-300/70">↑ {fmt(msg.usage.output_tokens)}</span>
                   </span>
                 )}
                 {msg.timestamp && (
@@ -293,11 +293,11 @@ export function MessageList({ messages, loading }: MessageListProps) {
                       <CollapsibleBlock
                         key={bIdx}
                         text={block.text}
-                        icon={<ScrollText className="w-3.5 h-3.5 text-cyan-400/60 flex-shrink-0" />}
+                        icon={<ScrollText className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400/60 flex-shrink-0" />}
                         title="Task Notification"
-                        borderClass="border-cyan-500/20"
+                        borderClass="border-cyan-200 dark:border-cyan-500/20"
                         bgClass="bg-cyan-500/5"
-                        textClass="text-cyan-400/80"
+                        textClass="text-cyan-700 dark:text-cyan-400/80"
                       />
                     );
                   }
@@ -310,11 +310,11 @@ export function MessageList({ messages, loading }: MessageListProps) {
                       <CollapsibleBlock
                         key={bIdx}
                         text={block.text}
-                        icon={<ScrollText className="w-3.5 h-3.5 text-blue-400/60 flex-shrink-0" />}
+                        icon={<ScrollText className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400/60 flex-shrink-0" />}
                         title={skillPath}
-                        borderClass="border-blue-500/20"
+                        borderClass="border-blue-200 dark:border-blue-500/20"
                         bgClass="bg-blue-500/5"
-                        textClass="text-blue-400/80"
+                        textClass="text-blue-700 dark:text-blue-400/80"
                       />
                     );
                   }
@@ -344,7 +344,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
                   return (
                     <div
                       key={bIdx}
-                      className="rounded-lg border border-amber-500/20 bg-amber-500/5 overflow-hidden"
+                      className="rounded-lg border border-amber-200 dark:border-amber-500/20 bg-amber-500/5 overflow-hidden"
                     >
                       <button
                         onClick={() =>
@@ -362,10 +362,10 @@ export function MessageList({ messages, loading }: MessageListProps) {
                             isExpanded ? "rotate-90" : ""
                           }`}
                         />
-                        <Brain className="w-3.5 h-3.5 text-amber-400/80" />
-                        <span className="text-xs text-amber-200/90 font-medium">Thinking</span>
+                        <Brain className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400/80" />
+                        <span className="text-xs text-amber-800 dark:text-amber-200/90 font-medium">Thinking</span>
                         {!isExpanded && (
-                          <span className="text-[10px] text-amber-300/40 font-mono ml-auto">
+                          <span className="text-[10px] text-amber-700 dark:text-amber-300/40 font-mono ml-auto">
                             {block.text.length.toLocaleString()} chars
                           </span>
                         )}
