@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Turn, ItemStatus } from '../../types'
 import { useStore } from '../../store/useStore'
 import EventRow from './EventRow'
+import { ConversationPanel } from './ConversationPanel'
 
-type Tab = 'tools' | 'context'
+type Tab = 'tools' | 'conversation' | 'context'
 
 const MIN_HEIGHT = 200
 const MAX_HEIGHT = 640
@@ -103,6 +104,7 @@ function TabButton({ active, onClick, children, count }: TabButtonProps) {
 export default function DetailPanel() {
   const selectedTurn = useStore((s) => s.selectedTurn)
   const selectTurn = useStore((s) => s.selectTurn)
+  const selectedSessionId = useStore((s) => s.selectedSessionId)
 
   const [tab, setTab] = useState<Tab>('tools')
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
@@ -113,7 +115,10 @@ export default function DetailPanel() {
   const lastTurnRef = useRef<Turn | null>(null)
   if (selectedTurn) lastTurnRef.current = selectedTurn
   const turn = selectedTurn ?? lastTurnRef.current
-  const visible = selectedTurn !== null
+
+  // The panel is visible when a turn is selected OR when on the Conversation tab
+  // (which is session-level and doesn't require a turn selection).
+  const visible = selectedTurn !== null || tab === 'conversation'
 
   // Reset transient UI state whenever a different turn is opened.
   useEffect(() => {
@@ -218,64 +223,66 @@ export default function DetailPanel() {
         />
       </div>
 
+      {/* Header — shown when a turn is selected (not needed for Conversation tab standalone) */}
       {turn && (
-        <>
-          {/* Header */}
-          <div
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '0 14px 8px',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          <span aria-hidden style={{ fontSize: 16, lineHeight: 1 }}>
+            {turn.icon}
+          </span>
+          <span
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '0 14px 8px',
-              borderBottom: '1px solid var(--border)',
+              flex: 1,
+              minWidth: 0,
+              fontSize: 14,
+              fontWeight: 600,
+              color: 'var(--text)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            <span aria-hidden style={{ fontSize: 16, lineHeight: 1 }}>
-              {turn.icon}
-            </span>
-            <span
-              style={{
-                flex: 1,
-                minWidth: 0,
-                fontSize: 14,
-                fontWeight: 600,
-                color: 'var(--text)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {turn.label}
-            </span>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', flex: '0 0 auto' }}>
-              {formatDuration(turn.duration_ms)}
-            </span>
-            <StatusBadge status={turn.status} />
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close detail panel"
-              title="Close (Esc)"
-              className="podium-icon-btn"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 26,
-                height: 26,
-                borderRadius: 6,
-                border: 'none',
-                background: 'transparent',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                fontSize: 14,
-              }}
-            >
-              {'✕'}
-            </button>
-          </div>
+            {turn.label}
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)', flex: '0 0 auto' }}>
+            {formatDuration(turn.duration_ms)}
+          </span>
+          <StatusBadge status={turn.status} />
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close detail panel"
+            title="Close (Esc)"
+            className="podium-icon-btn"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 26,
+              height: 26,
+              borderRadius: 6,
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              fontSize: 14,
+            }}
+          >
+            {'✕'}
+          </button>
+        </div>
+      )}
 
-          {/* Tabs */}
+      {/* Tabs — always shown when the panel is visible */}
+      {visible && (
+        <>
           <div
             style={{
               display: 'flex',
@@ -285,8 +292,15 @@ export default function DetailPanel() {
               borderBottom: '1px solid var(--border)',
             }}
           >
-            <TabButton active={tab === 'tools'} onClick={() => setTab('tools')} count={turn.tool_calls.length}>
+            <TabButton
+              active={tab === 'tools'}
+              onClick={() => setTab('tools')}
+              count={turn ? turn.tool_calls.length : undefined}
+            >
               Tools
+            </TabButton>
+            <TabButton active={tab === 'conversation'} onClick={() => setTab('conversation')}>
+              Conversation
             </TabButton>
             <TabButton active={tab === 'context'} onClick={() => setTab('context')}>
               Context
@@ -294,9 +308,11 @@ export default function DetailPanel() {
           </div>
 
           {/* Body */}
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-            {tab === 'tools' ? (
-              turn.tool_calls.length === 0 ? (
+          <div style={{ flex: 1, overflowY: tab === 'conversation' ? 'hidden' : 'auto', minHeight: 0 }}>
+            {tab === 'conversation' ? (
+              <ConversationPanel sessionId={selectedSessionId} />
+            ) : tab === 'tools' ? (
+              !turn ? null : turn.tool_calls.length === 0 ? (
                 <div style={{ padding: '20px 14px', fontSize: 12, color: 'var(--text-muted)' }}>
                   No tool calls in this turn.
                 </div>
@@ -311,8 +327,9 @@ export default function DetailPanel() {
                 ))
               )
             ) : (
+              /* Context tab */
               <div style={{ padding: '14px' }}>
-                {turn.prompt_preview ? (
+                {turn?.prompt_preview ? (
                   <pre
                     style={{
                       margin: 0,
@@ -351,22 +368,24 @@ export default function DetailPanel() {
             )}
           </div>
 
-          {/* Footer stats */}
-          <div
-            style={{
-              flex: '0 0 auto',
-              padding: '8px 14px',
-              borderTop: '1px solid var(--border)',
-              fontSize: 11,
-              color: 'var(--text-muted)',
-            }}
-          >
-            {turn.tool_calls.length} tool call{turn.tool_calls.length === 1 ? '' : 's'}
-            {' · '}
-            {agentSpawnCount} agent spawn{agentSpawnCount === 1 ? '' : 's'}
-            {' · '}
-            {formatDuration(turn.duration_ms)}
-          </div>
+          {/* Footer stats — only shown when a turn is selected and not on Conversation tab */}
+          {turn && tab !== 'conversation' && (
+            <div
+              style={{
+                flex: '0 0 auto',
+                padding: '8px 14px',
+                borderTop: '1px solid var(--border)',
+                fontSize: 11,
+                color: 'var(--text-muted)',
+              }}
+            >
+              {turn.tool_calls.length} tool call{turn.tool_calls.length === 1 ? '' : 's'}
+              {' · '}
+              {agentSpawnCount} agent spawn{agentSpawnCount === 1 ? '' : 's'}
+              {' · '}
+              {formatDuration(turn.duration_ms)}
+            </div>
+          )}
         </>
       )}
     </div>
