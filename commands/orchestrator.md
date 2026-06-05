@@ -557,7 +557,7 @@ parallel (non-blocking). Main pipeline continues immediately. Log PARALLEL event
 ### Step 4 — Branch creation
 
 ```bash
-bash .claude/commands/issue-workflow/scripts/make-issue-branch.sh <N> "<title>" <prefix> <base_branch>
+bash .claude/skills/issue-workflow/scripts/make-issue-branch.sh <N> "<title>" <prefix> <base_branch>
 ```
 
 Log AGENT event.

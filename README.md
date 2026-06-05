@@ -31,11 +31,16 @@ Every engineer installs it once. Every project tunes it through a single committ
 
 ---
 
-## Podium — Agent Observer Dashboard
+## Podium — Agent Observer Dashboard (Optional)
 
-Maestro ships with **Podium**, a real-time observability dashboard for every Claude Code session. It captures every tool call, agent spawn, and session event through native Claude Code hooks — **zero token cost, zero orchestrator changes**.
+**Podium** is a real-time observability dashboard for every Claude Code session. It captures every tool call, agent spawn, and session event through native Claude Code hooks — **zero token cost, zero orchestrator changes**. It's now available as a separate plugin.
 
-![Podium Dashboard](docs/images/podium-dashboard.png)
+### Install Podium
+
+```bash
+/plugin marketplace add wp-media/claude-marketplace
+/plugin install podium@wp-media
+```
 
 ### What it shows
 
@@ -48,19 +53,12 @@ Maestro ships with **Podium**, a real-time observability dashboard for every Cla
 ### Quick start
 
 ```bash
-# Install hooks once per project (restart Claude Code after)
-/podium setup
-
-# Start the dashboard
+# Start the dashboard (after installing the plugin)
 /podium start
 # → http://localhost:4820
 ```
 
 The dashboard auto-imports all your existing Claude Code sessions on first launch.
-
-### Why not the HTML log?
-
-The previous `workflow-log.html` wrote HTML after every agent step, consuming tokens each time. Podium captures everything at the harness level — hooks fire outside the LLM turn. Set `"html_log": false` in your `maestro.json` (the default) to skip HTML log writes entirely.
 
 ```
 Without Maestro                    With Maestro
@@ -168,7 +166,6 @@ maestro/
 │   ├── orchestrator.md
 │   ├── orchestrator/
 │   │   └── html-log-format.md
-│   ├── podium.md                            ← /podium start|stop|setup|status…
 │   ├── onboard-project.md                  ← /maestro:onboard-project
 │   ├── dod.md
 │   ├── docs.md
@@ -183,14 +180,6 @@ maestro/
 │   ├── sprint-planner.md
 │   ├── test.md
 │   └── wordpress-compliance.md
-│
-├── podium/                                  ← Podium agent observer dashboard
-│   ├── dashboard/                           ← React app (WP Media branded)
-│   │   ├── client/                          ← Vite + React + Tailwind frontend
-│   │   ├── server/                          ← Express + SQLite + WebSocket backend
-│   │   └── scripts/                         ← Hook handler, install script
-│   ├── hook.mjs                             ← Zero-token Claude Code hook
-│   └── install.mjs                          ← Hook registration helper
 │
 └── specs/phpcs/                             ← Recurring PHPCS fix patterns
     ├── escaped-output.md
@@ -210,11 +199,12 @@ Open the project in Claude and run:
 /maestro:onboard-project
 ```
 
-Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you and installs the Podium hooks.
+Maestro will discover what it can (repo, plugin name, namespace, text domain, tooling, directory structure) and ask for the rest in a single prompt. It writes `.claude/maestro.json` for you.
 
-Then start the dashboard:
+Optionally install the dashboard:
 
 ```
+/plugin install podium@wp-media
 /podium start
 ```
 
