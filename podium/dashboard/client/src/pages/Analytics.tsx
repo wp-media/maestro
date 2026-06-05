@@ -30,7 +30,7 @@ function ChartTooltip({ x, y, children }: { x: number; y: number; children: Reac
   const nearRight = x > window.innerWidth - 200;
   return (
     <div
-      className="fixed z-50 px-2 py-1.5 text-xs bg-[#12121f] border border-[#2a2a4a] rounded shadow-xl text-gray-800 dark:text-gray-200 pointer-events-none whitespace-nowrap"
+      className="fixed z-50 px-2 py-1.5 text-xs bg-white dark:bg-[#12121f] border border-gray-200 dark:border-[#2a2a4a] shadow-lg rounded shadow-xl text-gray-800 dark:text-gray-200 pointer-events-none whitespace-nowrap"
       style={{
         left: nearRight ? x - 14 : x + 14,
         top: y - 10,
@@ -68,33 +68,48 @@ function useTooltip() {
 
 // ── Heatmap ──────────────────────────────────────────────────────────────────
 
-function cellColor(count: number, max: number) {
-  if (count === 0) return "#161625";
-  // Log scale + RGB interpolation across a wide color ramp for maximum perceptual range
-  const t = Math.log(count + 1) / Math.log(Math.max(max, 1) + 1);
-  // Ramp: near-black indigo → deep indigo → bright indigo → lavender
+function cellColor(count: number, max: number, dark: boolean) {
   type RGB = [number, number, number];
-  const stops: RGB[] = [
-    [22, 20, 60], // near-black indigo
-    [55, 48, 163], // deep indigo
-    [99, 102, 241], // bright indigo
-    [199, 210, 254], // lavender
-  ];
-  const scaled = t * (stops.length - 1);
-  const lo = Math.min(Math.floor(scaled), stops.length - 2);
-  const frac = scaled - lo;
-  const [r1, g1, b1]: RGB = stops[lo] as RGB;
-  const [r2, g2, b2]: RGB = stops[lo + 1] as RGB;
-  const r = Math.round(r1 + (r2 - r1) * frac);
-  const g = Math.round(g1 + (g2 - g1) * frac);
-  const b = Math.round(b1 + (b2 - b1) * frac);
-  return `rgb(${r},${g},${b})`;
+  if (dark) {
+    // Dark mode: near-black indigo → deep indigo → bright indigo → lavender
+    if (count === 0) return "#161625";
+    const t = Math.log(count + 1) / Math.log(Math.max(max, 1) + 1);
+    const stops: RGB[] = [
+      [22, 20, 60],   // near-black indigo
+      [55, 48, 163],  // deep indigo
+      [99, 102, 241], // bright indigo
+      [199, 210, 254],// lavender
+    ];
+    const scaled = t * (stops.length - 1);
+    const lo = Math.min(Math.floor(scaled), stops.length - 2);
+    const frac = scaled - lo;
+    const [r1, g1, b1] = stops[lo] as RGB;
+    const [r2, g2, b2] = stops[lo + 1] as RGB;
+    return `rgb(${Math.round(r1+(r2-r1)*frac)},${Math.round(g1+(g2-g1)*frac)},${Math.round(b1+(b2-b1)*frac)})`;
+  } else {
+    // Light mode: warm gray (empty) → light gold → amber → deep gold
+    if (count === 0) return "#E8E5DF";
+    const t = Math.log(count + 1) / Math.log(Math.max(max, 1) + 1);
+    const stops: RGB[] = [
+      [254, 243, 199], // amber-100 — low activity
+      [253, 224, 100], // yellow-300
+      [234, 179,  8],  // yellow-500
+      [161, 120,  0],  // amber-700
+    ];
+    const scaled = t * (stops.length - 1);
+    const lo = Math.min(Math.floor(scaled), stops.length - 2);
+    const frac = scaled - lo;
+    const [r1, g1, b1] = stops[lo] as RGB;
+    const [r2, g2, b2] = stops[lo + 1] as RGB;
+    return `rgb(${Math.round(r1+(r2-r1)*frac)},${Math.round(g1+(g2-g1)*frac)},${Math.round(b1+(b2-b1)*frac)})`;
+  }
 }
 
 function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }>> }) {
   const { show, move, hide, node } = useTooltip();
   const { t, i18n } = useTranslation(["analytics", "common"]);
   const locale = i18n.resolvedLanguage ?? i18n.language;
+  const isDark = document.documentElement.classList.contains("dark");
 
   const monthLabels = useMemo(
     () =>
@@ -207,8 +222,8 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
                   width: 13,
                   height: 13,
                   borderRadius: 2,
-                  backgroundColor: cellColor(cell.count, maxCount),
-                  border: "1px solid rgba(255,255,255,0.04)",
+                  backgroundColor: cellColor(cell.count, maxCount, isDark),
+                  border: isDark ? "1px solid rgba(255,255,255,0.04)" : "1px solid rgba(0,0,0,0.06)",
                   flexShrink: 0,
                   cursor: "default",
                 }}
@@ -229,8 +244,8 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
                 width: 13,
                 height: 13,
                 borderRadius: 2,
-                backgroundColor: cellColor(v, maxCount),
-                border: "1px solid rgba(255,255,255,0.06)",
+                backgroundColor: cellColor(v, maxCount, isDark),
+                border: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.06)",
               }}
             />
           );
