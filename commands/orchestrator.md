@@ -156,15 +156,19 @@ user can see what mode you picked.
 
 **Determine run log mode at startup:**
 
+Check if the Podium plugin is installed:
+
 ```bash
-curl -s --max-time 1 http://localhost:4820/health
+find ~/.claude/plugins -name "podium-health.md" 2>/dev/null | head -1
 ```
 
-- HTTP 200 → Podium is running. Skip all `workflow-log.html` writes entirely.
-  Podium captures every agent event via zero-token hooks. Use `http://localhost:4820`.
-- No response → Podium not running. Check `.ai.html_log` in `.claude/maestro.json`:
+- Found → invoke `/podium-health`. If it returns `podium: running`, skip all
+  `workflow-log.html` writes entirely. Podium captures every agent event via
+  zero-token hooks.
+- Not found, or returns `podium: not running` → check `.ai.html_log` in
+  `.claude/maestro.json`:
   - `html_log: true` — enable the legacy HTML log (described below).
-  - `html_log: false` (default) — skip the HTML log too; maintain state in context only.
+  - `html_log: false` (default) — skip the log; maintain state in context only.
 
 **When `html_log: false` (default):** still maintain in context:
 - Which agents have been invoked and their return JSON
