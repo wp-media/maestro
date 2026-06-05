@@ -35,17 +35,28 @@ import { eventBus } from "../lib/eventBus";
 import { ThemeToggle } from "./ThemeToggle";
 import type { WSMessage } from "../lib/types";
 
-const NAV_ITEMS = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/kanban", icon: Columns3, label: "Kanban Board" },
-  { to: "/sessions", icon: FolderOpen, label: "Sessions" },
-  { to: "/activity", icon: Activity, label: "Activity Feed" },
-  { to: "/analytics", icon: BarChart3, label: "Analytics" },
-  { to: "/workflows", icon: Workflow, label: "Workflows" },
-  { to: "/cc-config", icon: Boxes, label: "Claude Config" },
-  { to: "/run", icon: Play, label: "Run Claude" },
-  { to: "/settings", icon: Settings, label: "Settings" },
+const ALL_NAV_ITEMS = [
+  { to: "/", icon: LayoutDashboard, label: "Dashboard", key: "dashboard" },
+  { to: "/kanban", icon: Columns3, label: "Kanban Board", key: "kanban" },
+  { to: "/sessions", icon: FolderOpen, label: "Sessions", key: "sessions" },
+  { to: "/activity", icon: Activity, label: "Activity Feed", key: "activity" },
+  { to: "/analytics", icon: BarChart3, label: "Analytics", key: "analytics" },
+  { to: "/workflows", icon: Workflow, label: "Workflows", key: "workflows" },
+  { to: "/cc-config", icon: Boxes, label: "Claude Config", key: "cc-config" },
+  { to: "/run", icon: Play, label: "Run Claude", key: "run" },
+  { to: "/settings", icon: Settings, label: "Settings", key: "settings" },
 ] as const;
+
+export const KANBAN_VISIBLE_KEY = "podium-show-kanban";
+
+export function loadKanbanVisible(): boolean {
+  try {
+    // Hidden by default — only show if user explicitly enabled it
+    return localStorage.getItem(KANBAN_VISIBLE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
 
 const STORAGE_KEY = "sidebar-collapsed";
 const STATS_STORAGE_KEY = "sidebar-connection-stats";
@@ -116,6 +127,21 @@ interface SidebarProps {
 
 export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
   const websiteLabel = "wp-media.me";
+
+  // Kanban visibility — hidden by default, toggled via Settings
+  const [kanbanVisible, setKanbanVisible] = useState(loadKanbanVisible);
+
+  // Keep in sync when Settings page changes the value (storage event from same tab via custom event)
+  useEffect(() => {
+    const handler = () => setKanbanVisible(loadKanbanVisible());
+    window.addEventListener("podium-settings-changed", handler);
+    return () => window.removeEventListener("podium-settings-changed", handler);
+  }, []);
+
+  const NAV_ITEMS = ALL_NAV_ITEMS.filter(
+    (item) => item.key !== "kanban" || kanbanVisible
+  );
+
   // Track whether nav items are clipped by overflow so we can render
   // chevron affordances pointing toward the hidden items. Recomputed on
   // scroll, resize, and any structural change (e.g. collapse toggle).
@@ -401,7 +427,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
         {!collapsed && (
           <div className="space-y-1.5">
             <a
-              href="https://github.com/wp-media"
+              href="https://github.com/wp-media/maestro"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-200 hover:bg-surface-3 hover:border-border transition-colors"
@@ -429,7 +455,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
         {collapsed && (
           <div className="flex flex-col items-center gap-2 pt-0.5">
             <a
-              href="https://github.com/wp-media"
+              href="https://github.com/wp-media/maestro"
               target="_blank"
               rel="noopener noreferrer"
               className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
