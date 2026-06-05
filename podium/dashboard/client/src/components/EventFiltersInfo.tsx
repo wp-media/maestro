@@ -59,7 +59,7 @@ export function EventFiltersInfo() {
           <ul className="list-disc pl-5 space-y-1 text-[11px] text-gray-600 dark:text-gray-400">
             <li>{t("eventFilters.help.filterTip1")}</li>
             <li>{t("eventFilters.help.filterTip2")}</li>
-            <li className="text-amber-300/90">{t("eventFilters.help.filterTipGrouping")}</li>
+            <li className="text-amber-700 dark:text-amber-300/90">{t("eventFilters.help.filterTipGrouping")}</li>
             <li>{t("eventFilters.help.filterTip3")}</li>
             <li>{t("eventFilters.help.filterTip4")}</li>
           </ul>

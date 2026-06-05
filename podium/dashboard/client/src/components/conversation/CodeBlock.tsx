@@ -95,15 +95,15 @@ export function CodeBlock({
   const palette =
     tone === "danger"
       ? {
-          wrapper: "border-red-500/30 bg-red-500/5",
-          chrome: "bg-red-500/10 border-b border-red-500/20",
-          label: "text-red-300",
+          wrapper: "border-red-200 dark:border-red-500/30 bg-red-500/5",
+          chrome: "bg-red-50 dark:bg-red-500/10 border-b border-red-200 dark:border-red-500/20",
+          label: "text-red-700 dark:text-red-300",
         }
       : tone === "success"
         ? {
-            wrapper: "border-emerald-500/30 bg-emerald-500/5",
-            chrome: "bg-emerald-500/10 border-b border-emerald-500/20",
-            label: "text-emerald-300",
+            wrapper: "border-emerald-200 dark:border-emerald-500/30 bg-emerald-500/5",
+            chrome: "bg-emerald-50 dark:bg-emerald-500/10 border-b border-emerald-200 dark:border-emerald-500/20",
+            label: "text-emerald-700 dark:text-emerald-300",
           }
         : {
             wrapper: "border-surface-3 bg-surface-4/50",
@@ -147,7 +147,7 @@ export function CodeBlock({
               type="button"
               onClick={handleCopy}
               className={`inline-flex items-center gap-1 transition-colors ${
-                copied ? "text-emerald-300" : "text-gray-700 dark:text-gray-500 hover:text-gray-200"
+                copied ? "text-emerald-700 dark:text-emerald-300" : "text-gray-700 dark:text-gray-500 hover:text-gray-200"
               }`}
               aria-label="Copy code"
             >

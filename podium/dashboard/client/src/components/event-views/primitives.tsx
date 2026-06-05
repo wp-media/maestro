@@ -53,7 +53,7 @@ export function Terminal({ command, description }: { command: string; descriptio
       <pre className="px-3 py-2 text-gray-200 whitespace-pre-wrap break-words">
         {description && <div className="text-gray-700 dark:text-gray-500 mb-1"># {description}</div>}
         <div>
-          <span className="text-emerald-400 select-none">$ </span>
+          <span className="text-emerald-700 dark:text-emerald-400 select-none">$ </span>
           {command}
         </div>
       </pre>
@@ -78,11 +78,11 @@ export function TerminalOutput({
   const hasStderr = typeof stderr === "string" && stderr.length > 0;
   const flag =
     interrupted === true
-      ? { label: "interrupted", color: "text-red-400 border-red-500/40 bg-red-500/10" }
+      ? { label: "interrupted", color: "text-red-700 dark:text-red-400 border-red-500/40 bg-red-50 dark:bg-red-500/10" }
       : typeof exitCode === "number" && exitCode !== 0
         ? {
             label: `exit ${exitCode}`,
-            color: "text-red-400 border-red-500/40 bg-red-500/10",
+            color: "text-red-700 dark:text-red-400 border-red-500/40 bg-red-50 dark:bg-red-500/10",
           }
         : null;
 
@@ -110,7 +110,7 @@ function OutputBlock({
   text: string;
   variant: "out" | "err";
 }) {
-  const color = variant === "err" ? "text-red-300" : "text-gray-200";
+  const color = variant === "err" ? "text-red-700 dark:text-red-300" : "text-gray-200";
   return (
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
       <div className="flex items-center justify-between px-3 py-1 border-b border-border bg-black/40">
@@ -194,7 +194,7 @@ function HunkView({ hunk }: { hunk: DiffHunk }) {
   let newLine = hunk.newStart;
   return (
     <div>
-      <div className="px-3 py-1 text-[10px] text-cyan-300 bg-cyan-500/10 border-y border-cyan-500/20 font-mono">
+      <div className="px-3 py-1 text-[10px] text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-500/10 border-y border-cyan-200 dark:border-cyan-500/20 font-mono">
         @@ -{hunk.oldStart},{hunk.oldLines} +{hunk.newStart},{hunk.newLines} @@
       </div>
       <table className="w-full border-collapse">
@@ -206,9 +206,9 @@ function HunkView({ hunk }: { hunk: DiffHunk }) {
             const showNew = kind !== "remove";
             const rowBg =
               kind === "add"
-                ? "bg-green-500/10 text-green-200"
+                ? "bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-200"
                 : kind === "remove"
-                  ? "bg-red-500/10 text-red-200"
+                  ? "bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-200"
                   : "text-gray-300";
             const oldCell = showOld ? oldLine++ : "";
             const newCell = showNew ? newLine++ : "";
@@ -277,7 +277,7 @@ function ValueCell({ value }: { value: unknown }) {
       <span
         className={`inline-block px-2 py-0.5 rounded border text-[11px] font-mono ${
           value
-            ? "text-green-400 border-green-500/30 bg-green-500/10"
+            ? "text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10"
             : "text-gray-600 dark:text-gray-400 border-gray-500/30 bg-gray-500/10"
         }`}
       >
@@ -349,7 +349,7 @@ export function MatchList({ matches }: { matches: GrepMatch[] }) {
     <ul className="divide-y divide-border border border-border rounded overflow-hidden text-[11px] max-h-80 overflow-y-auto font-mono">
       {matches.map((m, i) => (
         <li key={i} className="px-3 py-1 text-gray-300 break-all">
-          {m.file && <span className="text-cyan-300">{m.file}</span>}
+          {m.file && <span className="text-cyan-700 dark:text-cyan-300">{m.file}</span>}
           {m.line != null && <span className="text-gray-700 dark:text-gray-500">:{m.line}</span>}
           {m.text && <span className="text-gray-600 dark:text-gray-400">: {m.text}</span>}
         </li>

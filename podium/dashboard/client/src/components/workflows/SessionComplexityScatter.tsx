@@ -74,7 +74,7 @@ function Tooltip({ state }: { state: TooltipState }) {
         transform: nearRight ? "translateX(-100%)" : undefined,
       }}
     >
-      <p className="font-semibold text-gray-100 mb-1 truncate max-w-[180px]">
+      <p className="font-semibold text-gray-900 dark:text-gray-100 mb-1 truncate max-w-[180px]">
         {state.item.name ?? state.item.id.slice(0, 12)}
       </p>
       <div className="flex flex-col gap-0.5 text-gray-600 dark:text-gray-400">
@@ -119,7 +119,7 @@ function Legend() {
             className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ backgroundColor: statusColor(s) }}
           />
-          <span className="text-xs text-gray-700 dark:text-gray-500">
+          <span className="text-sm text-gray-600 dark:text-gray-500">
             {t(`common:status.${s}`, { defaultValue: s })}
           </span>
         </div>

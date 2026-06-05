@@ -333,7 +333,7 @@ function ScalarValue({ value }: { value: unknown }) {
   if (value == null) return <span className="text-gray-700 dark:text-gray-500 italic">null</span>;
   if (typeof value === "boolean") {
     const color = value
-      ? "text-green-400 border-green-500/30 bg-green-500/10"
+      ? "text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10"
       : "text-gray-600 dark:text-gray-400 border-gray-500/30 bg-gray-500/10";
     return (
       <span className={`inline-block px-2 py-0.5 rounded border ${color}`}>{String(value)}</span>

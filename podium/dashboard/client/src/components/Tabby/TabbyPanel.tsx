@@ -66,10 +66,10 @@ export function TabbyPanel({
           <span className="text-base leading-none" aria-hidden>
             🐾
           </span>
-          <span className="text-sm font-semibold text-gray-100">Tabby</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Tabby</span>
           <span
             className={`ml-0.5 inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-              status.connected ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+              status.connected ? "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-300"
             }`}
           >
             <span
@@ -181,13 +181,13 @@ const TONE_MUTED: Tone = {
 };
 
 const TONES: Record<string, Tone> = {
-  accent: { wrap: "border-accent/30 bg-accent/10", value: "text-gray-100", icon: "text-accent" },
+  accent: { wrap: "border-accent/30 bg-accent/10", value: "text-gray-900 dark:text-gray-100", icon: "text-accent" },
   amber: {
-    wrap: "border-amber-500/30 bg-amber-500/10",
-    value: "text-amber-200",
-    icon: "text-amber-400",
+    wrap: "border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10",
+    value: "text-amber-800 dark:text-amber-200",
+    icon: "text-amber-700 dark:text-amber-400",
   },
-  red: { wrap: "border-red-500/30 bg-red-500/10", value: "text-red-200", icon: "text-red-400" },
+  red: { wrap: "border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10", value: "text-red-800 dark:text-red-200", icon: "text-red-700 dark:text-red-400" },
   muted: TONE_MUTED,
 };
 

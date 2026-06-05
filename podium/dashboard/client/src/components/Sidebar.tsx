@@ -304,8 +304,8 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5"
                   } ${
                     isActive
-                      ? "bg-accent/10 text-accent border border-accent/20"
-                      : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3 border border-transparent"
+                      ? "bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border border-accent/40 dark:border-accent/20 font-semibold"
+                      : "text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-4 dark:hover:bg-surface-3 border border-transparent"
                   }`
                 }
               >
@@ -383,7 +383,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           >
             <span
               className={`inline-flex items-center gap-2 ${
-                wsConnected ? "text-emerald-400" : "text-gray-700 dark:text-gray-500"
+                wsConnected ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-500"
               }`}
             >
               {wsConnected ? (
@@ -574,7 +574,7 @@ function ConnectionStatusModal({
             <div
               className={`w-9 h-9 rounded-lg border flex items-center justify-center flex-shrink-0 ${
                 wsConnected
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                  ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
                   : "bg-surface-3 border-border text-gray-600 dark:text-gray-400"
               }`}
             >
@@ -593,7 +593,7 @@ function ConnectionStatusModal({
               </h2>
               <p
                 className={`text-[11px] font-medium inline-flex items-center gap-1.5 leading-tight ${
-                  wsConnected ? "text-emerald-400" : "text-gray-700 dark:text-gray-500"
+                  wsConnected ? "text-emerald-700 dark:text-emerald-400" : "text-gray-700 dark:text-gray-500"
                 }`}
               >
                 {wsConnected && (
@@ -654,7 +654,7 @@ function ConnectionStatusModal({
           {/* Top event types */}
           <Section title="Top event types" icon={BarChart3}>
             {topTypes.length === 0 ? (
-              <p className="text-xs text-gray-700 dark:text-gray-500 italic">No events yet</p>
+              <p className="text-sm text-gray-600 dark:text-gray-500 italic">No events yet</p>
             ) : (
               <div className="space-y-1.5">
                 {topTypes.map(([type, count]) => (
@@ -667,7 +667,7 @@ function ConnectionStatusModal({
           {/* Recent activity */}
           <Section title="Recent activity" icon={Clock}>
             {recentEvents.length === 0 ? (
-              <p className="text-xs text-gray-700 dark:text-gray-500 italic">No events yet</p>
+              <p className="text-sm text-gray-600 dark:text-gray-500 italic">No events yet</p>
             ) : (
               <ul className="space-y-1">
                 {recentEvents.map((evt, i) => (

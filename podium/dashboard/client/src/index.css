@@ -19,25 +19,38 @@
 
 /* ── Light theme (default) ─────────────────────────────── */
 :root {
-  --surface-0: 238 236 233;    /* warm stone — the "floor" */
-  --surface-1: 255 255 255;    /* sidebar — pure white */
-  --surface-2: 250 249 247;    /* inputs / secondary surfaces */
-  --surface-3: 255 255 255;    /* cards — white so they lift off the floor */
-  --surface-4: 245 244 241;    /* hover state */
-  --surface-5: 238 236 233;    /* pressed / deepest */
-  --border: 218 215 210;
-  --border-light: 230 228 224;
-  --card-shadow:
-    0 0 0 1px rgb(0 0 0 / 0.04),
-    0 1px 2px 0 rgb(0 0 0 / 0.06),
-    0 4px 8px -2px rgb(0 0 0 / 0.08),
-    0 12px 24px -4px rgb(0 0 0 / 0.05);
-  --text-primary: 21 25 33;
-  --text-muted: 102 102 102;
-  --text-dim: 155 155 155;
+  /* Surfaces: warm ivory "paper" floor → pure white cards */
+  --surface-0: 236 233 228;    /* page bg — warm linen */
+  --surface-1: 255 255 255;    /* sidebar */
+  --surface-2: 251 250 248;    /* inputs / secondary */
+  --surface-3: 255 255 255;    /* cards — white on linen = clear elevation */
+  --surface-4: 246 244 241;    /* hover */
+  --surface-5: 238 236 232;    /* pressed */
+
+  --border: 220 216 210;
+  --border-light: 232 229 224;
+
+  --text-primary: 14 14 14;    /* near-black — max readability */
+  --text-muted:   72  72  72;  /* dark gray — always readable */
+  --text-dim:    120 120 120;  /* medium gray — still AA-compliant */
+
   --accent: 254 210 58;
   --accent-hover: 224 187 53;
   --accent-muted: rgba(254,210,58,0.15);
+
+  /* Multi-layer elevation: contact shadow + lift + ambient diffusion */
+  --card-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.05),
+    0 1px 2px 0 rgb(0 0 0 / 0.07),
+    0 4px 10px -2px rgb(0 0 0 / 0.09),
+    0 16px 32px -4px rgb(0 0 0 / 0.06);
+
+  /* Elevated card (modals, dropdowns) */
+  --elevated-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.07),
+    0 4px 6px -1px rgb(0 0 0 / 0.10),
+    0 12px 24px -4px rgb(0 0 0 / 0.12),
+    0 32px 48px -8px rgb(0 0 0 / 0.08);
 }
 
 /* ── Dark theme ────────────────────────────────────────── */
@@ -57,6 +70,9 @@
   --accent-hover: 224 187 53;
   --accent-muted: rgba(254,210,58,0.15);
   --card-shadow: none;
+  --elevated-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.4),
+    0 12px 24px -4px rgb(0 0 0 / 0.5);
 }
 
 body {
@@ -65,10 +81,12 @@ body {
   background-color: rgb(var(--surface-0));
 }
 
+/* Subtle warm-linen texture for light mode */
 body:not(.dark) {
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgb(254 210 58 / 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgb(59 130 246 / 0.02) 0%, transparent 40%);
+    radial-gradient(ellipse 80% 60% at 15% 40%, rgb(254 210 58 / 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 85% 15%, rgb(59 130 246 / 0.025) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 40% at 50% 100%, rgb(0 0 0 / 0.02) 0%, transparent 60%);
 }
 
 @layer base {
@@ -77,26 +95,16 @@ body:not(.dark) {
     scrollbar-color: rgb(var(--border)) rgb(var(--surface-1));
   }
 
-  *::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: rgb(var(--surface-1));
-  }
-
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: rgb(var(--surface-1)); }
   *::-webkit-scrollbar-thumb {
     background: rgb(var(--border));
     border-radius: 3px;
   }
-
-  *::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--border-light));
-  }
+  *::-webkit-scrollbar-thumb:hover { background: rgb(var(--border-light)); }
 
   ::selection {
-    background: rgba(254,210,58,0.3);
+    background: rgba(254,210,58,0.35);
     color: rgb(var(--text-primary));
   }
 
@@ -105,16 +113,8 @@ body:not(.dark) {
     opacity: 0.7;
     transition: opacity 0.2s;
   }
-
-  /* The icon ships dark; inverting it only makes sense on a dark surface. */
-  .dark ::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(0.8);
-  }
-
-  ::-webkit-calendar-picker-indicator:hover {
-    opacity: 1;
-  }
-
+  .dark ::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0.8); }
+  ::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   .time-input-custom::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;
@@ -127,37 +127,42 @@ body:not(.dark) {
     box-shadow: var(--card-shadow);
   }
 
+  /* Card with a subtle accent-tinted top edge in light mode */
+  .card-accent {
+    @apply card;
+  }
+  :root .card-accent {
+    border-top: 2px solid rgb(var(--accent) / 0.6);
+  }
+
   .card-hover {
     @apply card transition-all duration-200 hover:border-border-light hover:bg-surface-4;
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors duration-150;
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-gray-900 text-sm font-semibold rounded-lg transition-colors duration-150;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 rounded-lg transition-colors duration-150;
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 rounded-lg transition-colors duration-150;
   }
 
   .badge {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border whitespace-nowrap shrink-0;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full border whitespace-nowrap shrink-0;
   }
 
   .input {
-    @apply bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors;
+    @apply bg-surface-2 border border-border rounded-lg px-3 py-2 text-sm text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors;
+  }
+
+  /* Section label — small uppercase heading inside cards */
+  .section-label {
+    @apply text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-600;
   }
 }
 
 @keyframes pulse-dot {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
-
-.animate-pulse-dot {
-  animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
+.animate-pulse-dot { animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }

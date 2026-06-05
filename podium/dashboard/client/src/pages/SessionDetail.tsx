@@ -493,7 +493,7 @@ export function SessionDetail() {
   if (error || !session) {
     return (
       <div className="text-center py-20">
-        <p className="text-red-400 mb-2">{error || t("detail.notFound")}</p>
+        <p className="text-red-700 dark:text-red-400 mb-2">{error || t("detail.notFound")}</p>
         <button onClick={goBack} className="btn-ghost mt-4">
           <ArrowLeft className="w-4 h-4" /> {t("detail.backToSessions")}
         </button>
@@ -516,7 +516,7 @@ export function SessionDetail() {
             <SessionStatusBadge status={effectiveSessionStatus(session)} />
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-            <span className="inline-flex items-center gap-1.5 text-xs text-gray-700 dark:text-gray-500 font-mono bg-surface-2 px-2 py-1 rounded">
+            <span className="inline-flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-500 font-mono bg-surface-2 px-2 py-1 rounded">
               {session.id.slice(0, 16)}
             </span>
             {session.model && (
@@ -535,14 +535,14 @@ export function SessionDetail() {
               )}
             </span>
             {cost && cost.total_cost > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded">
                 <DollarSign className="w-3 h-3" />
                 {fmtCostFull(cost.total_cost).slice(1)}
               </span>
             )}
           </div>
           {session.cwd && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-700 dark:text-gray-500 mt-2">
+            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-500 mt-2">
               <FolderOpen className="w-3 h-3 flex-shrink-0" />
               <span className="font-mono truncate">{session.cwd}</span>
             </div>
@@ -556,23 +556,23 @@ export function SessionDetail() {
       {isDashboardRun && (
         <Link
           to={`/run?session=${encodeURIComponent(id || "")}`}
-          className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.12] hover:border-emerald-500/50 px-4 py-2.5 transition-colors group"
+          className="flex items-center gap-3 rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-emerald-500/[0.06] hover:bg-emerald-500/[0.12] hover:border-emerald-500/50 px-4 py-2.5 transition-colors group"
         >
-          <span className="w-7 h-7 rounded-md bg-emerald-500/15 border border-emerald-500/30 inline-flex items-center justify-center flex-shrink-0">
-            <Play className="w-3.5 h-3.5 text-emerald-300" />
+          <span className="w-7 h-7 rounded-md bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/30 inline-flex items-center justify-center flex-shrink-0">
+            <Play className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300" />
           </span>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-emerald-200">
+            <div className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
               {t("detail.dashboardRun.title", "This session is being driven from the Run page")}
             </div>
-            <div className="text-[11px] text-emerald-400/70">
+            <div className="text-[11px] text-emerald-700 dark:text-emerald-400/70">
               {t(
                 "detail.dashboardRun.body",
                 "Send follow-ups, watch streaming output, or stop the run from there."
               )}
             </div>
           </div>
-          <ExternalLink className="w-4 h-4 text-emerald-300/70 group-hover:text-emerald-200 flex-shrink-0" />
+          <ExternalLink className="w-4 h-4 text-emerald-700 dark:text-emerald-300/70 group-hover:text-emerald-200 flex-shrink-0" />
         </Link>
       )}
 
@@ -624,7 +624,7 @@ export function SessionDetail() {
 
       {/* Tab Content */}
       {transcriptNotFound && (
-        <div className="flex items-center gap-2 px-4 py-2.5 mb-3 text-sm text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+        <div className="flex items-center gap-2 px-4 py-2.5 mb-3 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>
             Conversation transcript not found for this agent. The transcript file may be missing or
@@ -632,7 +632,7 @@ export function SessionDetail() {
           </span>
           <button
             onClick={() => setTranscriptNotFound(false)}
-            className="ml-auto text-amber-400/60 hover:text-amber-400 transition-colors"
+            className="ml-auto text-amber-700 dark:text-amber-400/60 hover:text-amber-400 transition-colors"
           >
             <List className="w-3.5 h-3.5" />
           </button>
@@ -838,7 +838,7 @@ export function SessionDetail() {
                         <td className="px-5 py-2.5 text-sm text-gray-600 dark:text-gray-400 text-right font-mono">
                           {row.cache_write_tokens.toLocaleString()}
                         </td>
-                        <td className="px-5 py-2.5 text-sm text-emerald-400 text-right font-mono font-medium">
+                        <td className="px-5 py-2.5 text-sm text-emerald-700 dark:text-emerald-400 text-right font-mono font-medium">
                           {fmtCostFull(row.cost, 4)}
                         </td>
                       </tr>
@@ -847,7 +847,7 @@ export function SessionDetail() {
                       <td className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200" colSpan={5}>
                         {t("common:total")}
                       </td>
-                      <td className="px-5 py-2.5 text-sm text-emerald-400 text-right font-mono font-semibold">
+                      <td className="px-5 py-2.5 text-sm text-emerald-700 dark:text-emerald-400 text-right font-mono font-semibold">
                         {fmtCostFull(cost.total_cost, 4)}
                       </td>
                     </tr>
@@ -997,14 +997,14 @@ export function SessionDetail() {
           )}
           {events.length < eventsTotal && (
             <div className="flex items-center justify-between mt-3 px-1">
-              <span className="text-xs text-gray-700 dark:text-gray-500">
+              <span className="text-sm text-gray-600 dark:text-gray-500">
                 {t("common:eventFilters.showing", { shown: events.length, total: eventsTotal })}
               </span>
               <button
                 type="button"
                 onClick={loadMoreEvents}
                 disabled={eventsLoadingMore}
-                className="px-3 py-1.5 text-xs font-medium rounded-md bg-accent/15 text-accent hover:bg-accent/25 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="px-3 py-1.5 text-xs font-medium rounded-md bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent hover:bg-accent/25 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
                 {eventsLoadingMore
                   ? t("common:eventFilters.loading")

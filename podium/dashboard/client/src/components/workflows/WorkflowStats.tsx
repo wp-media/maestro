@@ -22,9 +22,9 @@ function formatDurationSec(sec: number): string {
 }
 
 function successRateColor(rate: number): string {
-  if (rate > 90) return "text-emerald-400";
+  if (rate > 90) return "text-emerald-700 dark:text-emerald-400";
   if (rate > 70) return "text-yellow-400";
-  return "text-red-400";
+  return "text-red-700 dark:text-red-400";
 }
 
 // ── Deterministic interpreters — return an i18n key + params ─────────────────
@@ -186,7 +186,7 @@ function InfoPopover({ calculationKey, interp, valueDisplay, metricPhraseKey }: 
           style={{ left: coords.left, top: coords.top, width: POPOVER_W }}
         >
           <div className="flex items-baseline gap-2 mb-2 pb-2 border-b border-[#2a2a4a]">
-            <span className="text-base font-semibold text-gray-100 tabular-nums">
+            <span className="text-base font-semibold text-gray-900 dark:text-gray-100 tabular-nums">
               {valueDisplay}
             </span>
             <span className="text-[10px] uppercase tracking-wider text-gray-700 dark:text-gray-500">
@@ -277,7 +277,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.avgAgentDepth")}
         value={stats.avgDepth.toFixed(1)}
         icon={GitFork}
-        accentClass="text-indigo-400"
+        accentClass="text-indigo-700 dark:text-indigo-400"
         calculationKey="stats.tooltip.calc.depth"
         interp={interpAvgDepth(stats.avgDepth)}
         metricPhraseKey="stats.tooltip.phrase.depth"
@@ -286,7 +286,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.avgSubagentsPerSession")}
         value={stats.avgSubagents.toFixed(1)}
         icon={Users}
-        accentClass="text-blue-400"
+        accentClass="text-blue-700 dark:text-blue-400"
         calculationKey="stats.tooltip.calc.subagents"
         interp={interpAvgSubagents(stats.avgSubagents)}
         metricPhraseKey="stats.tooltip.phrase.subagents"
@@ -304,7 +304,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.mostCommonFlow")}
         value={topFlowLabel}
         icon={ArrowRightLeft}
-        accentClass="text-violet-400"
+        accentClass="text-violet-700 dark:text-violet-400"
         calculationKey="stats.tooltip.calc.topFlow"
         interp={interpTopFlow(topFlow?.source ?? null, topFlow?.target ?? null)}
         metricPhraseKey="stats.tooltip.phrase.topFlow"
@@ -313,7 +313,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.avgCompactions")}
         value={stats.avgCompactions.toFixed(1)}
         icon={Layers}
-        accentClass="text-cyan-400"
+        accentClass="text-cyan-700 dark:text-cyan-400"
         calculationKey="stats.tooltip.calc.compactions"
         interp={interpAvgCompactions(stats.avgCompactions)}
         metricPhraseKey="stats.tooltip.phrase.compactions"
@@ -322,7 +322,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.avgDuration")}
         value={formatDurationSec(stats.avgDurationSec)}
         icon={Clock}
-        accentClass="text-amber-400"
+        accentClass="text-amber-700 dark:text-amber-400"
         calculationKey="stats.tooltip.calc.duration"
         interp={interpAvgDuration(stats.avgDurationSec)}
         metricPhraseKey="stats.tooltip.phrase.duration"

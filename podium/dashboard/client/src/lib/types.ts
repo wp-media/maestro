@@ -444,8 +444,8 @@ export const STATUS_CONFIG: Record<
 > = {
   working: {
     labelKey: "common:status.working",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
+    color: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20",
     dot: "bg-emerald-400",
   },
   waiting: {
@@ -456,14 +456,14 @@ export const STATUS_CONFIG: Record<
   },
   completed: {
     labelKey: "common:status.completed",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
+    color: "text-violet-700 dark:text-violet-400",
+    bg: "bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20",
     dot: "bg-violet-400",
   },
   error: {
     labelKey: "common:status.error",
-    color: "text-red-400",
-    bg: "bg-red-500/10 border-red-500/20",
+    color: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20",
     dot: "bg-red-400",
   },
 };
@@ -520,8 +520,8 @@ export const SESSION_STATUS_CONFIG: Record<
 > = {
   active: {
     labelKey: "common:status.active",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10 border-emerald-500/20",
+    color: "text-emerald-700 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20",
     dot: "bg-emerald-400",
   },
   waiting: {
@@ -532,21 +532,21 @@ export const SESSION_STATUS_CONFIG: Record<
   },
   completed: {
     labelKey: "common:status.completed",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10 border-violet-500/20",
+    color: "text-violet-700 dark:text-violet-400",
+    bg: "bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20",
     dot: "bg-violet-400",
   },
   error: {
     labelKey: "common:status.error",
-    color: "text-red-400",
-    bg: "bg-red-500/10 border-red-500/20",
+    color: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20",
     dot: "bg-red-400",
   },
   abandoned: {
     // Muted slate distinguishes "given up / faded out" from yellow Waiting
     // (attention required).
     labelKey: "common:status.abandoned",
-    color: "text-slate-400",
+    color: "text-slate-700 dark:text-slate-400",
     bg: "bg-slate-500/10 border-slate-500/20",
     dot: "bg-slate-400",
   },

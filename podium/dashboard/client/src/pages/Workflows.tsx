@@ -123,8 +123,8 @@ export function Workflows() {
           lastUpdated={null}
         />
         <div className="card flex flex-col items-center justify-center py-16 gap-4">
-          <AlertCircle className="w-10 h-10 text-red-400" />
-          <p className="text-red-400 text-sm">{error}</p>
+          <AlertCircle className="w-10 h-10 text-red-700 dark:text-red-400" />
+          <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
           <button onClick={handleRefresh} className="btn-primary text-sm">
             {t("common:retry")}
           </button>
@@ -163,13 +163,13 @@ export function Workflows() {
         />
         {selectedNode && (
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-gray-700 dark:text-gray-500">{t("filteredBy")}</span>
-            <span className="badge bg-accent/15 text-accent border border-accent/20 text-xs">
+            <span className="text-sm text-gray-600 dark:text-gray-500">{t("filteredBy")}</span>
+            <span className="badge bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border border-accent/20 text-xs">
               {selectedNode}
             </span>
             <button
               onClick={() => setSelectedNode(null)}
-              className="text-xs text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 underline"
+              className="text-sm text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 underline"
             >
               {t("clearFilter")}
             </button>
@@ -306,7 +306,7 @@ function Section({
     <div>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <span className="w-5 h-5 rounded-md bg-accent/15 text-accent text-[11px] font-bold flex items-center justify-center">
+          <span className="w-5 h-5 rounded-md bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent text-[11px] font-bold flex items-center justify-center">
             {number}
           </span>
           <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{title}</h2>
@@ -405,7 +405,7 @@ function ChartInfoPopover({ infoKey, title }: { infoKey: string; title: string }
           className="fixed z-50 p-3.5 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-300 pointer-events-none"
           style={{ left: coords.left, top: coords.top, width: POPOVER_W }}
         >
-          <p className="text-xs font-semibold text-gray-100 mb-2.5 pb-2 border-b border-[#2a2a4a]">
+          <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2.5 pb-2 border-b border-[#2a2a4a]">
             {title}
           </p>
 
@@ -459,9 +459,9 @@ function PageHeader({
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
             {wsConnected ? (
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+              <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                 {t("common:live")}
               </span>
@@ -472,7 +472,7 @@ function PageHeader({
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-700 dark:text-gray-500">{t("subtitle")}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-500">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -485,7 +485,7 @@ function PageHeader({
               onClick={() => onStatusFilterChange(f.value)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                 statusFilter === f.value
-                  ? "bg-accent/15 text-accent"
+                  ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent"
                   : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >

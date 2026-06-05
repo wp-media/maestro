@@ -44,10 +44,10 @@ describe("StatCard", () => {
 
   it("should apply custom accent color", () => {
     const { container } = render(
-      <StatCard label="Test" value={0} icon={Activity} accentColor="text-emerald-400" />
+      <StatCard label="Test" value={0} icon={Activity} accentColor="text-emerald-700 dark:text-emerald-400" />
     );
     const svg = container.querySelector("svg");
-    expect(svg?.className?.baseVal ?? svg?.getAttribute("class")).toContain("text-emerald-400");
+    expect(svg?.className?.baseVal ?? svg?.getAttribute("class")).toContain("text-emerald-700 dark:text-emerald-400");
   });
 
   it("should apply default accent color when not specified", () => {

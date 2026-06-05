@@ -255,9 +255,9 @@ export function ActivityFeed() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
-                <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
                   {t("common:live")}
                 </span>
@@ -268,7 +268,7 @@ export function ActivityFeed() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-700 dark:text-gray-500">
+            <p className="text-sm text-gray-600 dark:text-gray-500">
               {t("subtitle")}
               {paused && (
                 <span className="ml-2 text-yellow-400">{t("paused", { count: bufferCount })}</span>
@@ -463,7 +463,7 @@ export function ActivityFeed() {
           </div>
           {total > 0 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-xs text-gray-700 dark:text-gray-500">
+              <span className="text-sm text-gray-600 dark:text-gray-500">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
