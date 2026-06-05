@@ -6,6 +6,7 @@
 import express from 'express'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -87,6 +88,77 @@ async function readEvents(filePath) {
 // Resolve the events.jsonl path for a given session id.
 function eventFileForSession(sessionId) {
   return path.join(PODIUM_DIR, sessionId, 'events.jsonl')
+}
+
+// ── Transcript resolution ──────────────────────────────────────────────────────
+// Read the transcript_path recorded in session-meta.json (written by the hook).
+function transcriptPathFromMeta(sessionId) {
+  const metaFile = path.join(PODIUM_DIR, sessionId, 'session-meta.json')
+  try {
+    const raw = fs.readFileSync(metaFile, 'utf8')
+    const meta = JSON.parse(raw)
+    const tp = meta?.transcript_path
+    if (typeof tp === 'string' && tp.length > 0) return tp
+  } catch {
+    // No meta file or unreadable — fall through.
+  }
+  return null
+}
+
+// Fallback: scan ~/.claude/projects/*/{sessionId}.jsonl (one level of project dirs).
+function findTranscriptFile(sessionId) {
+  const projectsDir = path.join(os.homedir(), '.claude', 'projects')
+  try {
+    const projects = fs.readdirSync(projectsDir, { withFileTypes: true })
+    for (const proj of projects) {
+      if (!proj.isDirectory()) continue
+      const candidate = path.join(projectsDir, proj.name, sessionId + '.jsonl')
+      if (fs.existsSync(candidate)) return candidate
+    }
+  } catch {
+    // Projects dir missing or unreadable.
+  }
+  return null
+}
+
+// Resolve a transcript file path for a session: meta first, then a directory scan.
+function resolveTranscriptPath(sessionId) {
+  const fromMeta = transcriptPathFromMeta(sessionId)
+  if (fromMeta && fs.existsSync(fromMeta)) return fromMeta
+  return findTranscriptFile(sessionId)
+}
+
+// Parse a transcript JSONL file into normalized TranscriptMessage objects.
+// Keeps only user/assistant entries; skips system lines and malformed JSON.
+async function readTranscriptMessages(filePath) {
+  let text
+  try {
+    text = await fsp.readFile(filePath, 'utf8')
+  } catch {
+    return []
+  }
+  const messages = []
+  const lines = text.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim()
+    if (!trimmed) continue
+    let entry
+    try {
+      entry = JSON.parse(trimmed)
+    } catch {
+      continue // Skip malformed lines.
+    }
+    if (entry?.type !== 'user' && entry?.type !== 'assistant') continue
+    messages.push({
+      id: String(i),
+      type: entry.type,
+      timestamp: entry.timestamp || null,
+      content: entry.message?.content || [],
+      usage: entry.usage || null,
+      model: entry.model || null,
+    })
+  }
+  return messages
 }
 
 async function listSessionDirs() {
@@ -446,6 +518,71 @@ app.get('/api/sessions/:id/events', async (req, res) => {
   // Client disconnect.
   req.on('close', cleanup)
   res.on('error', cleanup)
+})
+
+// ── GET /api/sessions/:id/transcript ───────────────────────────────────────────
+// Returns normalized user/assistant messages from the Claude Code JSONL transcript.
+// Query params:
+//   ?limit=N   (default 100, max 500) — keep only the last N messages
+//   ?after=L   — keep only messages whose line number is > L (incremental polling)
+app.get('/api/sessions/:id/transcript', async (req, res) => {
+  const sessionId = req.params.id
+
+  try {
+    const transcriptPath = resolveTranscriptPath(sessionId)
+    if (!transcriptPath) {
+      res.status(404).json({
+        error: 'transcript_not_found',
+        session_id: sessionId,
+        messages: [],
+        total: 0,
+        has_more: false,
+      })
+      return
+    }
+
+    let messages = await readTranscriptMessages(transcriptPath)
+
+    // ?after=LINE_NUM — only messages after the given line number.
+    const afterRaw = req.query.after
+    if (afterRaw !== undefined) {
+      const after = Number(afterRaw)
+      if (Number.isFinite(after)) {
+        messages = messages.filter((m) => Number(m.id) > after)
+      }
+    }
+
+    const total = messages.length
+
+    // ?limit=N — clamp 1..500, default 100. Keep the LAST N messages.
+    let limit = 100
+    const limitRaw = req.query.limit
+    if (limitRaw !== undefined) {
+      const parsed = Number(limitRaw)
+      if (Number.isFinite(parsed) && parsed > 0) {
+        limit = Math.min(Math.floor(parsed), 500)
+      }
+    }
+
+    const hasMore = total > limit
+    const sliced = hasMore ? messages.slice(total - limit) : messages
+
+    res.json({
+      messages: sliced,
+      total,
+      has_more: hasMore,
+      session_id: sessionId,
+    })
+  } catch (err) {
+    res.status(500).json({
+      error: 'failed_to_read_transcript',
+      message: String(err?.message ?? err),
+      session_id: sessionId,
+      messages: [],
+      total: 0,
+      has_more: false,
+    })
+  }
 })
 
 // ── Static React app ───────────────────────────────────────────────────────────

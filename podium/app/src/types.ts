@@ -125,9 +125,49 @@ export interface AppState {
   sseConnected: boolean
   sseReconnecting: boolean
   connection: 'connected' | 'reconnecting' | 'disconnected'  // derived from sseConnected/sseReconnecting
+  transcriptOpen: boolean             // whether conversation panel is showing
   selectSession: (id: string) => void
   selectTurn: (id: string | null) => void
   setSSEStatus: (connected: boolean, reconnecting?: boolean) => void
   appendRawEvents: (events: RawEvent[]) => void
   refreshSessions: () => Promise<void>
+  setTranscriptOpen: (open: boolean) => void
+}
+
+// ── Transcript viewer types ──────────────────────────────────────────────────
+export interface TranscriptContent {
+  type: 'text' | 'tool_use' | 'tool_result' | 'thinking' | 'image'
+  // text
+  text?: string
+  // tool_use
+  id?: string
+  name?: string
+  input?: Record<string, unknown>
+  // tool_result
+  tool_use_id?: string
+  content?: Array<{ type: string; text?: string }> | string
+  is_error?: boolean
+  // thinking
+  thinking?: string
+}
+
+export interface TranscriptMessage {
+  id: string               // line number as string
+  type: 'user' | 'assistant' | 'system'
+  timestamp: string | null
+  content: TranscriptContent[]
+  usage?: {
+    input_tokens?: number
+    output_tokens?: number
+    cache_creation_input_tokens?: number
+    cache_read_input_tokens?: number
+  }
+  model?: string
+}
+
+export interface TranscriptResponse {
+  messages: TranscriptMessage[]
+  total: number
+  has_more: boolean
+  session_id: string
 }

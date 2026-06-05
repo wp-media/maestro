@@ -51,6 +51,7 @@ export const useStore = create<AppState>((set, get) => ({
   sseConnected: false,
   sseReconnecting: false,
   connection: 'disconnected',
+  transcriptOpen: false,
 
   refreshSessions: async () => {
     set({ isLoadingSessions: true, loadingSessions: true })
@@ -110,6 +111,10 @@ export const useStore = create<AppState>((set, get) => ({
       sseReconnecting: reconnecting,
       connection: deriveConnection(connected, reconnecting),
     })
+  },
+
+  setTranscriptOpen: (open: boolean) => {
+    set({ transcriptOpen: open })
   },
 
   appendRawEvents: (events: RawEvent[]) => {

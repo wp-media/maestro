@@ -14,8 +14,13 @@
 //
 // Hard exit deadline: 1 500 ms (well inside Claude Code's 2 s kill timeout).
 
-import { appendFileSync, mkdirSync, readFileSync } from 'node:fs'
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+// Returns the value if it's a non-empty string, otherwise null.
+function asString(v) {
+  return typeof v === 'string' && v.length > 0 ? v : null
+}
 
 // ── Safety deadline ───────────────────────────────────────────────────────────
 const DEADLINE = setTimeout(() => process.exit(0), 1_500)
@@ -119,9 +124,34 @@ function run(input) {
 
   switch (hook_event_name) {
 
-    case 'SessionStart':
-      event = { ts, type: 'session_start', session_id, cwd: projectRoot, model: p.model ?? null }
+    case 'SessionStart': {
+      const transcriptPath = asString(p.transcript_path)
+      event = {
+        ts,
+        type: 'session_start',
+        session_id,
+        cwd: projectRoot,
+        model: p.model ?? null,
+        transcript_path: transcriptPath,
+      }
+      // Also persist a session-meta.json so the server can locate the transcript
+      // without re-deriving it. Idempotent overwrite.
+      try {
+        const meta = {
+          session_id,
+          transcript_path: transcriptPath,
+          cwd: projectRoot,
+          model: asString(p.model),
+          started_at: ts,
+        }
+        writeFileSync(
+          join(sessionDir, 'session-meta.json'),
+          JSON.stringify(meta, null, 2),
+          { flag: 'w' },
+        )
+      } catch { /* silent — never crash Claude Code */ }
       break
+    }
 
     case 'SessionEnd':
       event = { ts, type: 'session_end', session_id }
