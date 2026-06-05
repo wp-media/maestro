@@ -740,7 +740,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
-            className="w-6 h-6 text-gray-500"
+            className="w-6 h-6 text-gray-700 dark:text-gray-500"
           >
             <circle cx="6" cy="12" r="2" />
             <circle cx="18" cy="6" r="2" />
@@ -750,7 +750,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
           </svg>
         </div>
         <h3 className="text-base font-medium text-gray-300 mb-2">{t("orchestration.noData")}</h3>
-        <p className="text-sm text-gray-500 max-w-sm">{t("orchestration.noDataDesc")}</p>
+        <p className="text-sm text-gray-700 dark:text-gray-500 max-w-sm">{t("orchestration.noDataDesc")}</p>
       </div>
     );
   }
@@ -793,7 +793,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
               className="inline-block w-3 h-3 rounded-sm flex-shrink-0"
               style={{ background: item.color, border: `1px solid ${item.border}` }}
             />
-            <span className="text-[11px] text-gray-500">{item.label}</span>
+            <span className="text-[11px] text-gray-700 dark:text-gray-500">{item.label}</span>
           </div>
         ))}
         <div className="flex items-center gap-1.5 ml-2">
@@ -801,7 +801,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
             className="inline-block h-[2px] w-8 rounded flex-shrink-0"
             style={{ background: "linear-gradient(to right, #312e81, #4f46e5)" }}
           />
-          <span className="text-[11px] text-gray-500">{t("orchestration.edgeWeight")}</span>
+          <span className="text-[11px] text-gray-700 dark:text-gray-500">{t("orchestration.edgeWeight")}</span>
         </div>
       </div>
 

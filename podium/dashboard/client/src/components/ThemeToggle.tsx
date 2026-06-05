@@ -59,7 +59,7 @@ export function ThemeToggle({ collapsed }: ThemeToggleProps) {
       onClick={toggle}
       className={`w-full h-10 rounded-lg border border-border bg-surface-2 transition-colors ${
         collapsed
-          ? "flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3"
+          ? "flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3"
           : "flex items-center gap-2.5 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-surface-3"
       }`}
       title={label}

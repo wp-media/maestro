@@ -99,7 +99,7 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
             >
               {headline}
             </p>
-            {subtitle && <p className="text-[11px] text-gray-500 truncate">{subtitle}</p>}
+            {subtitle && <p className="text-[11px] text-gray-700 dark:text-gray-500 truncate">{subtitle}</p>}
           </div>
         </div>
         <AgentStatusBadge status={status} />
@@ -109,10 +109,10 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
           repeat it here. Subagents — and main agents without a captured prompt —
           still render the task as a secondary descriptive block. */}
       {agent.task && !useTaskAsHeadline && (
-        <p className="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">{agent.task}</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">{agent.task}</p>
       )}
 
-      <div className="flex items-center gap-3 text-[11px] text-gray-500 min-w-0 overflow-hidden flex-wrap">
+      <div className="flex items-center gap-3 text-[11px] text-gray-700 dark:text-gray-500 min-w-0 overflow-hidden flex-wrap">
         {agent.current_tool && (
           <span className="flex items-center gap-1 flex-shrink-0">
             <Wrench className="w-3 h-3" />

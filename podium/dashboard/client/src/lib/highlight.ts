@@ -606,7 +606,7 @@ export function highlight(source: string, lang: string): Token[] {
 export function tokenClass(type: TokenType): string {
   switch (type) {
     case "comment":
-      return "text-gray-500 italic";
+      return "text-gray-700 dark:text-gray-500 italic";
     case "string":
       return "text-emerald-300";
     case "number":
@@ -620,7 +620,7 @@ export function tokenClass(type: TokenType): string {
     case "operator":
       return "text-pink-300";
     case "punctuation":
-      return "text-gray-400";
+      return "text-gray-600 dark:text-gray-400";
     case "property":
       return "text-cyan-300";
     case "tag":

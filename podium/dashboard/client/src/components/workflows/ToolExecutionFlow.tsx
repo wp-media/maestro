@@ -460,7 +460,7 @@ export function ToolExecutionFlow({
     <div className="relative" ref={containerRef} onMouseLeave={hideTip}>
       {isEmpty ? (
         <div className="flex items-center justify-center" style={{ height: dimensions.height }}>
-          <span className="text-sm text-gray-500">{t("toolFlow.noData")}</span>
+          <span className="text-sm text-gray-700 dark:text-gray-500">{t("toolFlow.noData")}</span>
         </div>
       ) : (
         <svg
@@ -616,7 +616,7 @@ function Legend() {
             style={{ background: color, opacity: 0.9 }}
             className="inline-block w-2.5 h-2.5 rounded-sm flex-shrink-0"
           />
-          <span className="text-xs text-gray-400">{t(`toolLegend.${key}`)}</span>
+          <span className="text-xs text-gray-600 dark:text-gray-400">{t(`toolLegend.${key}`)}</span>
         </div>
       ))}
     </div>

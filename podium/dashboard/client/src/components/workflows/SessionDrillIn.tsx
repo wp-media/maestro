@@ -36,7 +36,7 @@ function statusColor(status: string): string {
     case "waiting":
       return "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
     default:
-      return "text-gray-400 bg-gray-500/10 border-gray-500/20";
+      return "text-gray-600 dark:text-gray-400 bg-gray-500/10 border-gray-500/20";
   }
 }
 
@@ -86,7 +86,7 @@ function TabBar({ active, onChange }: TabBarProps) {
             "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-150",
             active === tab.id
               ? "bg-surface-5 text-gray-100 shadow-sm"
-              : "text-gray-500 hover:text-gray-300",
+              : "text-gray-700 dark:text-gray-500 hover:text-gray-300",
           ].join(" ")}
         >
           {tab.icon}
@@ -144,7 +144,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
 
         {/* Subagent type */}
         {node.subagent_type && (
-          <span className="text-xs text-gray-500 truncate flex-shrink-0">
+          <span className="text-xs text-gray-700 dark:text-gray-500 truncate flex-shrink-0">
             [{node.subagent_type}]
           </span>
         )}
@@ -171,7 +171,7 @@ interface AgentTreeProps {
 function AgentTree({ tree }: AgentTreeProps) {
   const { t } = useTranslation("workflows");
   if (tree.length === 0) {
-    return <p className="text-sm text-gray-500 text-center py-8">{t("drillIn.noAgentTree")}</p>;
+    return <p className="text-sm text-gray-700 dark:text-gray-500 text-center py-8">{t("drillIn.noAgentTree")}</p>;
   }
 
   return (
@@ -194,7 +194,7 @@ interface ToolTimelineProps {
 function ToolTimeline({ events }: ToolTimelineProps) {
   const { t } = useTranslation("workflows");
   if (events.length === 0) {
-    return <p className="text-sm text-gray-500 text-center py-8">{t("drillIn.noToolEvents")}</p>;
+    return <p className="text-sm text-gray-700 dark:text-gray-500 text-center py-8">{t("drillIn.noToolEvents")}</p>;
   }
 
   return (
@@ -212,7 +212,7 @@ function ToolTimeline({ events }: ToolTimelineProps) {
 
             {/* Summary */}
             {ev.summary && (
-              <span className="text-xs text-gray-400 truncate flex-1 min-w-0">{ev.summary}</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 truncate flex-1 min-w-0">{ev.summary}</span>
             )}
 
             {/* Timestamp */}
@@ -242,13 +242,13 @@ const EVENT_TYPE_COLOR: Record<string, string> = {
 };
 
 function eventTypeColor(type: string): string {
-  return EVENT_TYPE_COLOR[type] ?? "text-gray-400";
+  return EVENT_TYPE_COLOR[type] ?? "text-gray-600 dark:text-gray-400";
 }
 
 function EventSequence({ events }: EventSequenceProps) {
   const { t } = useTranslation("workflows");
   if (events.length === 0) {
-    return <p className="text-sm text-gray-500 text-center py-8">{t("drillIn.noEvents")}</p>;
+    return <p className="text-sm text-gray-700 dark:text-gray-500 text-center py-8">{t("drillIn.noEvents")}</p>;
   }
 
   const recent = events.slice(0, 100);
@@ -270,7 +270,7 @@ function EventSequence({ events }: EventSequenceProps) {
             </span>
 
             {/* Summary */}
-            <span className="text-xs text-gray-400 flex-1 min-w-0 truncate">
+            <span className="text-xs text-gray-600 dark:text-gray-400 flex-1 min-w-0 truncate">
               {ev.summary ?? ev.tool_name ?? "—"}
             </span>
 
@@ -352,7 +352,7 @@ function NoSessionState({ onSelectSession }: NoSessionStateProps) {
         <div className="w-10 h-10 rounded-xl bg-surface-4 flex items-center justify-center mb-4">
           <GitFork className="w-5 h-5 text-gray-600" />
         </div>
-        <p className="text-sm font-medium text-gray-400 mb-1">{t("drillIn.noSessionSelected")}</p>
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{t("drillIn.noSessionSelected")}</p>
         <p className="text-xs text-gray-600 max-w-xs">{t("drillIn.noSessionDesc")}</p>
 
         {/* Preview tab pills */}
@@ -392,7 +392,7 @@ function SessionHeader({ drillIn, onClose, activeTab, onTabChange }: SessionHead
           <p className="text-sm font-semibold text-gray-100 truncate">
             {session.name ?? session.id}
           </p>
-          <p className="text-xs text-gray-500 mt-0.5 truncate">
+          <p className="text-xs text-gray-700 dark:text-gray-500 mt-0.5 truncate">
             {formatModelName(session.model) ?? t("drillIn.unknownModel")} &middot;{" "}
             {t(`common:status.${session.status}`, { defaultValue: session.status })}
             {session.started_at && ` \u00b7 ${safeTimestamp(session.started_at)}`}
@@ -401,7 +401,7 @@ function SessionHeader({ drillIn, onClose, activeTab, onTabChange }: SessionHead
         <button
           type="button"
           onClick={onClose}
-          className="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-gray-500 hover:text-gray-200 hover:bg-white/10 transition-colors"
+          className="flex-shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-200 hover:bg-white/10 transition-colors"
           aria-label={t("drillIn.closePanel")}
         >
           <X className="w-4 h-4" />
@@ -514,7 +514,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
           inputRef.current?.focus();
         }}
       >
-        <Search className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+        <Search className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -580,7 +580,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
                         )}
                       </span>
                       {s.model && (
-                        <span className="flex-shrink-0 text-[10px] text-gray-500 truncate max-w-[80px]">
+                        <span className="flex-shrink-0 text-[10px] text-gray-700 dark:text-gray-500 truncate max-w-[80px]">
                           {formatModelName(s.model)}
                         </span>
                       )}
@@ -601,7 +601,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
                 type="button"
                 onClick={handleLoadMore}
                 disabled={loading}
-                className="w-full px-3 py-2 text-xs text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors border-t border-border/50 disabled:opacity-50"
+                className="w-full px-3 py-2 text-xs text-gray-700 dark:text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-colors border-t border-border/50 disabled:opacity-50"
               >
                 {loading ? t("drillIn.loading") : t("drillIn.loadMore")}
               </button>

@@ -533,7 +533,7 @@ export function AgentCollaborationNetwork({
   if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-sm font-medium text-gray-400">{t("pipeline.noData")}</p>
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("pipeline.noData")}</p>
         <p className="text-xs text-gray-600 mt-1">{t("pipeline.noDataDesc")}</p>
       </div>
     );
@@ -579,7 +579,7 @@ export function AgentCollaborationNetwork({
                 border: `1.5px solid ${STROKE_PALETTE[n.colorIndex] ?? STROKE_PALETTE[0]}`,
               }}
             />
-            <span className="text-[11px] text-gray-500">{n.id}</span>
+            <span className="text-[11px] text-gray-700 dark:text-gray-500">{n.id}</span>
           </div>
         ))}
         <div className="flex items-center gap-1.5 ml-2">
@@ -587,7 +587,7 @@ export function AgentCollaborationNetwork({
             <line x1="0" y1="4" x2="14" y2="4" stroke="#64748b" strokeWidth="1.5" />
             <polygon points="14,1 20,4 14,7" fill="#64748b" />
           </svg>
-          <span className="text-[11px] text-gray-500">{t("pipeline.legendDesc")}</span>
+          <span className="text-[11px] text-gray-700 dark:text-gray-500">{t("pipeline.legendDesc")}</span>
         </div>
       </div>
     </div>

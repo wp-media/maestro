@@ -348,7 +348,7 @@ export function ModelDelegationFlow({ data }: ModelDelegationFlowProps) {
 
   if (!hasData) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-500">
+      <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-700 dark:text-gray-500">
         <svg
           width="40"
           height="40"

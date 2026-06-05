@@ -82,7 +82,7 @@ export function TabbyPanel({
           </span>
         </div>
         <button
-          className="rounded-md p-1 text-gray-500 transition-colors hover:bg-surface-4 hover:text-gray-200"
+          className="rounded-md p-1 text-gray-700 dark:text-gray-500 transition-colors hover:bg-surface-4 hover:text-gray-200"
           onClick={onClose}
           aria-label="Close Tabby"
         >
@@ -177,7 +177,7 @@ interface Tone {
 const TONE_MUTED: Tone = {
   wrap: "border-border bg-surface-1",
   value: "text-gray-300",
-  icon: "text-gray-500",
+  icon: "text-gray-700 dark:text-gray-500",
 };
 
 const TONES: Record<string, Tone> = {
@@ -209,7 +209,7 @@ function StatChip({
       <span className={`text-base font-semibold leading-none tabular-nums ${t.value}`}>
         {value}
       </span>
-      <span className="text-[9px] uppercase tracking-wider text-gray-500">{label}</span>
+      <span className="text-[9px] uppercase tracking-wider text-gray-700 dark:text-gray-500">{label}</span>
     </div>
   );
 }
