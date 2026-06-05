@@ -445,7 +445,8 @@ function ToolCallBlock({
 
 // ── User message bubble ───────────────────────────────────────────────────────
 function UserMessage({ msg }: { msg: TranscriptMessage }) {
-  const text = msg.content
+  const content = Array.isArray(msg.content) ? msg.content : []
+  const text = content
     .filter((c) => c.type === 'text' && c.text)
     .map((c) => c.text as string)
     .join('\n')
@@ -508,8 +509,11 @@ function AssistantMessage({
   const inTok = (usage?.input_tokens ?? 0) + (usage?.cache_read_input_tokens ?? 0)
   const outTok = usage?.output_tokens ?? 0
 
+  // Normalise content to always be an array (some transcript lines use a string)
+  const contentArr = Array.isArray(msg.content) ? msg.content : []
+
   // Nothing visible? Skip empty assistant frames.
-  const hasContent = msg.content.some(
+  const hasContent = contentArr.some(
     (c) =>
       (c.type === 'text' && c.text && c.text.trim()) ||
       c.type === 'tool_use' ||
@@ -537,7 +541,7 @@ function AssistantMessage({
 
       {/* Content stream */}
       <div style={{ paddingLeft: 19 }}>
-        {msg.content.map((c, i) => {
+        {contentArr.map((c, i) => {
           if (c.type === 'thinking' && c.thinking) {
             return <ThinkingBlock key={i} text={c.thinking} />
           }

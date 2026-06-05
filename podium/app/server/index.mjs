@@ -149,11 +149,18 @@ async function readTranscriptMessages(filePath) {
       continue // Skip malformed lines.
     }
     if (entry?.type !== 'user' && entry?.type !== 'assistant') continue
+    // content can be a string (simple messages) or an array of content blocks
+    const rawContent = entry.message?.content
+    const content = Array.isArray(rawContent)
+      ? rawContent
+      : typeof rawContent === 'string' && rawContent.length > 0
+      ? [{ type: 'text', text: rawContent }]
+      : []
     messages.push({
       id: String(i),
       type: entry.type,
       timestamp: entry.timestamp || null,
-      content: entry.message?.content || [],
+      content,
       usage: entry.usage || null,
       model: entry.model || null,
     })
