@@ -606,45 +606,41 @@ Before spawning, mark each in-scope task `in-progress` in `tasks.json` and recor
 
 ---
 
-**05a/b-PAR — Parallel execution** (scopes disjoint AND execution_mode == "parallel"):
+**Compose dispatch plans** — before calling the Workflow, write the dispatch plan for each in-scope agent. These must be complete and self-contained: agents cannot see the orchestrator context. Each dispatch plan must include the spec summary, grooming output (approach, development_steps, file_scope), and any relevant session learnings. In sequential mode, include the backend API surface from `contracts/backend-api.json` in the frontend dispatch plan if backend has already committed.
 
-Create git worktrees for isolation:
+**In parallel mode:** Create git worktrees for isolation before calling the Workflow:
 ```bash
 git worktree add {TEMP_ROOT}/issues/<N>/worktrees/backend <branch>
 git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
 ```
-
 Update each task's `worktree` field in `tasks.json`.
 
-> Spawn `backend-agent` and `frontend-agent` simultaneously.
-> Each agent receives: issue #N, spec path, dispatch plan, their task entry from `tasks.json`
-> (including `file_scope` and `worktree` path).
->
-> The orchestrator is the coordination hub — agents do not communicate with each other.
-> Backend writes `contracts/backend-api.json` (API surface) and `contracts/backend-result.json` (full result) on completion.
-> When backend completes, orchestrator reads `backend-api.json`, logs the API surface to the HTML log,
-> and updates `tasks.json`. Routing decisions use `backend-result.json` (via `result_path`).
-> Frontend reads `contracts/backend-api.json` opportunistically if it exists — this is
-> orchestrator-managed shared state, not direct agent-to-agent communication.
->
-> Orchestrator proceeds when both tasks show `completed` in `tasks.json`
-> (or either shows `blocked`).
+**Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/implementation.js` with the Read tool, then call the Workflow tool with:
+- `script`: the file contents
+- `args`:
+  ```json
+  {
+    "issueN": "<N>",
+    "branch": "<branch>",
+    "specPath": "{TEMP_ROOT}/issues/<N>/spec.md",
+    "domains": "backend|frontend|both",
+    "executionMode": "parallel|sequential",
+    "model": "<resolved implementation model>",
+    "backendDispatch": "<dispatch plan string — null if frontend-only>",
+    "frontendDispatch": "<dispatch plan string — null if backend-only>",
+    "backendTask": { "...task entry from tasks.json..." },
+    "frontendTask": { "...task entry from tasks.json — null if backend-only..." },
+    "worktrees": { "backend": "<path>", "frontend": "<path>" },
+    "sessionLearnings": "<section 13 content>",
+    "currentModel": "<current model name>"
+  }
+  ```
 
-**05a/b-SEQ — Sequential fallback** (scopes overlap OR execution_mode == "sequential"):
-
-Do NOT create git worktrees. All agents work on the same branch.
-
-> Invoke `backend-agent` first (if in scope), then `frontend-agent` (if in scope).
-> Max 3 attempts each. Hard stop after 3 — escalate.
-> When backend completes, orchestrator reads `contracts/backend-api.json` if it exists.
-> Frontend reads it opportunistically.
->
-> Both agents commit atomically to the same branch. Commits are ordered: backend first, then frontend.
+The Workflow shows a live progress panel with per-agent token and tool counts. It returns `{ backend, frontend }` — structured objects matching the implementation JSON contract. The underlying agents still write `contracts/backend-api.json` and `contracts/backend-result.json` / `frontend-result.json` as before.
 
 **Synthesis:** Read `tests_passing`, `dod_layer1.overall`, `e2e_smoke.status`, and
-`files_changed` from each agent's `result_path` in `tasks.json`. Full implementation
-JSONs go to the HTML log directly from contract files — do not accumulate them in
-orchestrator context.
+`files_changed` directly from the Workflow return value (`result.backend`, `result.frontend`).
+Log AGENT events with `docs` status, `e2e_smoke` status, DOD L1 summary, and commit SHA.
 
 Log AGENT events after each with `docs` status, `e2e_smoke` status, DOD L1 summary, and
 commit SHA.
@@ -676,39 +672,36 @@ Update the decisions strip Pull request field with the PR URL.
 After the PR is created (Step 6), GitHub Actions CI starts automatically. Quality gates execute
 in the configured mode:
 
-**Parallel mode** (default):
-```
-DOD L2       ──────────────────┐
-Lead Review  ─────────────────┤  all in parallel
-QA           ──────────────────┘
-```
-
-**Sequential mode** (--sequential flag):
-```
-DOD L2       ────┐
-               └──> Lead Review ────┐
-                                  └──> QA
-```
-
 CI is monitored by DOD L2 Check 5 in both modes.
 
-**Spawning logic:**
+**Determine skip conditions** (evaluate before calling the Workflow):
+- **Lead Review** — skip if `effort IN [XS, S]` AND `risk_level == LOW`. Set `skipLeadReview: true`.
+- **QA** — skip only for purely internal refactors. Set `skipQa: true`. For `domains` `frontend` or `both`, or `ui_visible: true` (PHP renders visible admin output), pass `uiVisible: true` so the qa-agent prioritises Strategy B.
 
-Determine gate order:
-- **Parallel** (if execution_mode == "parallel"): spawn all three simultaneously
-- **Sequential** (if execution_mode == "sequential"): spawn DOD L2 → wait for completion → spawn Lead Review → wait for completion → spawn QA
+**Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/quality-gates.js` with the Read tool, then call the Workflow tool with:
+- `script`: the file contents
+- `args`:
+  ```json
+  {
+    "issueN": "<N>",
+    "prUrl": "<PR URL from Step 6>",
+    "prNumber": "<PR number>",
+    "branch": "<branch>",
+    "baseBranch": "<base branch>",
+    "tempRoot": "{TEMP_ROOT}",
+    "specPath": "{TEMP_ROOT}/issues/<N>/spec.md",
+    "acceptanceCriteria": "<numbered list>",
+    "domains": "backend|frontend|both",
+    "uiVisible": true,
+    "executionMode": "parallel|sequential",
+    "skipLeadReview": false,
+    "skipQa": false,
+    "sessionLearnings": "<section 13 content>",
+    "currentModel": "<current model name>"
+  }
+  ```
 
-Regardless of mode, **skip conditions apply identically:**
-- **DOD L2** — always invoke the `dod` skill with `layer: "2"` in your context.
-- **Lead Review** — skip if `effort IN [XS, S]` AND `risk_level == LOW`.
-- **QA** — skip only for purely internal refactors. If `domains` is `frontend` or `both`, **or**
-  if `ui_visible: true` (PHP renders visible admin output) — explicitly instruct the qa-engineer
-  that Strategy B is the **primary** strategy.
-
-**Inputs for each:**
-- DOD L2: branch name, base branch, PR URL
-- Lead Review: issue #N, spec path, base branch, acceptance criteria (numbered list)
-- QA: issue #N, PR number, base branch, acceptance criteria (numbered list), domains, ui_visible flag
+The Workflow runs DOD L2 (independent gate), lead-reviewer, and qa-engineer — in parallel or sequential depending on `executionMode`, skipping any gate whose flag is `true`. It returns `{ dod, review, qa }`. Route on each result as described in Steps 7, 8, and 9 below.
 
 ---
 
