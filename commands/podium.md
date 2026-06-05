@@ -74,12 +74,32 @@ Claude Code." — but continue anyway (the server is still useful for browsing p
 curl -s --max-time 2 http://localhost:4820/health
 ```
 
-HTTP 200 → already up, skip to step d.
+HTTP 200 → already up, skip to step e.
 
-**c. Start server in background**
+**c. First-time setup (if node_modules missing)**
+
+Check whether `{DASHBOARD_ROOT}/node_modules` exists:
 
 ```bash
-cd /Users/gaelrobin/Desktop/Work/maestro/podium/dashboard && npm run start >> {LOG_FILE} 2>&1 &
+ls {DASHBOARD_ROOT}/node_modules/.bin/vite 2>/dev/null && echo "ok" || echo "missing"
+```
+
+If missing, install dependencies first. On Linux, `better-sqlite3` requires build tools:
+
+```bash
+# Linux only (skip on macOS):
+# sudo apt-get install -y python3 make g++   ← if npm install fails
+
+cd {DASHBOARD_ROOT} && npm install 2>&1 | tail -5
+```
+
+This takes 1–2 minutes on first run. The `dist/` directory is pre-built and committed,
+so no build step is needed unless you're developing the dashboard itself.
+
+**d. Start server in background**
+
+```bash
+cd {DASHBOARD_ROOT} && node server/index.js >> {LOG_FILE} 2>&1 &
 ```
 
 Wait 2 s, then verify:
@@ -88,7 +108,10 @@ Wait 2 s, then verify:
 curl -s --max-time 2 http://localhost:4820/health
 ```
 
-If still unreachable: "Podium failed to start. Check `{LOG_FILE}` for errors."
+If still unreachable:
+1. Check the log: `tail -20 {LOG_FILE}`
+2. Common Linux issue: `better-sqlite3` failed to compile — run `npm install` manually
+   inside `{DASHBOARD_ROOT}` after installing `python3`, `make`, `g++`
 
 **d. Show current stats**
 
@@ -108,8 +131,11 @@ Podium running -> http://localhost:4820
 
 ## `/podium stop`
 
+Find the process (cross-platform — try `lsof` first, fall back to `fuser` on Linux):
+
 ```bash
-lsof -ti:4820
+# macOS / Linux with lsof
+lsof -ti:4820 2>/dev/null || fuser 4820/tcp 2>/dev/null
 ```
 
 No output → "Podium is not running."
@@ -117,7 +143,8 @@ No output → "Podium is not running."
 Otherwise:
 
 ```bash
-kill $(lsof -ti:4820)
+# macOS / Linux with lsof
+kill $(lsof -ti:4820 2>/dev/null) 2>/dev/null || fuser -k 4820/tcp 2>/dev/null || true
 ```
 
 Confirm: "Podium stopped."
@@ -215,6 +242,10 @@ Alias for `/podium start`.
   and stores data in SQLite under the dashboard's data directory.
 - Token cost: **zero**. Hooks execute outside the LLM turn.
 - Podium is read-only — it never modifies code or project files.
-- The dashboard is served as a static SPA from `{DASHBOARD_ROOT}/index.html`.
+- The dashboard is served as a pre-built SPA (`dist/` is committed to the repo).
 - Requires Node 18+. Run `npm install` inside `{DASHBOARD_ROOT}` before first use.
 - The server listens on port **4820** by default.
+- **Linux:** `better-sqlite3` requires native compilation. If `npm install` fails, run:
+  `sudo apt-get install -y python3 make g++` then retry.
+- **Linux:** `lsof` may not be installed. `/podium stop` falls back to `fuser -k 4820/tcp`.
+- The `dist/` is pre-built and committed — no build step needed after `npm install`.
