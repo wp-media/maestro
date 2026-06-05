@@ -49,7 +49,6 @@ import {
 } from "lucide-react";
 import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
-import { tabbyPrefs } from "../components/Tabby/prefs";
 import { fmt, fmtCost, getCurrentLocale } from "../lib/format";
 import { subscribeToPush, unsubscribeFromPush } from "../lib/push";
 import { Tip } from "../components/Tip";
@@ -339,11 +338,6 @@ export function Settings() {
   } | null>(null);
   const [confirmAction, setConfirmAction] = useState<string | null>(null);
   const [notifPrefs, setNotifPrefs] = useState<NotifPrefs>(loadNotifPrefs);
-  const [tabbyEnabled, setTabbyEnabled] = useState(() => tabbyPrefs.getEnabled());
-  const setTabby = useCallback((v: boolean) => {
-    tabbyPrefs.setEnabled(v);
-    setTabbyEnabled(v);
-  }, []);
   const [abandonHours, setAbandonHours] = useState("24");
   const [purgeDays, setPurgeDays] = useState("90");
   const [claudeHome, setClaudeHomeState] = useState("");
@@ -1009,44 +1003,6 @@ export function Settings() {
 
       {/* ─── IMPORT HISTORY ─── */}
       <ImportHistory />
-
-      {/* ─── TABBY COMPANION ─── */}
-      <section>
-        <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
-          <span className="text-base leading-none" aria-hidden>
-            🐾
-          </span>
-          {t("tabby.title", "Tabby companion")}
-        </h3>
-        <p className="text-xs text-gray-500 mb-4">
-          {t("tabby.description", "A floating cat that reacts to your live sessions.")}
-        </p>
-
-        <div className="card p-5">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                tabbyEnabled
-                  ? "bg-blue-500/10 border border-blue-500/20"
-                  : "bg-surface-2 border border-border"
-              }`}
-            >
-              <span className="text-lg leading-none" aria-hidden>
-                🐾
-              </span>
-            </div>
-            <Toggle
-              checked={tabbyEnabled}
-              onChange={setTabby}
-              label={t("tabby.enable", "Show Tabby")}
-              description={t(
-                "tabby.enableDesc",
-                "Display the corner companion across the dashboard (⌘B to open)"
-              )}
-            />
-          </div>
-        </div>
-      </section>
 
       {/* ─── NOTIFICATIONS ─── */}
       <section>

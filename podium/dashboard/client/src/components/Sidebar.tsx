@@ -7,7 +7,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   Columns3,
@@ -24,8 +23,6 @@ import {
   Globe,
   PanelLeftClose,
   PanelLeftOpen,
-  Languages,
-  RefreshCw,
   X,
   Plug,
   Clock,
@@ -34,31 +31,24 @@ import {
   ChevronDown,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
-import type { UpdateStatusPayload, WSMessage } from "../lib/types";
+import type { WSMessage } from "../lib/types";
 
-function isUpdatePayload(x: unknown): x is UpdateStatusPayload {
-  return typeof x === "object" && x !== null && "git_repo" in x && "update_available" in x;
-}
-
-const NAV_KEYS = [
-  { to: "/", icon: LayoutDashboard, key: "nav:dashboard" },
-  { to: "/kanban", icon: Columns3, key: "nav:agentBoard" },
-  { to: "/sessions", icon: FolderOpen, key: "nav:sessions" },
-  { to: "/activity", icon: Activity, key: "nav:activityFeed" },
-  { to: "/analytics", icon: BarChart3, key: "nav:analytics" },
-  { to: "/workflows", icon: Workflow, key: "nav:workflows" },
-  { to: "/cc-config", icon: Boxes, key: "nav:ccConfig" },
-  { to: "/run", icon: Play, key: "nav:run" },
-  { to: "/settings", icon: Settings, key: "nav:settings" },
+const NAV_ITEMS = [
+  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/kanban", icon: Columns3, label: "Kanban Board" },
+  { to: "/sessions", icon: FolderOpen, label: "Sessions" },
+  { to: "/activity", icon: Activity, label: "Activity Feed" },
+  { to: "/analytics", icon: BarChart3, label: "Analytics" },
+  { to: "/workflows", icon: Workflow, label: "Workflows" },
+  { to: "/cc-config", icon: Boxes, label: "Claude Config" },
+  { to: "/run", icon: Play, label: "Run Claude" },
+  { to: "/settings", icon: Settings, label: "Settings" },
 ] as const;
 
 const STORAGE_KEY = "sidebar-collapsed";
 const STATS_STORAGE_KEY = "sidebar-connection-stats";
 const RECENT_EVENTS_CAP = 8;
-const SUPPORTED_LANGUAGES = ["en", "zh", "vi"] as const;
-type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 interface PersistedStats {
   eventCount: number;
@@ -117,14 +107,6 @@ function loadStats(): PersistedStats {
   }
 }
 
-function normalizeLanguage(language: string): SupportedLanguage {
-  const base = language.toLowerCase().split("-")[0];
-  if (base === "zh" || base === "vi" || base === "en") {
-    return base;
-  }
-  return "en";
-}
-
 interface SidebarProps {
   wsConnected: boolean;
   collapsed: boolean;
@@ -132,16 +114,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
-  const { t, i18n } = useTranslation();
   const websiteLabel = "wp-media.me";
   // Track whether nav items are clipped by overflow so we can render
   // chevron affordances pointing toward the hidden items. Recomputed on
   // scroll, resize, and any structural change (e.g. collapse toggle).
   const navRef = useRef<HTMLElement | null>(null);
   const [navOverflow, setNavOverflow] = useState({ up: false, down: false });
-  const [updateStatus, setUpdateStatus] = useState<UpdateStatusPayload | null>(null);
-  const [checking, setChecking] = useState(false);
-  const [checkError, setCheckError] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [connectedSince, setConnectedSince] = useState<number | null>(
     wsConnected ? Date.now() : null
@@ -242,13 +220,6 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
 
   useEffect(() => {
     return eventBus.subscribe((msg: WSMessage) => {
-      if (msg.type === "update_status") {
-        if (isUpdatePayload(msg.data)) {
-          setUpdateStatus(msg.data);
-          setCheckError(Boolean(msg.data.fetch_error));
-        }
-        return;
-      }
       const now = Date.now();
       eventCountRef.current += 1;
       lastEventRef.current = { type: msg.type, at: now };
@@ -291,56 +262,6 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
     }
   }, [wsConnected]);
 
-  const onCheckUpdates = async () => {
-    if (checking) return;
-    setChecking(true);
-    setCheckError(false);
-    // Explicit user intent — clear any prior dismissal so the modal can
-    // re-open if this check still reports an update.
-    try {
-      localStorage.removeItem("podium-update-dismissed-sha");
-    } catch {
-      /* ignore */
-    }
-    window.dispatchEvent(new Event("dashboard:reset-update-dismissal"));
-    try {
-      const fresh = await api.updates.check();
-      setUpdateStatus(fresh);
-      setCheckError(Boolean(fresh.fetch_error));
-    } catch {
-      setCheckError(true);
-    } finally {
-      setChecking(false);
-    }
-  };
-
-  const updateAvailable = Boolean(updateStatus?.update_available);
-  const checkTitle = checking
-    ? t("nav:checkingForUpdates")
-    : checkError
-      ? t("nav:checkFailed")
-      : updateAvailable
-        ? t("nav:updateAvailable")
-        : updateStatus
-          ? t("nav:upToDate")
-          : t("nav:checkForUpdates");
-  const currentLanguage = normalizeLanguage(i18n.resolvedLanguage ?? i18n.language);
-  const currentIndex = SUPPORTED_LANGUAGES.indexOf(currentLanguage);
-  const nextLanguage = SUPPORTED_LANGUAGES[(currentIndex + 1) % SUPPORTED_LANGUAGES.length];
-  const switchLanguageTitle = t("nav:switchLanguage", {
-    language: t(`nav:languageNames.${nextLanguage}`),
-  });
-
-  const toggleLang = () => {
-    i18n.changeLanguage(nextLanguage);
-  };
-
-  const changeLanguage = (language: SupportedLanguage) => {
-    if (language !== currentLanguage) {
-      i18n.changeLanguage(language);
-    }
-  };
-
   return (
     <aside
       className={`fixed left-0 top-0 bottom-0 bg-surface-1 border-r border-border flex flex-col z-30 overflow-hidden transition-[width] duration-200 ${
@@ -357,21 +278,20 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <h1 className="text-sm font-bold text-white truncate">{t("nav:brand")}</h1>
-              <p className="text-[11px] text-accent">{t("nav:brandSub")}</p>
+              <h1 className="text-sm font-bold text-white truncate">Podium</h1>
+              <p className="text-[11px] text-accent">{"{wpmedia}"}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Nav — only this section scrolls when its items overflow; the rest of
-          the sidebar (brand, language, collapse toggle, footer) stays pinned.
+          the sidebar (brand, collapse toggle, footer) stays pinned.
           Chevron buttons appear at the edges when content is clipped, so the
           user knows there's more to reach without inspecting the scrollbar. */}
       <div className="flex-1 min-h-0 relative flex">
         <nav ref={navRef} className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-3 space-y-1">
-          {NAV_KEYS.map(({ to, icon: Icon, key }) => {
-            const label = t(key);
+          {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
             return (
               <NavLink
                 key={to}
@@ -398,8 +318,8 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           <button
             type="button"
             onClick={() => scrollNavBy(-160)}
-            aria-label={t("nav:scrollUp")}
-            title={t("nav:scrollUp")}
+            aria-label="Scroll navigation up"
+            title="Scroll navigation up"
             className="absolute top-1.5 right-[7px] z-10 inline-flex items-center justify-center w-6 h-6 rounded-md border border-border bg-surface-2/90 text-gray-300 hover:text-gray-50 hover:bg-surface-3 shadow-md backdrop-blur-sm transition-colors animate-fade-in"
           >
             <ChevronUp className="w-3.5 h-3.5" aria-hidden />
@@ -409,56 +329,12 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           <button
             type="button"
             onClick={() => scrollNavBy(160)}
-            aria-label={t("nav:scrollDown")}
-            title={t("nav:scrollDown")}
+            aria-label="Scroll navigation down"
+            title="Scroll navigation down"
             className="absolute bottom-1.5 right-[7px] z-10 inline-flex items-center justify-center w-6 h-6 rounded-md border border-border bg-surface-2/90 text-gray-300 hover:text-gray-50 hover:bg-surface-3 shadow-md backdrop-blur-sm transition-colors animate-fade-in"
           >
             <ChevronDown className="w-3.5 h-3.5" aria-hidden />
           </button>
-        )}
-      </div>
-
-      {/* Language controls */}
-      <div className="px-2 pb-2 flex-shrink-0">
-        {collapsed ? (
-          <button
-            onClick={toggleLang}
-            className="w-full h-9 rounded-lg border border-border bg-surface-2 text-gray-300 hover:bg-surface-3 hover:text-gray-100 transition-colors flex flex-col items-center justify-center gap-0.5"
-            title={switchLanguageTitle}
-            aria-label={switchLanguageTitle}
-          >
-            <Languages className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-semibold leading-none">
-              {t(`nav:languageShort.${currentLanguage}`)}
-            </span>
-          </button>
-        ) : (
-          <div className="rounded-lg border border-border bg-surface-2 p-2">
-            <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
-              {t("nav:language")}
-            </p>
-            <div className="mt-2 grid grid-cols-3 gap-1">
-              {SUPPORTED_LANGUAGES.map((language) => {
-                const active = language === currentLanguage;
-                return (
-                  <button
-                    key={language}
-                    onClick={() => changeLanguage(language)}
-                    aria-pressed={active}
-                    aria-label={t(`nav:languageNames.${language}`)}
-                    title={t(`nav:languageNames.${language}`)}
-                    className={`rounded-md px-2 py-1.5 text-[11px] font-semibold transition-colors ${
-                      active
-                        ? "bg-accent/20 text-accent border border-accent/30"
-                        : "bg-surface-1 text-gray-400 border border-border hover:bg-surface-3 hover:text-gray-200"
-                    }`}
-                  >
-                    {t(`nav:languageShort.${language}`)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         )}
       </div>
 
@@ -471,17 +347,15 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
               ? "flex items-center justify-center text-gray-400 hover:text-gray-200 hover:bg-surface-3"
               : "flex items-center gap-2.5 px-3 text-gray-300 hover:text-gray-100 hover:bg-surface-3"
           }`}
-          title={collapsed ? t("nav:expand") : t("nav:collapse")}
-          aria-label={collapsed ? t("nav:expand") : t("nav:collapse")}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
             <PanelLeftOpen className="w-4 h-4 flex-shrink-0" />
           ) : (
             <>
               <PanelLeftClose className="w-4 h-4 flex-shrink-0" />
-              <span className="text-[11px] font-semibold uppercase tracking-wide">
-                {t("nav:collapseShort")}
-              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide">Collapse</span>
             </>
           )}
         </button>
@@ -494,8 +368,8 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
         <button
           type="button"
           onClick={() => setStatusModalOpen(true)}
-          aria-label={t("nav:connectionDetails")}
-          title={t("nav:connectionDetails")}
+          aria-label="Connection details"
+          title="Connection details"
           className={`rounded-lg border border-border bg-surface-2 hover:bg-surface-3 transition-colors text-left cursor-pointer ${
             collapsed
               ? "w-8 h-8 mx-auto flex items-center justify-center p-0"
@@ -516,60 +390,12 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
                 <WifiOff className="w-3.5 h-3.5 flex-shrink-0" />
               )}
               {!collapsed && (
-                <span className="font-medium">
-                  {wsConnected ? t("nav:live") : t("nav:disconnected")}
-                </span>
+                <span className="font-medium">{wsConnected ? "Live" : "Disconnected"}</span>
               )}
             </span>
             {!collapsed && <span className="text-[11px] font-medium text-gray-600">v1.0.0</span>}
           </div>
         </button>
-        {collapsed ? (
-          <button
-            type="button"
-            onClick={onCheckUpdates}
-            disabled={checking}
-            title={checkTitle}
-            aria-label={checkTitle}
-            className={`relative w-8 h-8 mx-auto flex items-center justify-center rounded-lg border bg-surface-2 transition-colors disabled:opacity-60 ${
-              updateAvailable
-                ? "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-                : checkError
-                  ? "border-amber-500/40 text-amber-300 hover:bg-amber-500/10"
-                  : "border-border text-gray-400 hover:text-gray-200 hover:bg-surface-3"
-            }`}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${checking ? "animate-spin" : ""}`} aria-hidden />
-            {updateAvailable && !checking && (
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            )}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onCheckUpdates}
-            disabled={checking}
-            title={checkTitle}
-            className={`w-full rounded-lg border bg-surface-2 px-2.5 py-2 text-xs transition-colors disabled:opacity-60 flex items-center justify-between gap-2 ${
-              updateAvailable
-                ? "border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10"
-                : checkError
-                  ? "border-amber-500/40 text-amber-300 hover:bg-amber-500/10"
-                  : "border-border text-gray-300 hover:text-gray-100 hover:bg-surface-3"
-            }`}
-          >
-            <span className="inline-flex items-center gap-2 truncate">
-              <RefreshCw
-                className={`w-3.5 h-3.5 flex-shrink-0 ${checking ? "animate-spin" : ""}`}
-                aria-hidden
-              />
-              <span className="font-medium truncate">{checkTitle}</span>
-            </span>
-            {updateAvailable && !checking && (
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-            )}
-          </button>
-        )}
         {!collapsed && (
           <div className="space-y-1.5">
             <a
@@ -577,12 +403,12 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-xs text-gray-300 hover:text-gray-200 hover:bg-surface-3 hover:border-border transition-colors"
-              title={t("nav:github")}
+              title="GitHub"
             >
               <span className="w-6 h-6 rounded-md bg-surface-3 flex items-center justify-center">
                 <Github className="w-3.5 h-3.5 flex-shrink-0" />
               </span>
-              <span className="font-medium">{t("nav:github")}</span>
+              <span className="font-medium">GitHub</span>
             </a>
             <a
               href="https://wp-media.me"
@@ -605,8 +431,8 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="w-8 h-8 rounded-md border border-transparent flex items-center justify-center text-gray-400 hover:text-gray-300 hover:bg-surface-3 hover:border-border transition-colors"
-              title={t("nav:github")}
-              aria-label={t("nav:github")}
+              title="GitHub"
+              aria-label="GitHub"
             >
               <Github className="w-3.5 h-3.5" />
             </a>
@@ -684,7 +510,6 @@ function ConnectionStatusModal({
   recentEventsRef,
   onResetStats,
 }: ConnectionStatusModalProps) {
-  const { t } = useTranslation();
   const [, forceTick] = useState(0);
 
   // Re-render once a second so the sparkline / relative timestamps / counts
@@ -762,7 +587,7 @@ function ConnectionStatusModal({
                 id="connection-status-title"
                 className="text-base font-semibold text-gray-50 truncate tracking-tight leading-tight"
               >
-                {t("nav:connectionDetails")}
+                Connection details
               </h2>
               <p
                 className={`text-[11px] font-medium inline-flex items-center gap-1.5 leading-tight ${
@@ -775,14 +600,14 @@ function ConnectionStatusModal({
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
                   </span>
                 )}
-                {wsConnected ? t("nav:live") : t("nav:disconnected")}
+                {wsConnected ? "Live" : "Disconnected"}
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={close}
-            aria-label={t("nav:close")}
+            aria-label="Close"
             className="p-1.5 -m-1 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-surface-4 transition-colors flex-shrink-0"
           >
             <X className="w-4 h-4" />
@@ -792,46 +617,32 @@ function ConnectionStatusModal({
         <div className="px-5 py-4 space-y-5 overflow-y-auto">
           {/* KPI row */}
           <div className="grid grid-cols-3 gap-2">
-            <KpiTile
-              label={t("nav:eventsTotal")}
-              value={eventCount.toLocaleString()}
-              unit={t("nav:unitEvents")}
-            />
-            <KpiTile
-              label={t("nav:eventsLastMin")}
-              value={eventsLastMinute.toLocaleString()}
-              unit={t("nav:unitEvents")}
-            />
-            <KpiTile
-              label={t("nav:peakRate")}
-              value={peakPerSec.toLocaleString()}
-              unit={t("nav:unitPerSec")}
-            />
+            <KpiTile label="Total" value={eventCount.toLocaleString()} unit="events" />
+            <KpiTile label="Last 60s" value={eventsLastMinute.toLocaleString()} unit="events" />
+            <KpiTile label="Peak" value={peakPerSec.toLocaleString()} unit="events/s" />
           </div>
 
           {/* Throughput sparkline */}
-          <Section title={t("nav:throughput60s")} icon={Gauge}>
+          <Section title="Throughput · last 60s" icon={Gauge}>
             <Sparkline
               buckets={buckets}
               connected={wsConnected}
-              avgLabel={`${avgPerSec.toFixed(2)}/s ${t("nav:avg")}`}
+              avgLabel={`${avgPerSec.toFixed(2)}/s avg`}
             />
           </Section>
 
           {/* Connection facts */}
-          <Section title={t("nav:connection")} icon={Plug}>
+          <Section title="Connection" icon={Plug}>
             <div className="space-y-2">
-              <DetailRow label={t("nav:wsEndpoint")} value={wsUrl} mono />
+              <DetailRow label="WebSocket" value={wsUrl} mono />
               <DetailRow
-                label={t("nav:connectionUptime")}
-                value={connectedSince ? formatRelative(connectedSince, t) : t("nav:notConnected")}
+                label="Connected"
+                value={connectedSince ? formatRelative(connectedSince) : "Not connected"}
               />
               <DetailRow
-                label={t("nav:lastEvent")}
+                label="Last event"
                 value={
-                  lastEvent
-                    ? `${lastEvent.type} · ${formatRelative(lastEvent.at, t)}`
-                    : t("nav:noEventsYet")
+                  lastEvent ? `${lastEvent.type} · ${formatRelative(lastEvent.at)}` : "No events yet"
                 }
                 mono={Boolean(lastEvent)}
               />
@@ -839,9 +650,9 @@ function ConnectionStatusModal({
           </Section>
 
           {/* Top event types */}
-          <Section title={t("nav:topEventTypes")} icon={BarChart3}>
+          <Section title="Top event types" icon={BarChart3}>
             {topTypes.length === 0 ? (
-              <p className="text-xs text-gray-500 italic">{t("nav:noEventsYet")}</p>
+              <p className="text-xs text-gray-500 italic">No events yet</p>
             ) : (
               <div className="space-y-1.5">
                 {topTypes.map(([type, count]) => (
@@ -852,9 +663,9 @@ function ConnectionStatusModal({
           </Section>
 
           {/* Recent activity */}
-          <Section title={t("nav:recentActivity")} icon={Clock}>
+          <Section title="Recent activity" icon={Clock}>
             {recentEvents.length === 0 ? (
-              <p className="text-xs text-gray-500 italic">{t("nav:noEventsYet")}</p>
+              <p className="text-xs text-gray-500 italic">No events yet</p>
             ) : (
               <ul className="space-y-1">
                 {recentEvents.map((evt, i) => (
@@ -863,7 +674,7 @@ function ConnectionStatusModal({
                     className="flex items-center justify-between gap-3 text-[11px] font-mono px-2 py-1 rounded bg-surface-2/50"
                   >
                     <span className="text-gray-200 truncate">{evt.type}</span>
-                    <span className="text-gray-500 flex-shrink-0">{formatRelative(evt.at, t)}</span>
+                    <span className="text-gray-500 flex-shrink-0">{formatRelative(evt.at)}</span>
                   </li>
                 ))}
               </ul>
@@ -872,13 +683,13 @@ function ConnectionStatusModal({
         </div>
 
         <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border bg-surface-2/40">
-          <span className="text-[10px] text-gray-500">{t("nav:statsPersisted")}</span>
+          <span className="text-[10px] text-gray-500">Stats persist across reloads</span>
           <button
             type="button"
             onClick={onResetStats}
             className="text-[11px] font-medium text-gray-400 hover:text-gray-100 hover:bg-surface-3 px-2 py-1 rounded transition-colors"
           >
-            {t("nav:resetStats")}
+            Reset
           </button>
         </div>
       </div>
@@ -1033,19 +844,16 @@ function bucketEventsPerSecond(timestamps: number[], windowSec: number): number[
   return buckets;
 }
 
-function formatRelative(
-  timestamp: number,
-  t: (key: string, opts?: Record<string, unknown>) => string
-): string {
+function formatRelative(timestamp: number): string {
   const diffSec = Math.max(0, Math.round((Date.now() - timestamp) / 1000));
-  if (diffSec < 5) return t("nav:justNow");
-  if (diffSec < 60) return t("nav:secondsAgo", { count: diffSec });
+  if (diffSec < 5) return "just now";
+  if (diffSec < 60) return `${diffSec}s ago`;
   const diffMin = Math.floor(diffSec / 60);
-  if (diffMin < 60) return t("nav:minutesAgo", { count: diffMin });
+  if (diffMin < 60) return `${diffMin}m ago`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return t("nav:hoursAgo", { count: diffHr });
+  if (diffHr < 24) return `${diffHr}h ago`;
   const diffDay = Math.floor(diffHr / 24);
-  return t("nav:daysAgo", { count: diffDay });
+  return `${diffDay}d ago`;
 }
 
 export { STORAGE_KEY as SIDEBAR_STORAGE_KEY, loadCollapsed };
