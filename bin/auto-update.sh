@@ -34,4 +34,4 @@ except Exception:
 # Developer mode: install path is a symlink to a local checkout — skip.
 [ -L "$INSTALL_PATH" ] && exit 0
 
-claude plugin update maestro 2>/dev/null
+claude plugin update "$PLUGIN_KEY" 2>/dev/null
