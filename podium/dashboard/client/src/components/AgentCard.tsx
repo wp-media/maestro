@@ -36,8 +36,30 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
   const model = formatModelName(session?.model);
   const cwdBase = pathBasename(session?.cwd);
   const cost = typeof session?.cost === "number" ? session.cost : 0;
+
+  // Derive the project name. Prefer the session cwd basename; fall back to
+  // parsing the auto-generated agent name ("Main Agent — maestro - 4c8d8efd"),
+  // pulling the segment between "— " and the final " - {id}".
+  const nameProject = (() => {
+    const m = agent.name.match(/—\s*(.+?)\s*-\s*[0-9a-f]{6,}\s*$/i);
+    return m?.[1] ? m[1].trim() : null;
+  })();
+  const projectName = cwdBase || nameProject;
+
+  // Primary headline: when the main agent has captured the first user prompt
+  // as its task, show that as the readable label. Otherwise fall back to the
+  // agent's (auto-generated) name. Subagents keep their existing name display.
+  const useTaskAsHeadline = isMain && !!agent.task;
+  const headline = useTaskAsHeadline ? (agent.task as string) : agent.name;
+
+  // Subtitle differs by type and headline mode:
+  //  - main + task headline: project name only (time/model live in the meta row).
+  //  - main + name headline: model · cwd (original behavior).
+  //  - subagent: subagent_type label.
   const subtitle = isMain
-    ? [model, cwdBase].filter(Boolean).join(" · ") || null
+    ? useTaskAsHeadline
+      ? projectName
+      : [model, cwdBase].filter(Boolean).join(" · ") || null
     : label || agent.subagent_type;
 
   function handleClick() {
@@ -69,14 +91,24 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
             {isMain ? <Bot className="w-3.5 h-3.5" /> : <GitBranch className="w-3.5 h-3.5" />}
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="text-sm font-medium text-gray-200 truncate">{agent.name}</p>
+            <p
+              className={`text-sm text-gray-200 truncate ${
+                useTaskAsHeadline ? "font-semibold" : "font-medium"
+              }`}
+              title={headline}
+            >
+              {headline}
+            </p>
             {subtitle && <p className="text-[11px] text-gray-500 truncate">{subtitle}</p>}
           </div>
         </div>
         <AgentStatusBadge status={status} />
       </div>
 
-      {agent.task && (
+      {/* When the task is already promoted to the headline (main agent), don't
+          repeat it here. Subagents — and main agents without a captured prompt —
+          still render the task as a secondary descriptive block. */}
+      {agent.task && !useTaskAsHeadline && (
         <p className="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">{agent.task}</p>
       )}
 
