@@ -26,17 +26,17 @@ export function StatCard({
   value,
   icon: Icon,
   trend,
-  accentColor = "text-accent",
+  accentColor = "text-amber-700 dark:text-accent",
   raw,
   loading = false,
 }: StatCardProps) {
   return (
-    <div className="card p-5 flex flex-col gap-3">
+    <div className="bg-white dark:bg-surface-2 border border-gray-100 dark:border-border shadow-sm dark:shadow-none hover:shadow-md transition-shadow duration-200 rounded-xl p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-600 truncate">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 truncate">
           {label}
         </span>
-        <div className={`w-8 h-8 rounded-lg bg-surface-4 dark:bg-surface-3 flex items-center justify-center flex-shrink-0`}>
+        <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
           <Icon className={`w-4 h-4 ${accentColor}`} />
         </div>
       </div>
@@ -45,13 +45,13 @@ export function StatCard({
           <StatValueSkeleton />
         ) : (
           <Tip raw={raw}>
-            <span className="text-3xl font-bold text-gray-900 dark:text-gray-100 tabular-nums leading-none truncate">
+            <span className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums leading-none truncate">
               {value}
             </span>
           </Tip>
         )}
         {!loading && trend && (
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-600 mb-0.5 flex-shrink-0">
+          <span className="text-sm text-gray-500 dark:text-gray-400 mb-0.5 flex-shrink-0">
             {trend}
           </span>
         )}

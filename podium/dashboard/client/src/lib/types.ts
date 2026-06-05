@@ -456,9 +456,9 @@ export const STATUS_CONFIG: Record<
   },
   completed: {
     labelKey: "common:status.completed",
-    color: "text-violet-700 dark:text-violet-400",
-    bg: "bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20",
-    dot: "bg-violet-400",
+    color: "text-indigo-700 dark:text-indigo-400",
+    bg: "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20",
+    dot: "bg-indigo-400",
   },
   error: {
     labelKey: "common:status.error",
@@ -532,9 +532,9 @@ export const SESSION_STATUS_CONFIG: Record<
   },
   completed: {
     labelKey: "common:status.completed",
-    color: "text-violet-700 dark:text-violet-400",
-    bg: "bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20",
-    dot: "bg-violet-400",
+    color: "text-indigo-700 dark:text-indigo-400",
+    bg: "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20",
+    dot: "bg-indigo-400",
   },
   error: {
     labelKey: "common:status.error",

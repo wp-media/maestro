@@ -25,7 +25,7 @@ const TOOL_COLORS: Record<string, string> = {
   Write: "#22c55e",
   Edit: "#eab308",
   Bash: "#ef4444",
-  Grep: "#a855f7",
+  Grep: "#14b8a6",
   Glob: "#ec4899",
   Agent: "#6366f1",
 };
@@ -600,7 +600,7 @@ const LEGEND_ITEMS: Array<{ key: string; color: string }> = [
   { key: "write", color: "#22c55e" },
   { key: "edit", color: "#eab308" },
   { key: "bash", color: "#ef4444" },
-  { key: "grep", color: "#a855f7" },
+  { key: "grep", color: "#14b8a6" },
   { key: "glob", color: "#ec4899" },
   { key: "agent", color: "#6366f1" },
   { key: "other", color: "#64748b" },

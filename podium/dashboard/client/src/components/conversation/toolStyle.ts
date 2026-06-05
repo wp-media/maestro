@@ -39,10 +39,10 @@ export interface ToolStyle {
 
 const VIOLET: ToolStyle = {
   Icon: Wrench,
-  text: "text-violet-700 dark:text-violet-300",
-  chip: "bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300",
-  bar: "bg-violet-500/60",
-  border: "border-violet-200 dark:border-violet-500/20",
+  text: "text-indigo-700 dark:text-indigo-300",
+  chip: "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
+  bar: "bg-indigo-500/60",
+  border: "border-indigo-200 dark:border-indigo-500/20",
 };
 
 const STYLES: Record<string, ToolStyle> = {
@@ -62,10 +62,10 @@ const STYLES: Record<string, ToolStyle> = {
   },
   write: {
     Icon: FilePlus2,
-    text: "text-violet-700 dark:text-violet-300",
-    chip: "bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300",
-    bar: "bg-violet-500/60",
-    border: "border-violet-200 dark:border-violet-500/20",
+    text: "text-indigo-700 dark:text-indigo-300",
+    chip: "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
+    bar: "bg-indigo-500/60",
+    border: "border-indigo-200 dark:border-indigo-500/20",
   },
   edit: {
     Icon: FilePen,
@@ -111,17 +111,17 @@ const STYLES: Record<string, ToolStyle> = {
   },
   task: {
     Icon: Bot,
-    text: "text-pink-700 dark:text-pink-300",
-    chip: "bg-pink-50 dark:bg-pink-500/15 text-pink-700 dark:text-pink-300",
-    bar: "bg-pink-500/60",
-    border: "border-pink-200 dark:border-pink-500/20",
+    text: "text-amber-700 dark:text-accent",
+    chip: "bg-accent/25 dark:bg-accent/10 text-amber-700 dark:text-accent",
+    bar: "bg-accent/60",
+    border: "border-accent/30 dark:border-accent/20",
   },
   agent: {
     Icon: Bot,
-    text: "text-pink-700 dark:text-pink-300",
-    chip: "bg-pink-50 dark:bg-pink-500/15 text-pink-700 dark:text-pink-300",
-    bar: "bg-pink-500/60",
-    border: "border-pink-200 dark:border-pink-500/20",
+    text: "text-amber-700 dark:text-accent",
+    chip: "bg-accent/25 dark:bg-accent/10 text-amber-700 dark:text-accent",
+    bar: "bg-accent/60",
+    border: "border-accent/30 dark:border-accent/20",
   },
   todowrite: {
     Icon: ListTodo,

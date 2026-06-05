@@ -600,9 +600,9 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
         .append("path")
         .attr("d", path)
         .attr("fill", "none")
-        .attr("stroke", "#6366f1")
+        .attr("stroke", "#FED23A")
         .attr("stroke-width", stroke + 2)
-        .attr("stroke-opacity", isZero ? 0 : 0.08)
+        .attr("stroke-opacity", isZero ? 0 : 0.1)
         .attr("filter", "url(#edge-glow)");
 
       // Main edge
@@ -610,9 +610,9 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
         .append("path")
         .attr("d", path)
         .attr("fill", "none")
-        .attr("stroke", isZero ? "#2a2a3d" : "#4f46e5")
+        .attr("stroke", isZero ? "#2a2a3d" : "#FED23A")
         .attr("stroke-width", isZero ? 1 : stroke)
-        .attr("stroke-opacity", isZero ? 0.3 : 0.55)
+        .attr("stroke-opacity", isZero ? 0.3 : 0.6)
         .attr("stroke-linecap", "round");
     }
 
@@ -657,10 +657,10 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
       .attr("height", (d) => d.height + 6)
       .attr("rx", NODE_RX + 3)
       .attr("fill", "none")
-      .attr("stroke", "#6366f1")
+      .attr("stroke", "#FED23A")
       .attr("stroke-width", 2)
       .attr("filter", "url(#glow)")
-      .attr("opacity", 0.8);
+      .attr("opacity", 0.85);
 
     // Background rect — outcome nodes use per-status fill
     nodeGroups
@@ -676,7 +676,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
         return `url(#${KIND_GRADIENTS[d.kind].id})`;
       })
       .attr("stroke", (d) => {
-        if (d.id === selectedNode) return "#6366f1";
+        if (d.id === selectedNode) return "#FED23A";
         if (d.kind === "outcome" && d.meta?.status) {
           return outcomeColorSet(d.meta.status).stroke;
         }
@@ -995,7 +995,7 @@ function textColorForKind(kind: DAGNode["kind"]): string {
     case "nested":
       return "#5eead4";
     case "outcome":
-      return "#c4b5fd";
+      return "#fcd34d";
   }
 }
 

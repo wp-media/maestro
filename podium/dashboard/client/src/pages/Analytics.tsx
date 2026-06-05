@@ -16,6 +16,8 @@ import {
   DollarSign,
   Clock,
   BarChart3,
+  Wrench,
+  Activity,
 } from "lucide-react";
 import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
@@ -30,7 +32,7 @@ function ChartTooltip({ x, y, children }: { x: number; y: number; children: Reac
   const nearRight = x > window.innerWidth - 200;
   return (
     <div
-      className="fixed z-50 px-2 py-1.5 text-xs bg-white dark:bg-[#12121f] border border-gray-200 dark:border-[#2a2a4a] shadow-lg rounded shadow-xl text-gray-800 dark:text-gray-200 pointer-events-none whitespace-nowrap"
+      className="fixed z-50 px-2.5 py-1.5 text-xs bg-white dark:bg-surface-1 border border-gray-200 dark:border-border shadow-lg rounded-lg text-gray-900 dark:text-white pointer-events-none whitespace-nowrap"
       style={{
         left: nearRight ? x - 14 : x + 14,
         top: y - 10,
@@ -171,7 +173,7 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
         {monthPositions.map((mp, i) => (
           <div
             key={i}
-            className="absolute text-[10px] text-gray-600 font-medium whitespace-nowrap"
+            className="absolute text-[10px] text-gray-500 dark:text-gray-400 font-medium whitespace-nowrap"
             style={{ left: mp.col * 16 }}
           >
             {mp.label}
@@ -184,7 +186,7 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
           {dayLabels.map((d, i) => (
             <div
               key={i}
-              className="text-[9px] text-gray-700 flex items-center justify-end pr-1.5"
+              className="text-[9px] text-gray-500 dark:text-gray-400 flex items-center justify-end pr-1.5"
               style={{ height: 13 }}
             >
               {d}
@@ -233,7 +235,7 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
         ))}
       </div>
       {/* Legend */}
-      <div className="flex items-center gap-2 mt-3 text-[11px] text-gray-600">
+      <div className="flex items-center gap-2 mt-3 text-[11px] text-gray-500 dark:text-gray-400">
         <span>{t("less")}</span>
         {[0, 0.25, 0.5, 0.75, 1].map((f) => {
           const v = Math.round(f * maxCount);
@@ -260,7 +262,7 @@ function Heatmap({ weeks }: { weeks: Array<Array<{ date: string; count: number }
 
 function Sparkline({
   data,
-  color = "#6366f1",
+  color = "#FED23A",
 }: {
   data: Array<{ date: string; count: number }>;
   color?: string;
@@ -454,8 +456,10 @@ function DonutChart({
 }) {
   const { t } = useTranslation(["analytics", "common"]);
   const { show, move, hide, node } = useTooltip();
+  const isDark = document.documentElement.classList.contains("dark");
+  const trackColor = isDark ? "#1e1e2e" : "#ECEBE4";
   const total = segments.reduce((s, g) => s + g.value, 0);
-  if (total === 0) return <div className="text-sm text-gray-600 dark:text-gray-500">{t("common:noData")}</div>;
+  if (total === 0) return <div className="text-sm text-gray-500 dark:text-gray-400">{t("common:noData")}</div>;
 
   const r = 52;
   const cx = 64;
@@ -470,7 +474,7 @@ function DonutChart({
     <div className="flex items-center justify-center gap-6 w-full">
       {node}
       <svg width={128} height={128} viewBox="0 0 128 128" className="flex-shrink-0">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1e1e2e" strokeWidth={stroke} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke={trackColor} strokeWidth={stroke} />
         {segments.map(({ label, value, color }, i) => {
           const dash = (value / total) * circumference;
           const gap = circumference - dash;
@@ -503,10 +507,22 @@ function DonutChart({
             />
           );
         })}
-        <text x={cx} y={cy - 6} textAnchor="middle" className="fill-gray-300" fontSize={11}>
+        <text
+          x={cx}
+          y={cy - 6}
+          textAnchor="middle"
+          className="fill-gray-900 dark:fill-white font-semibold"
+          fontSize={12}
+        >
           {(formatTotal ?? fmt)(total)}
         </text>
-        <text x={cx} y={cy + 10} textAnchor="middle" className="fill-gray-600" fontSize={9}>
+        <text
+          x={cx}
+          y={cy + 10}
+          textAnchor="middle"
+          className="fill-gray-500 dark:fill-gray-400"
+          fontSize={9}
+        >
           {t("common:total_lower")}
         </text>
       </svg>
@@ -517,11 +533,24 @@ function DonutChart({
               className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
               style={{ backgroundColor: color }}
             />
-            <span className="text-gray-600 dark:text-gray-400">{label}</span>
-            <span className="text-gray-700 dark:text-gray-500 ml-auto pl-4">{Math.round((value / total) * 100)}%</span>
+            <span className="text-gray-500 dark:text-gray-400">{label}</span>
+            <span className="text-gray-700 dark:text-gray-300 font-medium ml-auto pl-4">{Math.round((value / total) * 100)}%</span>
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── Compact empty state (chart cards) ─────────────────────────────────────────
+
+function ChartEmpty({ icon: Icon, message }: { icon: React.ElementType; message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-surface-4 flex items-center justify-center mb-3">
+        <Icon className="w-4.5 h-4.5 text-gray-400 dark:text-gray-500" />
+      </div>
+      <p className="text-xs text-gray-500 dark:text-gray-400 max-w-[14rem]">{message}</p>
     </div>
   );
 }
@@ -731,7 +760,7 @@ export function Analytics() {
     {
       label: t("common:token.cacheRead"),
       value: data?.tokens.total_cache_read ?? 0,
-      color: "#a78bfa",
+      color: "#6366f1",
     },
     {
       label: t("common:token.cacheWrite"),
@@ -751,7 +780,7 @@ export function Analytics() {
     {
       label: t("common:status.completed"),
       value: data?.sessions_by_status?.completed ?? 0,
-      color: "#8b5cf6",
+      color: "#6366f1",
     },
     {
       label: t("common:status.active"),
@@ -774,7 +803,7 @@ export function Analytics() {
     {
       label: t("common:status.completed"),
       value: data?.agents_by_status?.completed ?? 0,
-      color: "#8b5cf6",
+      color: "#6366f1",
     },
     {
       label: t("common:status.working"),
@@ -796,7 +825,7 @@ export function Analytics() {
   const EVENT_TYPE_COLORS: Record<string, string> = {
     PreToolUse: "bg-emerald-400",
     PostToolUse: "bg-blue-400",
-    Stop: "bg-violet-400",
+    Stop: "bg-indigo-400",
     SubagentStop: "bg-yellow-400",
     Notification: "bg-orange-400",
   };
@@ -873,7 +902,7 @@ export function Analytics() {
           raw={data ? totalTokens.toLocaleString() : undefined}
           sub={data ? `${cacheHitPct}${t("cacheHitRate")}` : undefined}
           icon={Cpu}
-          color="text-violet-700 dark:text-violet-400"
+          color="text-indigo-700 dark:text-indigo-400"
           loading={!data}
         />
         <StatPill
@@ -903,7 +932,7 @@ export function Analytics() {
       {/* Activity heatmap + 30-day sparkline */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card p-5 lg:col-span-2">
-          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-4">{t("eventActivity")}</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-4">{t("eventActivity")}</h3>
           <div className="overflow-x-auto">
             <div className="w-fit min-w-max mx-auto">
               <Heatmap weeks={weeks} />
@@ -911,10 +940,10 @@ export function Analytics() {
           </div>
         </div>
         <div className="card p-5">
-          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("last30Days")}</h3>
-          <p className="text-[11px] text-gray-600 mb-4">{t("dailyEventCount")}</p>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-1">{t("last30Days")}</h3>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">{t("dailyEventCount")}</p>
           <Sparkline data={last30} />
-          <div className="flex justify-between text-[11px] text-gray-600 mt-2">
+          <div className="flex justify-between text-[11px] text-gray-500 dark:text-gray-400 mt-2">
             <span>{last30[0]?.date?.slice(5)}</span>
             <span>{last30[last30.length - 1]?.date?.slice(5)}</span>
           </div>
@@ -943,7 +972,7 @@ export function Analytics() {
 
       {/* Tabs */}
       <div>
-        <div className="flex gap-1 bg-surface-2 rounded-lg p-1 mb-6 w-fit">
+        <div className="flex items-center gap-1 border-b border-border mb-6">
           {(
             [
               { key: "cost" as const, label: t("tabs.costAnalytics") },
@@ -955,10 +984,10 @@ export function Analytics() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === key
-                  ? "bg-surface-4 text-gray-700 dark:text-gray-200"
-                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  ? "border-accent text-gray-900 dark:text-accent font-semibold"
+                  : "border-transparent text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {label}
@@ -970,7 +999,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Token bars */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenDistribution")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("tokenDistribution")}</h3>
               <div className="space-y-4">
                 {[
                   {
@@ -986,7 +1015,7 @@ export function Analytics() {
                   {
                     label: t("common:token.cacheRead"),
                     value: data?.tokens.total_cache_read ?? 0,
-                    color: "bg-violet-400",
+                    color: "bg-indigo-400",
                   },
                   {
                     label: t("common:token.cacheWrite"),
@@ -1012,14 +1041,14 @@ export function Analytics() {
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
                   <span>{t("cacheEfficiency")}</span>
-                  <span className="text-violet-700 dark:text-violet-400 font-mono">{cacheHitPct}%</span>
+                  <span className="text-indigo-700 dark:text-indigo-400 font-mono">{cacheHitPct}%</span>
                 </div>
               </div>
             </div>
 
             {/* Token summary */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenBreakdown")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("tokenBreakdown")}</h3>
               <div className="space-y-3">
                 {[
                   {
@@ -1035,7 +1064,7 @@ export function Analytics() {
                   {
                     label: t("common:token.cacheRead"),
                     value: data?.tokens.total_cache_read ?? 0,
-                    color: "text-violet-700 dark:text-violet-400",
+                    color: "text-indigo-700 dark:text-indigo-400",
                   },
                   {
                     label: t("common:token.cacheWrite"),
@@ -1056,15 +1085,15 @@ export function Analytics() {
                 ))}
               </div>
               {totalTokens === 0 && (
-                <p className="text-[11px] text-gray-600 mt-4">{t("tokenInfo")}</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-4">{t("tokenInfo")}</p>
               )}
             </div>
 
             {/* Token mix donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenMix")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("tokenMix")}</h3>
               {tokenMixSegments.length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("common:noData")}</p>
+                <ChartEmpty icon={Cpu} message={t("common:noData")} />
               ) : (
                 <>
                   <DonutChart segments={tokenMixSegments} formatTotal={(total) => fmt(total)} />
@@ -1088,14 +1117,14 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Daily cost trends */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("dailyCostTrends")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-1">{t("dailyCostTrends")}</h3>
               {dailyCostsLocal.length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noDailyCostData")}</p>
+                <ChartEmpty icon={DollarSign} message={t("noDailyCostData")} />
               ) : (
                 <>
-                  <p className="text-[11px] text-gray-600 mb-4">{t("costPerDay")}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">{t("costPerDay")}</p>
                   <CostTrendLine data={dailyCostLast30} />
-                  <div className="flex justify-between text-[11px] text-gray-600 mt-2">
+                  <div className="flex justify-between text-[11px] text-gray-500 dark:text-gray-400 mt-2">
                     <span>{dailyCostLast30[0]?.date?.slice(5)}</span>
                     <span>{dailyCostLast30[dailyCostLast30.length - 1]?.date?.slice(5)}</span>
                   </div>
@@ -1121,7 +1150,7 @@ export function Analytics() {
 
             {/* Cost by model */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("costByModel")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("costByModel")}</h3>
               {costBreakdown.length > 0 ? (
                 <>
                   <DonutChart
@@ -1129,7 +1158,7 @@ export function Analytics() {
                       label: formatModelName(b.model) ?? b.model,
                       value: Math.round(b.cost * 100),
                       color:
-                        ["#8b5cf6", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#ec4899"][i % 6] ??
+                        ["#FED23A", "#6366f1", "#10b981", "#38bdf8", "#f59e0b", "#ef4444"][i % 6] ??
                         "#6b7280",
                     }))}
                     formatTotal={(cents) => fmtCost(cents / 100)}
@@ -1156,18 +1185,18 @@ export function Analytics() {
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noCostData")}</p>
+                <ChartEmpty icon={DollarSign} message={t("noCostData")} />
               )}
             </div>
 
             {/* Cost by weekday */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("costByWeekday")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-1">{t("costByWeekday")}</h3>
               {dailyCostsLocal.length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noDailyCostData")}</p>
+                <ChartEmpty icon={DollarSign} message={t("noDailyCostData")} />
               ) : (
                 <>
-                  <p className="text-[11px] text-gray-600 mb-4">{t("last30Days")}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-4">{t("last30Days")}</p>
                   <div className="space-y-3">
                     {weekdayCosts.map(({ label, cost }) => (
                       <CostBarRow
@@ -1195,9 +1224,9 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Agent type distribution */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("subagentTypes")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("subagentTypes")}</h3>
               {(data?.agent_types ?? []).length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noSubagentData")}</p>
+                <ChartEmpty icon={Bot} message={t("noSubagentData")} />
               ) : (
                 <div className="space-y-3">
                   {(data?.agent_types ?? []).slice(0, 10).map(({ subagent_type, count }) => (
@@ -1206,7 +1235,7 @@ export function Analytics() {
                       label={subagent_type}
                       count={count}
                       max={maxAgentTypeCount}
-                      color="bg-violet-400"
+                      color="bg-indigo-400"
                     />
                   ))}
                 </div>
@@ -1215,7 +1244,7 @@ export function Analytics() {
 
             {/* Agent status donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("agentStatus")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("agentStatus")}</h3>
               <DonutChart segments={agentStatusSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
@@ -1248,9 +1277,9 @@ export function Analytics() {
 
             {/* Event type breakdown */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("eventTypes")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("eventTypes")}</h3>
               {(data?.event_types ?? []).length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noEventData")}</p>
+                <ChartEmpty icon={Activity} message={t("noEventData")} />
               ) : (
                 <div className="space-y-3">
                   {(data?.event_types ?? []).map(({ event_type, count }) => (
@@ -1272,9 +1301,9 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Top tools */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("toolUsage")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("toolUsage")}</h3>
               {(data?.tool_usage ?? []).length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noToolData")}</p>
+                <ChartEmpty icon={Wrench} message={t("noToolData")} />
               ) : (
                 <div className="space-y-3">
                   {(data?.tool_usage ?? []).slice(0, 12).map(({ tool_name, count }) => (
@@ -1292,7 +1321,7 @@ export function Analytics() {
 
             {/* Session outcomes donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("sessionOutcomes")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("sessionOutcomes")}</h3>
               <DonutChart segments={sessionOutcomeSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-500">
@@ -1325,9 +1354,9 @@ export function Analytics() {
 
             {/* Daily session trends */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("dailySessionTrends")}</h3>
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-5">{t("dailySessionTrends")}</h3>
               {dailySessionsLocal.length === 0 ? (
-                <p className="text-sm text-gray-700 dark:text-gray-500">{t("noSessionTrendData")}</p>
+                <ChartEmpty icon={Activity} message={t("noSessionTrendData")} />
               ) : (
                 <>
                   <Sparkline data={dailySessionsLocal.slice(-30)} color="#6366f1" />
@@ -1362,7 +1391,7 @@ export function Analytics() {
                         );
                       })}
                   </div>
-                  <p className="text-[11px] text-gray-600 mt-3">{t("last7Days")}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-3">{t("last7Days")}</p>
                 </>
               )}
             </div>

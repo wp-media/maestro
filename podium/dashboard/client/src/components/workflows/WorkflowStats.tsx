@@ -304,7 +304,7 @@ export function WorkflowStats({ stats }: WorkflowStatsProps) {
         label={t("stats.mostCommonFlow")}
         value={topFlowLabel}
         icon={ArrowRightLeft}
-        accentClass="text-violet-700 dark:text-violet-400"
+        accentClass="text-indigo-700 dark:text-indigo-400"
         calculationKey="stats.tooltip.calc.topFlow"
         interp={interpTopFlow(topFlow?.source ?? null, topFlow?.target ?? null)}
         metricPhraseKey="stats.tooltip.phrase.topFlow"

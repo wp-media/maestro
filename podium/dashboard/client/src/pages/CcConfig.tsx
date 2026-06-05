@@ -682,10 +682,10 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
               key={key}
               data-tab-active={active ? "true" : undefined}
               onClick={() => onSelect(key)}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors flex-shrink-0 whitespace-nowrap ${
+              className={`relative flex items-center gap-2 rounded-t-lg px-3 py-1.5 text-xs font-medium transition-colors flex-shrink-0 whitespace-nowrap border-b-2 ${
                 active
-                  ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border border-accent/30"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-surface-3 border border-transparent"
+                  ? "text-amber-700 dark:text-accent border-accent"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-3 border-transparent"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -842,7 +842,6 @@ function TabPanel({
 type Tone =
   | "sky"
   | "emerald"
-  | "violet"
   | "amber"
   | "fuchsia"
   | "cyan"
@@ -864,12 +863,6 @@ const TONES: Record<Tone, { iconBg: string; iconText: string; bar: string; ring:
     iconText: "text-emerald-700 dark:text-emerald-300",
     bar: "bg-emerald-500/40",
     ring: "ring-emerald-500/20",
-  },
-  violet: {
-    iconBg: "bg-violet-50 dark:bg-violet-500/10",
-    iconText: "text-violet-700 dark:text-violet-300",
-    bar: "bg-violet-500/40",
-    ring: "ring-violet-500/20",
   },
   amber: {
     iconBg: "bg-amber-50 dark:bg-amber-500/10",
@@ -934,7 +927,7 @@ function OverviewPanel({ overview }: { overview: CcOverview | null }) {
   return (
     <div className="space-y-5">
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-2">
           {t("overview.rootsTitle")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -952,7 +945,7 @@ function OverviewPanel({ overview }: { overview: CcOverview | null }) {
           />
           <RootRow
             icon={FolderTree}
-            tone="violet"
+            tone="indigo"
             label={t("overview.projectRoot")}
             value={roots.projectRoot}
           />
@@ -966,7 +959,7 @@ function OverviewPanel({ overview }: { overview: CcOverview | null }) {
       </section>
 
       <section>
-        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-2">
           {t("overview.summary")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
@@ -1267,8 +1260,10 @@ function PluginsPanel({ data, search }: { data: CcPluginsResponse | null; search
         commands={[{ cmd: t("explain.plugins.installCmd"), note: "" }]}
       />
       <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
-        <FileText className="w-3.5 h-3.5" />
-        <span className="font-mono truncate">{data.manifestPath}</span>
+        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="bg-gray-100 dark:bg-surface-3 font-mono text-xs rounded px-1.5 py-0.5 truncate text-gray-700 dark:text-gray-300">
+          {data.manifestPath}
+        </span>
         {!data.manifestExists && (
           <span className="ml-auto text-amber-700 dark:text-amber-400">
             {t("plugins.manifestMissing", { path: "" })}
@@ -1466,7 +1461,7 @@ function McpPanel({ data, search }: { data: CcMcpResponse | null; search: string
       )}
       {data.user.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-2">
             {t("mcp.userScope")}
           </h3>
           <div className="space-y-2">
@@ -1478,7 +1473,7 @@ function McpPanel({ data, search }: { data: CcMcpResponse | null; search: string
       )}
       {data.projectScoped.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-2">
             {t("mcp.projectScope")}
           </h3>
           <div className="space-y-2">
@@ -1734,12 +1729,12 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
             <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
               {t("statusline.configured")}
             </div>
-            <div className="rounded-md border border-border bg-surface-1 px-3 py-2 text-[11px] font-mono text-gray-800 dark:text-gray-200">
-              <span className="text-gray-700 dark:text-gray-500">type:</span> {data.config.type ?? "—"}
+            <div className="rounded-lg bg-gray-900 dark:bg-surface-0 px-4 py-3 text-xs font-mono text-green-400">
+              <span className="text-green-400/60">type:</span> {data.config.type ?? "—"}
               {data.config.command && (
                 <>
                   <br />
-                  <span className="text-gray-700 dark:text-gray-500">command:</span> {data.config.command}
+                  <span className="text-green-400/60">command:</span> {data.config.command}
                 </>
               )}
             </div>
@@ -1812,9 +1807,11 @@ function SettingsBlock({
       </div>
       {source.exists &&
         (showRaw ? (
-          <pre className="p-3 text-[11px] font-mono text-gray-700 dark:text-gray-300 overflow-auto max-h-96">
-            {JSON.stringify(source.data, null, 2)}
-          </pre>
+          <div className="p-3">
+            <pre className="rounded-lg bg-gray-900 dark:bg-surface-0 text-green-400 font-mono text-xs p-4 overflow-auto max-h-96">
+              {JSON.stringify(source.data, null, 2)}
+            </pre>
+          </div>
         ) : (
           <SettingsKeyValueList data={source.data as Record<string, unknown> | null | undefined} />
         ))}
@@ -1959,15 +1956,17 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
               {t("edit.deleteButton")}
             </button>
           </div>
-          <pre className="p-3 text-[11px] font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words max-h-72 overflow-auto">
-            {m.preview}
-            {m.truncated && (
-              <span className="text-gray-600 italic">
-                {"\n\n"}
-                {t("common.truncated")}
-              </span>
-            )}
-          </pre>
+          <div className="p-3">
+            <pre className="rounded-lg bg-gray-900 dark:bg-surface-0 text-green-400 font-mono text-xs p-4 whitespace-pre-wrap break-words max-h-72 overflow-auto">
+              {m.preview}
+              {m.truncated && (
+                <span className="text-green-400/50 italic">
+                  {"\n\n"}
+                  {t("common.truncated")}
+                </span>
+              )}
+            </pre>
+          </div>
         </div>
       ))}
 
@@ -2019,8 +2018,10 @@ function MarketplacesPanel({
         commands={[{ cmd: t("marketplaces.addCmd"), note: "" }]}
       />
       <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500">
-        <FileText className="w-3.5 h-3.5" />
-        <span className="font-mono truncate">{data.knownPath}</span>
+        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="bg-gray-100 dark:bg-surface-3 font-mono text-xs rounded px-1.5 py-0.5 truncate text-gray-700 dark:text-gray-300">
+          {data.knownPath}
+        </span>
       </div>
       {filtered.length === 0 ? (
         <div className="rounded-lg border border-border bg-surface-2 px-4 py-6 text-center text-sm text-gray-700 dark:text-gray-500">
@@ -2103,8 +2104,10 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
   return (
     <div className="space-y-3">
       <div className="rounded-lg border border-border bg-surface-2 px-3 py-2 flex items-center gap-2 text-[11px] text-gray-700 dark:text-gray-500 flex-wrap">
-        <FileText className="w-3.5 h-3.5" />
-        <span className="font-mono truncate flex-1 min-w-0">{data.file}</span>
+        <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="bg-gray-100 dark:bg-surface-3 font-mono text-xs rounded px-1.5 py-0.5 truncate flex-1 min-w-0 text-gray-700 dark:text-gray-300">
+          {data.file}
+        </span>
         {data.docs && (
           <a
             href={data.docs}
@@ -2159,7 +2162,7 @@ function ScopeBadge({ scope }: { scope: string }) {
       : scope === "project"
         ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
         : scope === "project-local"
-          ? "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/30"
+          ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-accent/20"
           : "bg-surface-3 text-gray-600 dark:text-gray-400 border-border";
   const label =
     scope === "project-local"
@@ -2268,10 +2271,10 @@ function FileViewer({
           ) : !state.data ? (
             <div className="text-sm text-gray-700 dark:text-gray-500">…</div>
           ) : (
-            <pre className="text-[11px] font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
+            <pre className="rounded-lg bg-gray-900 dark:bg-surface-0 text-green-400 font-mono text-xs p-4 whitespace-pre-wrap break-words">
               {state.data.text}
               {state.data.truncated && (
-                <span className="text-gray-700 dark:text-gray-500 italic">
+                <span className="text-green-400/50 italic">
                   {"\n\n"}
                   {t("common.truncated")}
                 </span>

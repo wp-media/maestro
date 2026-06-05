@@ -18,7 +18,7 @@ const SUBAGENT_PALETTE = [
   "#f43f5e", // rose
   "#06b6d4", // cyan
   "#f97316", // orange
-  "#a855f7", // purple
+  "#14b8a6", // teal
   "#84cc16", // lime
 ];
 

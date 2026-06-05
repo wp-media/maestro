@@ -75,8 +75,8 @@ export function EventGroupRow({
   // standalone single-event rows at a glance.
   const isMultiGroup = !isSingleEvent;
   const rowBg = isMultiGroup
-    ? "bg-teal-500/[0.04] hover:bg-teal-500/[0.08] border-l-2 border-teal-400/40"
-    : "hover:bg-surface-4 border-l-2 border-transparent";
+    ? "bg-accent/[0.05] hover:bg-accent/10 border-l-2 border-accent/30 dark:border-accent/20"
+    : "hover:bg-gray-50 dark:hover:bg-surface-3 border-l-2 border-transparent";
 
   return (
     <div>
@@ -88,7 +88,7 @@ export function EventGroupRow({
           aria-label={expanded ? "Collapse group" : "Expand group"}
           disabled={!canExpand}
           className={`p-1 rounded flex-shrink-0 -mr-3 ${
-            canExpand ? "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer" : "text-transparent"
+            canExpand ? "text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer" : "text-transparent"
           }`}
         >
           <ChevronRight
@@ -101,14 +101,14 @@ export function EventGroupRow({
           onClick={() => (onRowActivate ? onRowActivate() : canExpand && setExpanded((v) => !v))}
         >
           <div className="w-16 flex-shrink-0 text-right font-mono leading-tight">
-            <div className="text-[11px] text-gray-700 dark:text-gray-500">{formatTime(group.firstAt)}</div>
-            <div className="text-[9px] text-gray-600">{formatDateShort(group.firstAt)}</div>
+            <div className="text-[11px] text-gray-500 dark:text-gray-400 tabular-nums">{formatTime(group.firstAt)}</div>
+            <div className="text-[9px] text-gray-400 dark:text-gray-500 tabular-nums">{formatDateShort(group.firstAt)}</div>
           </div>
 
           <div className="flex items-center gap-1 flex-shrink-0">
             {statusSequence.map((status, i) => (
               <div key={i} className="flex items-center gap-1">
-                {i > 0 && <span className="text-gray-600 text-[10px]">→</span>}
+                {i > 0 && <span className="text-gray-400 dark:text-gray-500 text-[10px]">→</span>}
                 <AgentStatusBadge status={status} />
               </div>
             ))}
@@ -127,10 +127,13 @@ export function EventGroupRow({
             );
             return (
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
                   {origin && (
-                    <span className="text-gray-700 dark:text-gray-500 mr-1" title={`${sid ?? ""} · ${agentId ?? ""}`}>
-                      {origin} ·
+                    <span
+                      className="text-amber-700 dark:text-accent bg-accent/10 rounded px-1.5 py-0.5 mr-1.5 text-xs"
+                      title={`${sid ?? ""} · ${agentId ?? ""}`}
+                    >
+                      {origin}
                     </span>
                   )}
                   {buildGroupTitle(group)}
@@ -140,16 +143,16 @@ export function EventGroupRow({
           })()}
 
           {group.tool_name && (
-            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
+            <span className="text-xs px-1.5 py-0.5 bg-gray-100 dark:bg-surface-3 rounded-md text-gray-700 dark:text-gray-300 font-mono flex-shrink-0">
               {group.tool_name}
             </span>
           )}
 
           {duration && (
-            <span className="text-[11px] text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">{duration}</span>
+            <span className="text-[11px] text-gray-500 dark:text-gray-400 font-mono tabular-nums flex-shrink-0">{duration}</span>
           )}
 
-          <span className="text-[11px] text-gray-600 flex-shrink-0 w-16 text-right">
+          <span className="text-[11px] text-gray-400 dark:text-gray-500 tabular-nums flex-shrink-0 w-16 text-right">
             {timeAgo(group.firstAt)}
           </span>
         </div>
@@ -159,7 +162,7 @@ export function EventGroupRow({
             to={`/sessions/${group.events[0].session_id}`}
             onClick={(e) => e.stopPropagation()}
             title={ta("viewSession")}
-            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
+            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-white dark:bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-amber-700 dark:hover:text-accent hover:bg-accent/10 border border-gray-200 dark:border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
           >
             {ta("viewSession")}
             <ExternalLink className="w-3 h-3" />
@@ -176,8 +179,8 @@ export function EventGroupRow({
       )}
 
       {expanded && !isSingleEvent && (
-        <div className="bg-surface-2/40 border-t border-border divide-y divide-border">
-          <div className="px-5 py-1.5 text-[10px] text-gray-600 uppercase tracking-wide">
+        <div className="bg-gray-50 dark:bg-surface-1 border-t border-gray-200 dark:border-border divide-y divide-gray-200 dark:divide-border">
+          <div className="px-5 py-1.5 text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">
             {t("eventFilters.groupEventCount", { count: group.events.length })}
           </div>
           {group.events.map((event) => {
@@ -189,25 +192,25 @@ export function EventGroupRow({
                   onClick={() => event.id != null && toggleInner(event.id)}
                   aria-expanded={innerOpen}
                   aria-label={innerOpen ? t("eventDetail.collapse") : t("eventDetail.expand")}
-                  className="w-full text-left px-5 py-2 flex items-center gap-4 min-w-0 hover:bg-surface-3/60 transition-colors cursor-pointer"
+                  className="w-full text-left px-5 py-2 flex items-center gap-4 min-w-0 hover:bg-gray-100 dark:hover:bg-surface-3 transition-colors cursor-pointer"
                 >
                   <span
-                    className={`text-gray-700 dark:text-gray-500 text-[10px] w-3 flex-shrink-0 transition-transform ${innerOpen ? "rotate-90" : ""}`}
+                    className={`text-gray-400 dark:text-gray-500 text-[10px] w-3 flex-shrink-0 transition-transform ${innerOpen ? "rotate-90" : ""}`}
                     aria-hidden="true"
                   >
                     ▶
                   </span>
                   <div className="w-20 flex-shrink-0 text-right font-mono leading-tight">
-                    <div className="text-[11px] text-gray-600">{formatTime(event.created_at)}</div>
-                    <div className="text-[9px] text-gray-700">
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400 tabular-nums">{formatTime(event.created_at)}</div>
+                    <div className="text-[9px] text-gray-400 dark:text-gray-500 tabular-nums">
                       {formatDateShort(event.created_at)}
                     </div>
                   </div>
                   <AgentStatusBadge status={statusFromEventType(event.event_type)} />
-                  <span className="text-[11px] text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
+                  <span className="text-[11px] text-gray-600 dark:text-gray-400 font-mono flex-shrink-0">
                     {event.event_type}
                   </span>
-                  <span className="text-[11px] text-gray-600 dark:text-gray-400 flex-1 truncate">
+                  <span className="text-[11px] text-gray-700 dark:text-gray-300 flex-1 truncate">
                     {buildEventTitle(event)}
                   </span>
                 </button>

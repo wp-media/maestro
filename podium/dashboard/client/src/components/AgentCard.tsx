@@ -73,11 +73,11 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
   return (
     <div
       onClick={handleClick}
-      className={`card-hover p-4 cursor-pointer overflow-hidden ${
+      className={`group relative p-4 cursor-pointer overflow-hidden rounded-xl bg-white dark:bg-surface-2 border border-gray-100 dark:border-border shadow-sm hover:shadow-md dark:shadow-none hover:ring-1 hover:ring-black/5 dark:hover:ring-white/5 transition-all duration-200 ${
         isWaiting
-          ? "border-l-2 border-l-yellow-500/60"
+          ? "border-l-2 border-l-amber-400 dark:border-l-amber-500/60"
           : isActive
-            ? "border-l-2 border-l-emerald-500/50"
+            ? "border-l-2 border-l-emerald-500"
             : ""
       }`}
     >
@@ -85,21 +85,27 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
         <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
           <div
             className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${
-              isMain ? "bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent" : "bg-violet-50 dark:bg-violet-500/15 text-violet-700 dark:text-violet-400"
+              isMain
+                ? "bg-accent/25 dark:bg-accent/15 text-amber-700 dark:text-accent"
+                : "bg-indigo-50 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-400"
             }`}
           >
             {isMain ? <Bot className="w-3.5 h-3.5" /> : <GitBranch className="w-3.5 h-3.5" />}
           </div>
           <div className="min-w-0 overflow-hidden">
             <p
-              className={`text-sm text-gray-700 dark:text-gray-200 truncate ${
-                useTaskAsHeadline ? "font-semibold" : "font-medium"
+              className={`text-sm truncate ${
+                useTaskAsHeadline
+                  ? "font-semibold text-gray-900 dark:text-white"
+                  : "font-medium text-gray-900 dark:text-gray-100"
               }`}
               title={headline}
             >
               {headline}
             </p>
-            {subtitle && <p className="text-[11px] text-gray-700 dark:text-gray-500 truncate">{subtitle}</p>}
+            {subtitle && (
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{subtitle}</p>
+            )}
           </div>
         </div>
         <AgentStatusBadge status={status} />
@@ -112,7 +118,19 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
         <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">{agent.task}</p>
       )}
 
-      <div className="flex items-center gap-3 text-[11px] text-gray-700 dark:text-gray-500 min-w-0 overflow-hidden flex-wrap">
+      <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 min-w-0 overflow-hidden flex-wrap">
+        {isActive && (
+          <span
+            className="flex items-center gap-1.5 flex-shrink-0 text-emerald-700 dark:text-emerald-400 font-medium"
+            title={t("working", "Working")}
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 dark:bg-emerald-400" />
+            </span>
+            {t("live", "Live")}
+          </span>
+        )}
         {agent.current_tool && (
           <span className="flex items-center gap-1 flex-shrink-0">
             <Wrench className="w-3 h-3" />
@@ -141,7 +159,9 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
               {t("ran")}
               {formatDuration(agent.started_at, agent.ended_at)}
             </span>
-            <span className="text-gray-600 flex-shrink-0">{timeAgo(agent.ended_at)}</span>
+            <span className="text-gray-400 dark:text-gray-500 flex-shrink-0">
+              {timeAgo(agent.ended_at)}
+            </span>
           </>
         ) : (
           <span className="flex items-center gap-1 flex-shrink-0">
@@ -149,7 +169,7 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
             {timeAgo(agent.updated_at || agent.started_at)}
           </span>
         )}
-        <span className="ml-auto font-mono opacity-50 flex-shrink-0">
+        <span className="ml-auto font-mono text-gray-400 dark:text-gray-600 flex-shrink-0">
           {agent.session_id.slice(0, 8)}
         </span>
       </div>

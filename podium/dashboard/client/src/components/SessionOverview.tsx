@@ -45,11 +45,11 @@ function StatTile({
   value: React.ReactNode;
   hint?: string;
   icon: React.ReactNode;
-  tone?: "default" | "violet" | "emerald" | "amber" | "rose" | "cyan" | "blue";
+  tone?: "default" | "indigo" | "emerald" | "amber" | "rose" | "cyan" | "blue";
 }) {
   const palette = {
     default: "border-surface-3 bg-surface-2 text-gray-800 dark:text-gray-200",
-    violet: "border-violet-200 dark:border-violet-500/20 bg-violet-500/5 text-violet-800 dark:text-violet-200",
+    indigo: "border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5 text-indigo-700 dark:text-indigo-300",
     emerald: "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
     amber: "border-amber-200 dark:border-amber-500/20 bg-amber-500/5 text-amber-800 dark:text-amber-200",
     rose: "border-rose-200 dark:border-rose-500/20 bg-rose-500/5 text-rose-800 dark:text-rose-200",
@@ -59,7 +59,7 @@ function StatTile({
 
   const iconTone = {
     default: "text-gray-700 dark:text-gray-500",
-    violet: "text-violet-700 dark:text-violet-400",
+    indigo: "text-indigo-700 dark:text-indigo-400",
     emerald: "text-emerald-700 dark:text-emerald-400",
     amber: "text-amber-700 dark:text-amber-400",
     rose: "text-rose-700 dark:text-rose-400",
@@ -266,7 +266,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
           value={toolCallCount.toLocaleString()}
           hint={stats.tools_used.length > 0 ? `${stats.tools_used.length} unique` : undefined}
           icon={<Wrench className="w-3 h-3" />}
-          tone="violet"
+          tone="indigo"
         />
         <StatTile
           label="Subagents"
@@ -302,7 +302,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
         <div className="lg:col-span-2 rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
-              <Wrench className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400" />
+              <Wrench className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
               Top tools
             </h3>
             <span className="text-[10px] text-gray-700 dark:text-gray-500 font-mono">
@@ -457,8 +457,8 @@ function TokenFlowBar({ tokens, total }: { tokens: SessionStats["tokens"]; total
       key: "cache_write",
       label: "Cache write",
       value: tokens.cache_write_tokens,
-      cls: "bg-violet-500",
-      text: "text-violet-700 dark:text-violet-300",
+      cls: "bg-indigo-500",
+      text: "text-indigo-700 dark:text-indigo-300",
     },
     {
       key: "input",

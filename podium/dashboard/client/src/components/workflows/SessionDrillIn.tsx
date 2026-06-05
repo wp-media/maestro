@@ -26,7 +26,7 @@ type AgentNode = SessionDrillInData["tree"][number];
 function statusColor(status: string): string {
   switch (status) {
     case "completed":
-      return "text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-500/10 border-violet-200 dark:border-violet-500/20";
+      return "text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 border-indigo-200 dark:border-indigo-500/20";
     case "working":
       return "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20";
     case "error":
@@ -236,7 +236,7 @@ const EVENT_TYPE_COLOR: Record<string, string> = {
   tool_use: "text-blue-700 dark:text-blue-400",
   tool_result: "text-emerald-700 dark:text-emerald-400",
   agent_start: "text-indigo-700 dark:text-indigo-400",
-  agent_stop: "text-violet-700 dark:text-violet-400",
+  agent_stop: "text-indigo-700 dark:text-indigo-400",
   compaction: "text-amber-700 dark:text-amber-400",
   error: "text-red-700 dark:text-red-400",
 };

@@ -12,7 +12,7 @@ import type { SubagentEffectivenessItem } from "../../lib/types";
 const COLORS = [
   "#10b981",
   "#3b82f6",
-  "#a855f7",
+  "#FED23A",
   "#f59e0b",
   "#f43f5e",
   "#06b6d4",

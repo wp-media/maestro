@@ -227,7 +227,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
     const codeM = rest.match(/^`([^`\n]+)`/);
     if (codeM) {
       push(
-        <code className="rounded bg-surface-4 border border-surface-3 px-1.5 py-0.5 font-mono text-[12.5px] text-amber-800 dark:text-amber-200">
+        <code className="rounded bg-gray-100 dark:bg-surface-3 border border-gray-200 dark:border-border px-1.5 py-0.5 font-mono text-[12.5px] text-gray-800 dark:text-gray-200">
           {codeM[1]}
         </code>
       );
@@ -277,7 +277,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
           href={linkM[2]!}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-700 dark:text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70"
+          className="text-indigo-700 dark:text-indigo-300 hover:text-indigo-500 dark:hover:text-indigo-300 underline underline-offset-2 decoration-indigo-400/40 hover:decoration-indigo-300/70"
         >
           {renderInline(linkM[1]!, `${baseKey}-l${n}`)}
         </a>
@@ -294,7 +294,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
           href={urlM[0]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-violet-700 dark:text-violet-300 hover:text-violet-200 underline underline-offset-2 decoration-violet-400/40 hover:decoration-violet-300/70 break-all"
+          className="text-indigo-700 dark:text-indigo-300 hover:text-indigo-500 dark:hover:text-indigo-300 underline underline-offset-2 decoration-indigo-400/40 hover:decoration-indigo-300/70 break-all"
         >
           {urlM[0]}
         </a>
@@ -383,7 +383,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
               );
             }
             return (
-              <ul key={idx} className="list-disc pl-5 space-y-1 marker:text-violet-400/60">
+              <ul key={idx} className="list-disc pl-5 space-y-1 marker:text-amber-500/70 dark:marker:text-accent/60">
                 {b.items.map((item, i) => (
                   <li key={i} className="text-sm text-gray-700 dark:text-gray-300">
                     {renderListItem(item, `li${idx}-${i}`)}
@@ -396,7 +396,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
             return (
               <blockquote
                 key={idx}
-                className="relative border-l-2 border-violet-400/50 pl-3 pr-2 py-1 text-gray-600 dark:text-gray-400 italic bg-violet-500/[0.04] rounded-r"
+                className="relative border-l-2 border-indigo-400/50 pl-3 pr-2 py-1 text-gray-600 dark:text-gray-400 italic bg-indigo-500/[0.04] rounded-r"
               >
                 {renderInline(b.text, `q${idx}`)}
               </blockquote>

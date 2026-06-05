@@ -148,16 +148,16 @@ export function EventFilters({
   return (
     <div className="card p-3 space-y-2">
       <div className="flex flex-wrap items-center gap-2">
-        <Filter className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
+        <Filter className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
         <div className="relative flex-1 min-w-[180px]">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 dark:text-gray-500" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
             placeholder={t("eventFilters.searchPlaceholder")}
             aria-label={t("eventFilters.searchPlaceholder")}
-            className="w-full bg-surface-2 border border-border rounded pl-7 pr-2 py-1.5 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 focus:outline-none focus:border-accent"
+            className="w-full bg-white dark:bg-surface-2 border border-gray-200 dark:border-border rounded-lg pl-7 pr-2 py-1.5 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-colors"
           />
         </div>
         <DateTimePicker
@@ -167,7 +167,7 @@ export function EventFilters({
           title={t("eventFilters.from")}
           placeholder={t("eventFilters.from")}
         />
-        <span className="text-xs text-gray-600">→</span>
+        <span className="text-xs text-gray-400 dark:text-gray-500">→</span>
         <DateTimePicker
           value={value.to}
           onChange={(val: string) => onChange({ ...value, to: val })}
@@ -179,7 +179,7 @@ export function EventFilters({
           <button
             type="button"
             onClick={() => onChange(EMPTY_FILTERS)}
-            className="flex items-center gap-1 text-[11px] px-2 py-1 rounded text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-2 cursor-pointer"
+            className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-surface-3 transition-colors cursor-pointer"
             aria-label={t("eventFilters.clearAll")}
           >
             <X className="w-3 h-3" />
@@ -272,10 +272,10 @@ function ChipGroup({
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`text-[11px] px-2 py-1 rounded border cursor-pointer flex items-center gap-1.5 ${
+        className={`text-[11px] px-2 py-1 rounded-md border cursor-pointer flex items-center gap-1.5 transition-colors ${
           selectedCount > 0
-            ? "border-accent/40 bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent"
-            : "border-border bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+            ? "border-accent/30 bg-accent/20 text-gray-900 dark:bg-accent/10 dark:text-accent font-medium"
+            : "border-gray-200 dark:border-border bg-white dark:bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3"
         }`}
       >
         <span>{label}</span>
@@ -287,10 +287,10 @@ function ChipGroup({
         <div
           role="listbox"
           aria-label={label}
-          className="absolute left-0 mt-1 z-20 min-w-[220px] max-h-64 overflow-auto bg-surface-1 border border-border rounded shadow-xl p-1.5"
+          className="absolute left-0 mt-1 z-20 min-w-[220px] max-h-64 overflow-auto bg-white dark:bg-surface-1 border border-gray-200 dark:border-border rounded-lg shadow-xl p-1.5"
         >
           {options.length === 0 ? (
-            <p className="text-[11px] text-gray-700 dark:text-gray-500 px-2 py-1 italic">
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 px-2 py-1 italic">
               {t("eventFilters.noOptions")}
             </p>
           ) : (
@@ -300,7 +300,7 @@ function ChipGroup({
               return (
                 <label
                   key={opt}
-                  className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-600 dark:text-gray-300 rounded hover:bg-surface-3 cursor-pointer"
+                  className="flex items-center gap-2 px-2 py-1 text-[11px] text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-surface-3 cursor-pointer transition-colors"
                 >
                   <input
                     type="checkbox"

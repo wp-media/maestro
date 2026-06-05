@@ -41,7 +41,7 @@ export function Skeleton({
       role="status"
       aria-label={label}
       aria-busy="true"
-      className={`inline-block bg-surface-3/70 animate-pulse ${ROUNDED_CLASS[rounded]} ${className}`}
+      className={`inline-block bg-gray-100 dark:bg-surface-3 animate-pulse ${ROUNDED_CLASS[rounded]} ${className}`}
       style={style}
     />
   );

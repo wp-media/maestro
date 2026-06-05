@@ -1474,20 +1474,20 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
         ? "bg-amber-500"
         : "bg-gradient-to-r from-cyan-500 to-indigo-500";
   return (
-    <div className="border-t border-border px-4 py-2 flex items-center gap-3 text-[11px] text-gray-600 dark:text-gray-400 flex-wrap">
+    <div className="border-t border-gray-700 dark:border-border bg-gray-800/50 dark:bg-surface-1/50 px-4 py-2 flex items-center gap-3 text-[11px] text-gray-400 dark:text-gray-400 flex-wrap">
       <span className="inline-flex items-center gap-1.5">
-        <Activity className="w-3 h-3 text-gray-700 dark:text-gray-500" />
-        <span className="text-gray-700 dark:text-gray-500">{t("tokens.label")}</span>
-        <span className="font-mono text-gray-800 dark:text-gray-200">
+        <Activity className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+        <span className="text-gray-400 dark:text-gray-500">{t("tokens.label")}</span>
+        <span className="font-mono text-gray-200 dark:text-gray-200">
           {formatNum(total)} / {formatNum(cap)}
         </span>
         <span
-          className={`font-mono ${tone === "red" ? "text-red-700 dark:text-red-300" : tone === "amber" ? "text-amber-700 dark:text-amber-300" : "text-gray-700 dark:text-gray-500"}`}
+          className={`font-mono ${tone === "red" ? "text-red-400 dark:text-red-400" : tone === "amber" ? "text-amber-400 dark:text-amber-400" : "text-gray-500 dark:text-gray-500"}`}
         >
           ({pct}%)
         </span>
       </span>
-      <div className="flex-1 min-w-24 h-1.5 bg-surface-3 rounded-full overflow-hidden max-w-xs">
+      <div className="flex-1 min-w-24 h-1.5 bg-gray-700 dark:bg-surface-3 rounded-full overflow-hidden max-w-xs">
         <div
           className={`h-full ${barColor} transition-all duration-300 rounded-full`}
           style={{ width: `${pct}%` }}
@@ -1495,23 +1495,23 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
       </div>
       <span className="inline-flex items-center gap-3">
         <span>
-          <span className="text-gray-700 dark:text-gray-500">{t("tokens.input")}:</span>{" "}
-          <span className="font-mono text-gray-700 dark:text-gray-300">{formatNum(stats.inputTokens)}</span>
+          <span className="text-gray-500 dark:text-gray-500">{t("tokens.input")}:</span>{" "}
+          <span className="font-mono text-gray-300 dark:text-gray-300">{formatNum(stats.inputTokens)}</span>
         </span>
         <span>
-          <span className="text-gray-700 dark:text-gray-500">{t("tokens.output")}:</span>{" "}
-          <span className="font-mono text-gray-700 dark:text-gray-300">{formatNum(stats.outputTokens)}</span>
+          <span className="text-gray-500 dark:text-gray-500">{t("tokens.output")}:</span>{" "}
+          <span className="font-mono text-gray-300 dark:text-gray-300">{formatNum(stats.outputTokens)}</span>
         </span>
         {stats.cacheReadTokens > 0 && (
           <span>
-            <span className="text-gray-700 dark:text-gray-500">{t("tokens.cacheRead")}:</span>{" "}
-            <span className="font-mono text-emerald-700 dark:text-emerald-300">{formatNum(stats.cacheReadTokens)}</span>
+            <span className="text-gray-500 dark:text-gray-500">{t("tokens.cacheRead")}:</span>{" "}
+            <span className="font-mono text-emerald-400 dark:text-emerald-400">{formatNum(stats.cacheReadTokens)}</span>
           </span>
         )}
         {stats.costUsd != null && (
           <span>
-            <span className="text-gray-700 dark:text-gray-500">{t("tokens.cost")}:</span>{" "}
-            <span className="font-mono text-gray-800 dark:text-gray-200">${stats.costUsd.toFixed(4)}</span>
+            <span className="text-gray-500 dark:text-gray-500">{t("tokens.cost")}:</span>{" "}
+            <span className="font-mono text-gray-200 dark:text-gray-200">${stats.costUsd.toFixed(4)}</span>
           </span>
         )}
       </span>
@@ -1571,7 +1571,7 @@ function commandSourceTone(s: SlashCommand["source"]): string {
       ? "bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-500/30"
       : s === "project"
         ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30"
-        : "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/30";
+        : "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-accent/20";
 }
 
 /**
@@ -1837,7 +1837,7 @@ function PromptEditor({
         placeholder={placeholder}
         rows={rows}
         spellCheck={false}
-        className="w-full bg-surface-2 border border-border rounded-md px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50 resize-y font-sans leading-relaxed"
+        className="w-full bg-white dark:bg-surface-3 border border-gray-200 dark:border-border rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 resize-y font-sans leading-relaxed transition-colors"
       />
       {state && (
         <div className="absolute z-30 left-0 right-0 bottom-full mb-1 rounded-md border border-border bg-surface-1 shadow-lg shadow-black/40 max-h-72 overflow-auto py-1">
@@ -2430,7 +2430,7 @@ function UnifiedRunRowView({
           {canResume && (
             <button
               onClick={onResume}
-              className="inline-flex items-center gap-1 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-2 py-0.5 text-[10.5px] font-medium transition-colors"
+              className="inline-flex items-center gap-1 rounded-md bg-accent hover:bg-accent-hover text-gray-900 font-semibold px-2 py-0.5 text-[10.5px] transition-colors shadow-sm"
             >
               <RotateCcw className="w-3 h-3" />
               {t("resume.resumeOption", "Resume")}
@@ -2516,7 +2516,7 @@ function ConfigCard(props: ConfigCardProps) {
   }, [isResume, resumePicked, props.mode]);
 
   return (
-    <div className="rounded-xl border border-border bg-surface-1">
+    <div className="rounded-xl border border-gray-100 dark:border-border bg-white dark:bg-surface-1 shadow-sm">
       {/* Step 1: Mode (always visible — the primary decision) */}
       <div className="border-b border-border px-4 py-3">
         <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-2">
@@ -2687,7 +2687,7 @@ function ConfigCard(props: ConfigCardProps) {
             // invisible default.
             (!props.resumeSession && !props.cwd.trim())
           }
-          className="inline-flex items-center gap-2 rounded-lg border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent hover:bg-accent-hover text-gray-900 font-semibold px-4 py-1.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {props.busy ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -2836,7 +2836,7 @@ function CwdAutocomplete({
           placeholder={t("fields.cwdPlaceholder")}
           autoComplete="off"
           spellCheck={false}
-          className="w-full bg-surface-2 border border-border rounded-md pl-7 pr-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
+          className="w-full bg-white dark:bg-surface-3 border border-gray-200 dark:border-border rounded-lg pl-7 pr-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-colors"
         />
       </div>
       {open && (
@@ -3128,7 +3128,7 @@ function Select<T extends string>({
         type="button"
         onClick={() => setOpen((v) => !v)}
         onKeyDown={onKey}
-        className="w-full flex items-center justify-between gap-2 bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] text-gray-900 dark:text-gray-100 focus:outline-none focus:border-accent/50 hover:bg-surface-3 transition-colors"
+        className="w-full flex items-center justify-between gap-2 bg-white dark:bg-surface-3 border border-gray-200 dark:border-border rounded-lg px-3 py-1.5 text-[11px] text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 hover:bg-gray-50 dark:hover:bg-surface-2 transition-colors"
       >
         <span className="truncate">{current?.label ?? "—"}</span>
         <ChevronDown className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
@@ -3223,7 +3223,7 @@ function ModelPicker({ value, onChange }: { value: string; onChange: (s: string)
           placeholder={t("fields.modelCustomPlaceholder")}
           autoComplete="off"
           spellCheck={false}
-          className="w-full bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-accent/50"
+          className="w-full bg-white dark:bg-surface-3 border border-gray-200 dark:border-border rounded-lg px-3 py-1.5 text-[11px] font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-colors"
         />
       )}
     </div>
@@ -3286,9 +3286,9 @@ function RunSession(props: RunSessionProps) {
     // flex-1 + min-h-0 lets us fill the viewport-locked parent, while the
     // inner stream area's overflow-auto keeps long chats scrollable inside
     // the panel — never the page.
-    <div className="rounded-xl border border-border bg-surface-1 flex flex-col flex-1 min-h-0">
+    <div className="rounded-xl border border-gray-200 dark:border-border bg-white dark:bg-surface-1 shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* Toolbar */}
-      <div className="border-b border-border px-4 py-2.5 flex items-center gap-2 flex-wrap">
+      <div className="border-b border-gray-200 dark:border-border bg-white dark:bg-surface-1 px-4 py-2.5 flex items-center gap-2 flex-wrap">
         <StatusPill status={props.handle.status} />
         <ModeBadge mode={props.mode} />
         {init?.model && (
@@ -3306,7 +3306,7 @@ function RunSession(props: RunSessionProps) {
           <button
             onClick={props.onStop}
             disabled={props.busy === "stop"}
-            className="inline-flex items-center gap-1.5 rounded-md border border-red-500/40 bg-red-50 dark:bg-red-500/10 hover:bg-red-500/20 text-red-800 dark:text-red-200 px-2.5 py-1 text-[11px] font-medium disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-transparent hover:bg-red-100 dark:hover:bg-red-500/10 text-red-600 dark:text-red-400 px-2.5 py-1 text-[11px] font-medium disabled:opacity-60 transition-colors"
           >
             <Square className="w-3 h-3" />
             {props.busy === "stop" ? t("actions.stopping") : t("actions.stop")}
@@ -3326,7 +3326,7 @@ function RunSession(props: RunSessionProps) {
             Active Runs dropdown for re-attach. */}
         <button
           onClick={props.onNewRun}
-          className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-2.5 py-1 text-[11px] font-medium transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-md bg-accent hover:bg-accent-hover text-gray-900 font-semibold px-2.5 py-1 text-[11px] transition-colors shadow-sm"
         >
           <Plus className="w-3 h-3" />
           {t("actions.newRun")}
@@ -3334,7 +3334,7 @@ function RunSession(props: RunSessionProps) {
       </div>
 
       {/* Stream area */}
-      <div ref={scrollRef} className="flex-1 overflow-auto px-4 py-3 space-y-3 min-h-0">
+      <div ref={scrollRef} className="flex-1 overflow-auto px-4 py-3 space-y-3 min-h-0 bg-gray-900 dark:bg-surface-0">
         {props.envelopes.length === 0 && <EmptyStream isLive={props.isLive} />}
         {props.envelopes.map((env, i) => (
           <EnvelopeRow key={i} envelope={env} />
@@ -3349,7 +3349,7 @@ function RunSession(props: RunSessionProps) {
 
       {/* Follow-up input — only for conversation mode while live */}
       {props.mode === "conversation" && props.isLive && (
-        <div className="border-t border-border px-4 py-3">
+        <div className="border-t border-gray-200 dark:border-border bg-white dark:bg-surface-1 px-4 py-3">
           <PromptEditor
             value={props.followUp}
             onChange={props.onFollowUpChange}
@@ -3364,7 +3364,7 @@ function RunSession(props: RunSessionProps) {
             <button
               onClick={props.onSend}
               disabled={!props.followUp.trim() || props.busy === "send"}
-              className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-md bg-accent hover:bg-accent-hover text-gray-900 font-semibold px-3 py-1.5 text-xs transition-colors disabled:opacity-50 shadow-sm"
             >
               <Send className="w-3 h-3" />
               {props.busy === "send" ? t("actions.sending") : t("actions.send")}
@@ -3380,17 +3380,17 @@ function EmptyStream({ isLive }: { isLive: boolean }) {
   const { t } = useTranslation("run");
   if (isLive) {
     return (
-      <div className="text-center py-12 text-gray-700 dark:text-gray-500 flex flex-col items-center gap-2">
-        <RefreshCw className="w-5 h-5 animate-spin" />
-        <span className="text-xs">{t("status.spawning")}</span>
+      <div className="text-center py-12 text-gray-400 dark:text-gray-500 flex flex-col items-center gap-2">
+        <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
+        <span className="text-xs text-gray-300 dark:text-gray-500">{t("status.spawning")}</span>
       </div>
     );
   }
   return (
     <div className="text-center py-12 flex flex-col items-center gap-2">
-      <Sparkles className="w-6 h-6 text-gray-600" />
-      <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{t("empty.title")}</div>
-      <div className="text-sm text-gray-600 dark:text-gray-500 max-w-md">{t("empty.body")}</div>
+      <Sparkles className="w-6 h-6 text-gray-400 dark:text-gray-600" />
+      <div className="text-sm font-medium text-gray-400 dark:text-gray-400">{t("empty.title")}</div>
+      <div className="text-sm text-gray-400 dark:text-gray-500 max-w-md">{t("empty.body")}</div>
     </div>
   );
 }
@@ -3402,7 +3402,7 @@ function StatusPill({ status }: { status: string }) {
     spawning: { color: "bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/30", icon: RefreshCw },
     running: { color: "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30", icon: Sparkles },
     completed: {
-      color: "bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/30",
+      color: "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30",
       icon: CheckCircle2,
     },
     error: { color: "bg-red-50 dark:bg-red-500/15 text-red-700 dark:text-red-300 border-red-200 dark:border-red-500/30", icon: XCircle },
@@ -3499,8 +3499,8 @@ function UserTurn({ env }: { env: UserMessage }) {
     <div className="flex gap-3">
       <Avatar tone="indigo" letter={t("events.you").charAt(0)} />
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 mb-1">{t("events.you")}</div>
-        <div className="rounded-lg border border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
+        <div className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-400 mb-1">{t("events.you")}</div>
+        <div className="rounded-lg border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50 dark:bg-indigo-500/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
           {text || "—"}
         </div>
       </div>
@@ -3531,12 +3531,12 @@ function AssistantTurn({ env }: { env: AssistantMessage }) {
     <div className="flex gap-3">
       <Avatar tone="accent" letter="C" />
       <div className="flex-1 min-w-0 space-y-2">
-        <div className="text-[11px] font-semibold text-accent mb-1">{t("events.claude")}</div>
+        <div className="text-[11px] font-semibold text-amber-700 dark:text-accent mb-1">{t("events.claude")}</div>
         {thinking.map((th, i) => (
           <ThinkingBlock key={`th-${i}`} text={th.thinking || ""} />
         ))}
         {text && (
-          <div className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose-claude">
+          <div className="text-sm text-gray-800 dark:text-emerald-400 leading-relaxed prose-claude">
             <MarkdownContent text={text} />
           </div>
         )}
@@ -3553,17 +3553,17 @@ function ThinkingBlock({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   if (!text) return null;
   return (
-    <div className="rounded-md border border-violet-200 dark:border-violet-500/20 bg-violet-500/5">
+    <div className="rounded-md border border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-500/10 transition-colors"
+        className="w-full flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
       >
         {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
         <Sparkles className="w-3 h-3" />
         {t("events.thinking")}
       </button>
       {open && (
-        <pre className="px-3 py-2 text-[11px] font-mono text-violet-800 dark:text-violet-200/80 whitespace-pre-wrap break-words border-t border-violet-200 dark:border-violet-500/20">
+        <pre className="px-3 py-2 text-[11px] font-mono text-indigo-700 dark:text-indigo-400/80 whitespace-pre-wrap break-words border-t border-indigo-200 dark:border-indigo-500/20">
           {text}
         </pre>
       )}
@@ -3618,8 +3618,8 @@ function ToolResultBlock({ result }: { result: Extract<ContentBlock, { type: "to
         : JSON.stringify(result.content);
   const lines = text.split("\n").length;
   const tone = result.is_error
-    ? "border-red-200 dark:border-red-500/30 bg-red-500/5 text-red-800 dark:text-red-200"
-    : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200";
+    ? "border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400"
+    : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
   return (
     <div className={`rounded-md border ${tone}`}>
       <button
@@ -3695,8 +3695,8 @@ function ResultFooter({ result }: { result: ResultEnvelope }) {
     <div
       className={`border-t px-4 py-2.5 flex items-center gap-4 flex-wrap text-[11px] ${
         isError
-          ? "border-red-200 dark:border-red-500/30 bg-red-500/5 text-red-800 dark:text-red-200"
-          : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200"
+          ? "border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400"
+          : "border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
       }`}
     >
       {isError ? (

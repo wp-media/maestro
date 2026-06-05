@@ -203,7 +203,7 @@ function Toggle({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ${
-          checked ? "bg-blue-500" : "bg-surface-4"
+          checked ? "bg-accent" : "bg-gray-200 dark:bg-surface-4"
         }`}
       >
         <span
@@ -770,7 +770,7 @@ export function Settings() {
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
+            <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
               <DollarSign className="w-4 h-4 text-gray-700 dark:text-gray-500" />
               {t("pricing.title")}
               <PricingInfoTooltip />
@@ -873,7 +873,7 @@ export function Settings() {
                         <button
                           onClick={() => startEdit(rule)}
                           disabled={isEditing}
-                          className="p-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors disabled:opacity-30"
+                          className="p-1.5 rounded-md text-gray-600 dark:text-gray-400 hover:text-amber-700 dark:hover:text-accent hover:bg-accent/10 transition-colors disabled:opacity-30"
                           title={t("common:edit")}
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -906,7 +906,7 @@ export function Settings() {
 
       {/* ─── HOOK CONFIGURATION ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
           <Plug className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("hooks.title")}
         </h3>
@@ -966,7 +966,7 @@ export function Settings() {
 
       {/* ─── CLAUDE HOME ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
           <FolderOpen className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("claudeHome.title")}
         </h3>
@@ -981,7 +981,7 @@ export function Settings() {
                 setClaudeHomeInput(e.target.value);
                 setClaudeHomeError(null);
               }}
-              className="flex-1 bg-surface-4 border border-surface-3 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono focus:outline-none focus:border-violet-500/50"
+              className="flex-1 bg-white dark:bg-surface-3 border border-gray-200 dark:border-border rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono focus:outline-none focus:ring-1 focus:ring-accent/30 focus:border-accent/50"
               placeholder={t("claudeHome.placeholder")}
             />
             <button
@@ -1006,7 +1006,7 @@ export function Settings() {
 
       {/* ─── NOTIFICATIONS ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
           <Bell className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("notifications.title")}
         </h3>
@@ -1018,12 +1018,12 @@ export function Settings() {
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
                   notifPrefs.enabled
-                    ? "bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20"
+                    ? "bg-accent/20 dark:bg-accent/10 border border-accent/30 dark:border-accent/20"
                     : "bg-surface-2 border border-border"
                 }`}
               >
                 {notifPrefs.enabled ? (
-                  <BellRing className="w-5 h-5 text-blue-700 dark:text-blue-400" />
+                  <BellRing className="w-5 h-5 text-amber-700 dark:text-accent" />
                 ) : (
                   <BellOff className="w-5 h-5 text-gray-700 dark:text-gray-500" />
                 )}
@@ -1087,7 +1087,7 @@ export function Settings() {
                   />
                 </div>
                 <div className="flex items-center gap-3 bg-surface-2 rounded-lg px-3.5 py-3">
-                  <CheckCircle className="w-4 h-4 text-violet-700 dark:text-violet-400 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-indigo-700 dark:text-indigo-400 flex-shrink-0" />
                   <Toggle
                     checked={notifPrefs.onSessionComplete}
                     onChange={(v) => updateNotifPrefs({ onSessionComplete: v })}
@@ -1146,7 +1146,7 @@ export function Settings() {
 
       {/* ─── DATA MANAGEMENT ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
           <Database className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("data.title")}
         </h3>
@@ -1172,7 +1172,7 @@ export function Settings() {
                   const tableIcons: Record<string, React.ReactNode> = {
                     sessions: <Layers className="w-4 h-4 text-blue-700 dark:text-blue-400" />,
                     agents: <Users className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />,
-                    events: <Activity className="w-4 h-4 text-violet-700 dark:text-violet-400" />,
+                    events: <Activity className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />,
                     token_usage: <Coins className="w-4 h-4 text-amber-700 dark:text-amber-400" />,
                     model_pricing: <BarChart3 className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />,
                   };
@@ -1186,7 +1186,7 @@ export function Settings() {
                   const tableColors: Record<string, string> = {
                     sessions: "border-blue-200 dark:border-blue-500/20",
                     agents: "border-emerald-200 dark:border-emerald-500/20",
-                    events: "border-violet-200 dark:border-violet-500/20",
+                    events: "border-indigo-200 dark:border-indigo-500/20",
                     token_usage: "border-amber-200 dark:border-amber-500/20",
                     model_pricing: "border-cyan-200 dark:border-cyan-500/20",
                   };
@@ -1288,7 +1288,7 @@ export function Settings() {
           </div>
 
           {/* Danger zone */}
-          <div className="card p-5 space-y-4 border-red-500/10">
+          <div className="card p-5 space-y-4 border border-red-200 dark:border-red-500/30 bg-red-50/40 dark:bg-red-500/[0.03]">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 flex items-center justify-center">
                 <AlertTriangle className="w-4 h-4 text-red-700 dark:text-red-400" />
@@ -1339,7 +1339,7 @@ export function Settings() {
 
       {/* ─── ABOUT ─── */}
       <section>
-        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-1 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
           <Server className="w-4 h-4 text-gray-700 dark:text-gray-500" />
           {t("about.title")}
         </h3>
@@ -1372,7 +1372,7 @@ export function Settings() {
               </div>
               <div className="bg-surface-2 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <Globe className="w-4 h-4 text-violet-700 dark:text-violet-400" />
+                  <Globe className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
                   <p className="text-[11px] text-gray-700 dark:text-gray-500 uppercase tracking-wider">
                     {t("about.platform")}
                   </p>

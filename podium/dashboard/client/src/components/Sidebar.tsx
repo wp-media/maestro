@@ -265,7 +265,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed left-0 top-0 bottom-0 bg-surface-1 border-r border-border flex flex-col z-30 overflow-hidden transition-[width] duration-200 ${
+      className={`fixed left-0 top-0 bottom-0 bg-white/90 dark:bg-surface-1/90 backdrop-blur-md border-r border-white/50 dark:border-border flex flex-col z-30 overflow-hidden transition-[width] duration-200 ${
         collapsed ? "w-[4.25rem]" : "w-60"
       }`}
     >
@@ -304,8 +304,8 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
                     collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2.5"
                   } ${
                     isActive
-                      ? "bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border border-accent/40 dark:border-accent/20 font-semibold"
-                      : "text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-4 dark:hover:bg-surface-3 border border-transparent"
+                      ? "bg-accent/20 dark:bg-accent/10 text-gray-900 dark:text-accent border-l-2 border-accent font-semibold"
+                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-4 dark:hover:bg-surface-3 border-l-2 border-transparent"
                   }`
                 }
               >
@@ -346,7 +346,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           onClick={onToggle}
           className={`w-full h-10 rounded-lg border border-border bg-surface-2 transition-colors ${
             collapsed
-              ? "flex items-center justify-center text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-surface-3"
+              ? "flex items-center justify-center text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-surface-3"
               : "flex items-center gap-2.5 px-3 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 hover:bg-surface-3"
           }`}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -689,7 +689,7 @@ function ConnectionStatusModal({
           <button
             type="button"
             onClick={onResetStats}
-            className="text-[11px] font-medium text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-surface-3 px-2 py-1 rounded transition-colors"
+            className="text-[11px] font-medium text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-surface-3 px-2 py-1 rounded transition-colors"
           >
             Reset
           </button>

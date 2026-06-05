@@ -510,7 +510,7 @@ export function SessionDetail() {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {session.name || `${t("defaultName")}${session.id.slice(0, 8)}`}
             </h2>
             <SessionStatusBadge status={effectiveSessionStatus(session)} />
@@ -647,10 +647,10 @@ export function SessionDetail() {
             <p className="text-sm text-gray-700 dark:text-gray-500">{t("detail.noAgents")}</p>
           ) : (
             <>
-              <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5 text-accent" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-3 flex items-center gap-1.5">
+                <Bot className="w-3.5 h-3.5 text-amber-700 dark:text-accent" />
                 {t("detail.agents")}
-                <span className="text-gray-600 font-mono">· {agents.length}</span>
+                <span className="text-gray-400 dark:text-gray-500 font-mono">· {agents.length}</span>
               </h3>
               <div className="space-y-2" data-testid="agent-tree">
                 {(() => {
@@ -733,7 +733,7 @@ export function SessionDetail() {
 
                         {/* Recursive children (collapsible) */}
                         {hasChildren && isExpanded && (
-                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-accent/20 pl-3">
+                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-accent/30 dark:border-accent/20 pl-3">
                             {children.map((child) => renderAgentNode(child, depth + 1))}
                           </div>
                         )}
@@ -744,7 +744,7 @@ export function SessionDetail() {
                             onClick={() =>
                               setExpandedAgents((prev) => new Set([...prev, agent.id]))
                             }
-                            className="ml-7 mt-1 text-[11px] text-accent hover:text-violet-300 transition-colors"
+                            className="ml-7 mt-1 text-[11px] font-medium text-amber-700 dark:text-accent hover:text-amber-800 dark:hover:text-accent-hover transition-colors"
                           >
                             {t("common:subagent_label", { count: totalDesc })}
                           </button>
@@ -792,37 +792,37 @@ export function SessionDetail() {
           {/* Cost Breakdown — shown under Agents tab */}
           {cost && cost.breakdown.length > 0 && cost.total_cost > 0 && (
             <div className="mt-8">
-              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-4 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5 mb-4 flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 {t("detail.costBreakdown")}
               </h3>
               <div className="card overflow-x-auto">
                 <table className="w-full min-w-[600px]">
                   <thead>
-                    <tr className="border-b border-border text-left">
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                    <tr className="border-b border-gray-100 dark:border-border text-left bg-gray-50/50 dark:bg-transparent">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {t("common:cost.model")}
                       </th>
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                         {t("common:token.input")}
                       </th>
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                         {t("common:token.output")}
                       </th>
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                         {t("common:token.cacheRead")}
                       </th>
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                         {t("common:token.cacheWrite")}
                       </th>
-                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider text-right">
+                      <th className="px-5 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">
                         {t("common:cost.cost")}
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border">
+                  <tbody className="divide-y divide-gray-100 dark:divide-border">
                     {cost.breakdown.map((row) => (
-                      <tr key={row.model} className="hover:bg-surface-4 transition-colors">
+                      <tr key={row.model} className="hover:bg-gray-50 dark:hover:bg-surface-3 transition-colors">
                         <td className="px-5 py-2.5 text-sm font-mono text-gray-600 dark:text-gray-300">
                           {formatModelName(row.model)}
                         </td>
@@ -888,9 +888,9 @@ export function SessionDetail() {
                 type="button"
                 onClick={() => setGrouped(true)}
                 aria-pressed={grouped}
-                className={`text-[11px] px-3 py-1 cursor-pointer ${
+                className={`text-[11px] px-3 py-1 cursor-pointer transition-colors ${
                   grouped
-                    ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
+                    ? "bg-accent/20 text-amber-700 dark:bg-accent/20 dark:text-accent font-medium"
                     : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
@@ -900,9 +900,9 @@ export function SessionDetail() {
                 type="button"
                 onClick={() => setGrouped(false)}
                 aria-pressed={!grouped}
-                className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
+                className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer transition-colors ${
                   !grouped
-                    ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
+                    ? "bg-accent/20 text-amber-700 dark:bg-accent/20 dark:text-accent font-medium"
                     : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
@@ -940,7 +940,7 @@ export function SessionDetail() {
                                 ? t("common:eventDetail.collapse")
                                 : t("common:eventDetail.expand")
                             }
-                            className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-surface-4 transition-colors min-w-0 cursor-pointer"
+                            className="w-full text-left px-5 py-3 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-surface-3 transition-colors min-w-0 cursor-pointer"
                           >
                             <span
                               className={`text-gray-700 dark:text-gray-500 text-[10px] w-3 flex-shrink-0 transition-transform ${isOpen ? "rotate-90" : ""}`}
@@ -1004,7 +1004,7 @@ export function SessionDetail() {
                 type="button"
                 onClick={loadMoreEvents}
                 disabled={eventsLoadingMore}
-                className="px-3 py-1.5 text-xs font-medium rounded-md bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent hover:bg-accent/25 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                className="px-3 py-1.5 text-xs font-medium rounded-md bg-accent/20 dark:bg-accent/15 text-amber-700 dark:text-accent hover:bg-accent/30 dark:hover:bg-accent/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 {eventsLoadingMore
                   ? t("common:eventFilters.loading")

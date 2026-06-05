@@ -134,11 +134,11 @@ function renderSegment(seg: TuiSegment, key: number): React.ReactNode {
         <CollapsibleBlock
           key={key}
           text={seg.text}
-          icon={<ScrollText className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400/60 flex-shrink-0" />}
+          icon={<ScrollText className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400/60 flex-shrink-0" />}
           title="Persisted output"
-          borderClass="border-violet-200 dark:border-violet-500/20"
-          bgClass="bg-violet-500/5"
-          textClass="text-violet-700 dark:text-violet-300/80"
+          borderClass="border-indigo-200 dark:border-indigo-500/20"
+          bgClass="bg-indigo-500/5"
+          textClass="text-indigo-700 dark:text-indigo-300/80"
         />
       );
     case "text": {
@@ -235,10 +235,15 @@ export function MessageList({ messages, loading }: MessageListProps) {
         }
 
         const isAssistant = msg.type === "assistant";
-        const accentBar = isAssistant ? "before:bg-violet-500/40" : "before:bg-blue-500/40";
+        const accentBar = isAssistant ? "before:bg-indigo-500/40" : "before:bg-amber-400/50";
         const avatarRing = isAssistant
           ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
-          : "bg-gradient-to-br from-blue-500/30 to-cyan-500/20 text-blue-800 dark:text-blue-200 ring-1 ring-blue-400/30";
+          : "bg-accent/20 text-amber-800 dark:text-accent ring-1 ring-accent/30";
+        // User turns read as a tinted bubble; assistant turns stay transparent so
+        // prose flows naturally against the page surface.
+        const bodyBubble = isAssistant
+          ? "text-gray-800 dark:text-gray-200"
+          : "bg-accent/15 dark:bg-accent/10 border border-amber-200/50 dark:border-accent/20 text-gray-900 dark:text-white rounded-2xl rounded-tr-sm px-3 py-2";
 
         return (
           <div
@@ -253,7 +258,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
             </div>
 
             {/* Message body */}
-            <div className="flex-1 min-w-0 space-y-2">
+            <div className={`flex-1 min-w-0 space-y-2 ${bodyBubble}`}>
               {/* Header line */}
               <div className="flex items-center gap-2 flex-wrap">
                 <span
@@ -344,7 +349,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
                   return (
                     <div
                       key={bIdx}
-                      className="rounded-lg border border-amber-200 dark:border-amber-500/20 bg-amber-500/5 overflow-hidden"
+                      className="rounded-lg border border-gray-200 dark:border-border bg-gray-50 dark:bg-surface-1 overflow-hidden"
                     >
                       <button
                         onClick={() =>
@@ -355,23 +360,23 @@ export function MessageList({ messages, loading }: MessageListProps) {
                             return next;
                           })
                         }
-                        className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-amber-500/10 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-left hover:bg-gray-100 dark:hover:bg-surface-2 transition-colors"
                       >
                         <ChevronRight
-                          className={`w-3.5 h-3.5 text-amber-500/60 transition-transform duration-150 ${
+                          className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-150 ${
                             isExpanded ? "rotate-90" : ""
                           }`}
                         />
-                        <Brain className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400/80" />
-                        <span className="text-xs text-amber-800 dark:text-amber-200/90 font-medium">Thinking</span>
+                        <Brain className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-xs italic text-gray-600 dark:text-gray-400 font-medium">Thinking</span>
                         {!isExpanded && (
-                          <span className="text-[10px] text-amber-700 dark:text-amber-300/40 font-mono ml-auto">
+                          <span className="text-[10px] text-gray-500 dark:text-gray-500 font-mono ml-auto">
                             {block.text.length.toLocaleString()} chars
                           </span>
                         )}
                       </button>
                       {isExpanded && (
-                        <div className="border-t border-amber-500/10 px-3 py-2 text-amber-100/80">
+                        <div className="border-t border-gray-200 dark:border-border px-3 py-2 italic text-gray-600 dark:text-gray-400">
                           <MarkdownContent text={block.text} dense />
                         </div>
                       )}
