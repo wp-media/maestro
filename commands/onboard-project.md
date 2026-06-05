@@ -99,9 +99,6 @@ confirmed values. Use this exact structure:
       "settings_path": null,
       "ci_integration": false,
       "license_option_key": null
-    },
-    "podium": {
-      "port": 4820
     }
   }
 }
@@ -116,8 +113,6 @@ Rules for filling it in:
 - `frontend_skill`, `editions`, `e2e.settings_path` → leave `null`. Later runs
   or the full deep-analysis onboarding can fill these in.
 - `e2e.ci_integration` → `false`.
-- `podium.port` → `4820` unless the user already runs Podium for another
-  project on this machine; if so, pick a free port and tell them.
 
 ```bash
 mkdir -p .claude
@@ -132,13 +127,12 @@ Write the JSON to `.claude/maestro.json`.
 Use the confirmed `temp_root` (default `.maestro`).
 
 ```bash
-mkdir -p .maestro/issues .maestro/podium
+mkdir -p .maestro/issues
 ```
 
 - `.maestro/issues/` — orchestrator run artifacts (one folder per issue).
-- `.maestro/podium/` — Podium hook events (one folder per session).
 
-If the user chose a non-default `temp_root`, substitute it in both paths.
+If the user chose a non-default `temp_root`, substitute it in the path.
 
 ---
 

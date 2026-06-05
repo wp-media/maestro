@@ -1,3 +1,5 @@
 WHY_MAESTRO.md
 .pipeline-logs/
 .playwright-mcp/
+.maestro/
+node_modules/
