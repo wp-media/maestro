@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 
 const { version: APP_VERSION } = JSON.parse(
-  readFileSync(resolve(__dirname, "../package.json"), "utf-8")
+  readFileSync(resolve(__dirname, "../../../.claude-plugin/plugin.json"), "utf-8")
 ) as { version: string };
 
 // Honour DASHBOARD_PORT so the proxy follows when `npm run dev:server` is
