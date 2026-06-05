@@ -192,6 +192,9 @@
     "slack_channel": null,
     "slack_threads_dir": null,
 
+    "_html_log_note": "Set to true to enable the token-heavy HTML workflow log (legacy). Default false — Podium captures all pipeline events via zero-token Claude Code hooks.",
+    "html_log": false,
+
     "e2e": {
       "_note": "boot_cmd is set by onboard-project to the resolved Maestro bin path. seed_cmd points to the project-specific seed script in .maestro/bin/.",
       "local_url": "http://localhost:8888",
