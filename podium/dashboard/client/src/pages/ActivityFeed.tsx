@@ -321,7 +321,7 @@ export function ActivityFeed() {
             aria-pressed={grouped}
             className={`text-[11px] px-3 py-1 cursor-pointer ${
               grouped
-                ? "bg-accent/20 text-accent"
+                ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
                 : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
             }`}
           >
@@ -333,7 +333,7 @@ export function ActivityFeed() {
             aria-pressed={!grouped}
             className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
               !grouped
-                ? "bg-accent/20 text-accent"
+                ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
                 : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
             }`}
           >
@@ -518,7 +518,7 @@ export function ActivityFeed() {
                         aria-current={p === page ? "page" : undefined}
                         className={`min-w-[32px] px-2.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors ${
                           p === page
-                            ? "bg-accent/20 text-accent border border-accent/30"
+                            ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
                             : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
                         }`}
                       >

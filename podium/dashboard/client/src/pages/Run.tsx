@@ -2224,7 +2224,7 @@ function RunsModal({
           <Link
             to="/sessions"
             onClick={onClose}
-            className="text-[11px] text-accent hover:text-accent/80 inline-flex items-center gap-1 mr-1"
+            className="text-[11px] text-amber-700 dark:text-accent hover:text-amber-600 dark:hover:text-accent/80 inline-flex items-center gap-1 mr-1"
           >
             {t("runs.allSessionsLink")}
           </Link>
@@ -2430,7 +2430,7 @@ function UnifiedRunRowView({
           {canResume && (
             <button
               onClick={onResume}
-              className="inline-flex items-center gap-1 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/25 text-accent px-2 py-0.5 text-[10.5px] font-medium transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-2 py-0.5 text-[10.5px] font-medium transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
               {t("resume.resumeOption", "Resume")}
@@ -2687,7 +2687,7 @@ function ConfigCard(props: ConfigCardProps) {
             // invisible default.
             (!props.resumeSession && !props.cwd.trim())
           }
-          className="inline-flex items-center gap-2 rounded-lg border border-accent/40 bg-accent/15 hover:bg-accent/25 text-accent px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-lg border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-4 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {props.busy ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -3326,7 +3326,7 @@ function RunSession(props: RunSessionProps) {
             Active Runs dropdown for re-attach. */}
         <button
           onClick={props.onNewRun}
-          className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/25 text-accent px-2.5 py-1 text-[11px] font-medium transition-colors"
+          className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-2.5 py-1 text-[11px] font-medium transition-colors"
         >
           <Plus className="w-3 h-3" />
           {t("actions.newRun")}
@@ -3364,7 +3364,7 @@ function RunSession(props: RunSessionProps) {
             <button
               onClick={props.onSend}
               disabled={!props.followUp.trim() || props.busy === "send"}
-              className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/25 text-accent px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
             >
               <Send className="w-3 h-3" />
               {props.busy === "send" ? t("actions.sending") : t("actions.send")}

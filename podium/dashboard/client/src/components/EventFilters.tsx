@@ -280,7 +280,7 @@ function ChipGroup({
       >
         <span>{label}</span>
         {selectedCount > 0 && (
-          <span className="bg-accent/25 text-accent rounded px-1.5 font-mono">{selectedCount}</span>
+          <span className="bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent rounded px-1.5 font-mono">{selectedCount}</span>
         )}
       </button>
       {open && (

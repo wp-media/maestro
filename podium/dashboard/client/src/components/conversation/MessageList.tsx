@@ -237,7 +237,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
         const isAssistant = msg.type === "assistant";
         const accentBar = isAssistant ? "before:bg-violet-500/40" : "before:bg-blue-500/40";
         const avatarRing = isAssistant
-          ? "bg-accent/20 text-accent border border-accent/30"
+          ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
           : "bg-gradient-to-br from-blue-500/30 to-cyan-500/20 text-blue-800 dark:text-blue-200 ring-1 ring-blue-400/30";
 
         return (
@@ -259,8 +259,8 @@ export function MessageList({ messages, loading }: MessageListProps) {
                 <span
                   className={`text-xs font-semibold tracking-wide ${
                     isAssistant
-                      ? "text-accent"
-                      : "text-blue-600 dark:text-blue-200"
+                      ? "text-amber-700 dark:text-accent"
+                      : "text-blue-700 dark:text-blue-400"
                   }`}
                 >
                   {isAssistant ? "Assistant" : "User"}

@@ -420,7 +420,7 @@ export function CcConfig() {
             {isMutable(tab) && tab !== "memory" && (
               <button
                 onClick={() => openCreate(tabToArtifactType(tab))}
-                className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-accent/30 bg-accent/10 hover:bg-accent/20 text-accent inline-flex items-center gap-1.5"
+                className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-accent/30 bg-accent/10 hover:bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent inline-flex items-center gap-1.5"
               >
                 <Plus className="w-3 h-3" />
                 {t("edit.newButton")}
@@ -554,7 +554,7 @@ function ScopeToggle({ value, onChange }: { value: CcScope; onChange: (s: CcScop
           onClick={() => onChange(o.v)}
           className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors ${
             value === o.v
-              ? "bg-accent/20 text-accent border border-accent/30"
+              ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
               : "text-gray-600 dark:text-gray-400 hover:text-gray-200"
           }`}
         >
@@ -693,7 +693,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
               {c !== null && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                    active ? "bg-accent/20 text-accent" : "bg-surface-3 text-gray-600 dark:text-gray-400"
+                    active ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent" : "bg-surface-3 text-gray-600 dark:text-gray-400"
                   }`}
                 >
                   {c}
@@ -1413,7 +1413,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
                   href={meta.homepage}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-accent hover:underline"
+                  className="text-amber-700 dark:text-accent hover:underline"
                 >
                   {meta.homepage}
                 </a>
@@ -1982,7 +1982,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
           </div>
           <button
             onClick={() => onCreate(s)}
-            className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-accent/30 bg-accent/10 hover:bg-accent/20 text-accent inline-flex items-center gap-1.5"
+            className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-accent/30 bg-accent/10 hover:bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent inline-flex items-center gap-1.5"
           >
             <Plus className="w-3 h-3" />
             {t("edit.newButton")}
@@ -2110,7 +2110,7 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
             href={data.docs}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] text-accent hover:underline inline-flex items-center gap-1"
+            className="text-[11px] text-amber-700 dark:text-accent hover:underline inline-flex items-center gap-1"
           >
             <ExternalLink className="w-3 h-3" />
             {t("keybindings.docsLink")}
@@ -2408,7 +2408,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
                       onClick={() => setTargetScope(s)}
                       className={`px-3 py-1 text-[11px] font-medium rounded ${
                         targetScope === s
-                          ? "bg-accent/20 text-accent border border-accent/30"
+                          ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
                           : "text-gray-600 dark:text-gray-400 hover:text-gray-200"
                       }`}
                     >
@@ -2454,7 +2454,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
           <button
             onClick={handleSave}
             disabled={saving || loading}
-            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/25 text-accent inline-flex items-center gap-1.5 disabled:opacity-60"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-accent/40 bg-accent/15 hover:bg-accent/30 text-gray-900 dark:bg-accent/25 dark:text-accent inline-flex items-center gap-1.5 disabled:opacity-60"
           >
             <Save className="w-3.5 h-3.5" />
             {saving ? t("edit.saving") : t("edit.save")}
