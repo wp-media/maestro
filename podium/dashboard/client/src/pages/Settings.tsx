@@ -46,6 +46,7 @@ import {
   Settings as SettingsIcon,
   FolderOpen,
   Info,
+  LayoutDashboard,
 } from "lucide-react";
 import { api } from "../lib/api";
 import { eventBus } from "../lib/eventBus";
@@ -54,6 +55,7 @@ import { subscribeToPush, unsubscribeFromPush } from "../lib/push";
 import { Tip } from "../components/Tip";
 import { ImportHistory } from "../components/ImportHistory";
 import { Skeleton } from "../components/Skeleton";
+import { KANBAN_VISIBLE_KEY, loadKanbanVisible } from "../components/Sidebar";
 import type { ModelPricing, WSMessage } from "../lib/types";
 
 // ─── Notification preferences ───
@@ -321,6 +323,16 @@ function PricingInfoTooltip() {
 
 export function Settings() {
   const { t } = useTranslation("settings");
+
+  // ── Interface preferences ──
+  const [kanbanVisible, setKanbanVisible] = useState(loadKanbanVisible);
+  const toggleKanban = (checked: boolean) => {
+    try { localStorage.setItem(KANBAN_VISIBLE_KEY, String(checked)); } catch {}
+    setKanbanVisible(checked);
+    // Notify Sidebar to re-filter nav items
+    window.dispatchEvent(new Event("podium-settings-changed"));
+  };
+
   const [pricing, setPricing] = useState<ModelPricing[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPattern, setEditingPattern] = useState<string | null>(null);
@@ -765,6 +777,38 @@ export function Settings() {
           </div>
         </div>
       </div>
+
+      {/* ─── INTERFACE ─── */}
+      <section>
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2 mb-3 border-l-2 border-amber-400/60 dark:border-accent/60 pl-2.5">
+          <LayoutDashboard className="w-4 h-4 text-gray-700 dark:text-gray-500" />
+          Interface
+        </h3>
+        <div className="bg-white dark:bg-surface-2 border border-gray-100 dark:border-border rounded-xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-gray-900 dark:text-white">Kanban Board</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              Show the Kanban Board in the sidebar. Hidden by default — enable if you use it.
+            </p>
+          </div>
+          <button
+            role="switch"
+            aria-checked={kanbanVisible}
+            onClick={() => toggleKanban(!kanbanVisible)}
+            className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              kanbanVisible
+                ? "bg-accent"
+                : "bg-gray-200 dark:bg-surface-4"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow transition duration-200 ease-in-out ${
+                kanbanVisible ? "translate-x-4" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      </section>
 
       {/* ─── MODEL PRICING ─── */}
       <section>
