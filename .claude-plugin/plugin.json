@@ -1,7 +1,7 @@
 {
   "name": "maestro",
-  "version": "0.3.2",
-  "description": "AI delivery pipeline for wp-media WordPress plugins — agents, skills, orchestration, and Podium observability dashboard.",
+  "version": "0.3.3",
+  "description": "AI delivery pipeline for wp-media WordPress plugins — agents, skills, and orchestration.",
   "author": {
     "name": "wp-media"
   },
