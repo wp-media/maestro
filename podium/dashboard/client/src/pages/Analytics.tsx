@@ -797,7 +797,7 @@ export function Analytics() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+                <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
                 {wsConnected ? (
                   <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -888,7 +888,7 @@ export function Analytics() {
       {/* Activity heatmap + 30-day sparkline */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card p-5 lg:col-span-2">
-          <h3 className="text-sm font-medium text-gray-300 mb-4">{t("eventActivity")}</h3>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-4">{t("eventActivity")}</h3>
           <div className="overflow-x-auto">
             <div className="w-fit min-w-max mx-auto">
               <Heatmap weeks={weeks} />
@@ -896,7 +896,7 @@ export function Analytics() {
           </div>
         </div>
         <div className="card p-5">
-          <h3 className="text-sm font-medium text-gray-300 mb-1">{t("last30Days")}</h3>
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("last30Days")}</h3>
           <p className="text-[11px] text-gray-600 mb-4">{t("dailyEventCount")}</p>
           <Sparkline data={last30} />
           <div className="flex justify-between text-[11px] text-gray-600 mt-2">
@@ -906,7 +906,7 @@ export function Analytics() {
           <div className="mt-4 pt-4 border-t border-border space-y-1">
             <div className="flex justify-between text-xs">
               <span className="text-gray-500">{t("peakDay")}</span>
-              <span className="text-gray-300 font-mono">
+              <span className="text-gray-600 dark:text-gray-300 font-mono">
                 <Tip raw={Math.max(...last30.map((d) => d.count)).toLocaleString()}>
                   {fmt(Math.max(...last30.map((d) => d.count)))}
                 </Tip>{" "}
@@ -915,7 +915,7 @@ export function Analytics() {
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-gray-500">{t("total30d")}</span>
-              <span className="text-gray-300 font-mono">
+              <span className="text-gray-600 dark:text-gray-300 font-mono">
                 <Tip raw={last30.reduce((s, d) => s + d.count, 0).toLocaleString()}>
                   {fmt(last30.reduce((s, d) => s + d.count, 0))}
                 </Tip>{" "}
@@ -942,8 +942,8 @@ export function Analytics() {
               onClick={() => setActiveTab(key)}
               className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
                 activeTab === key
-                  ? "bg-surface-4 text-gray-200"
-                  : "text-gray-500 hover:text-gray-300"
+                  ? "bg-surface-4 text-gray-700 dark:text-gray-200"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {label}
@@ -955,7 +955,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Token bars */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("tokenDistribution")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenDistribution")}</h3>
               <div className="space-y-4">
                 {[
                   {
@@ -992,7 +992,7 @@ export function Analytics() {
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{t("common:token.totalTokens")}</span>
                   <Tip raw={totalTokens.toLocaleString()}>
-                    <span className="text-gray-300 font-mono">{fmt(totalTokens)}</span>
+                    <span className="text-gray-600 dark:text-gray-300 font-mono">{fmt(totalTokens)}</span>
                   </Tip>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
@@ -1004,7 +1004,7 @@ export function Analytics() {
 
             {/* Token summary */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("tokenBreakdown")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenBreakdown")}</h3>
               <div className="space-y-3">
                 {[
                   {
@@ -1027,7 +1027,7 @@ export function Analytics() {
                     value: data?.tokens.total_cache_write ?? 0,
                     color: "text-yellow-400",
                   },
-                  { label: t("common:total"), value: totalTokens, color: "text-gray-100" },
+                  { label: t("common:total"), value: totalTokens, color: "text-gray-800 dark:text-gray-100" },
                 ].map(({ label, value, color }) => (
                   <div
                     key={label}
@@ -1047,7 +1047,7 @@ export function Analytics() {
 
             {/* Token mix donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("tokenMix")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("tokenMix")}</h3>
               {tokenMixSegments.length === 0 ? (
                 <p className="text-sm text-gray-500">{t("common:noData")}</p>
               ) : (
@@ -1057,7 +1057,7 @@ export function Analytics() {
                     {tokenMixSegments.map((segment) => (
                       <div key={segment.label} className="flex justify-between text-xs">
                         <span className="text-gray-400">{segment.label}</span>
-                        <span className="text-gray-300 font-mono">
+                        <span className="text-gray-600 dark:text-gray-300 font-mono">
                           <Tip raw={segment.value.toLocaleString()}>{fmt(segment.value)}</Tip>
                         </span>
                       </div>
@@ -1073,7 +1073,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Daily cost trends */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">{t("dailyCostTrends")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("dailyCostTrends")}</h3>
               {dailyCostsLocal.length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noDailyCostData")}</p>
               ) : (
@@ -1106,7 +1106,7 @@ export function Analytics() {
 
             {/* Cost by model */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("costByModel")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("costByModel")}</h3>
               {costBreakdown.length > 0 ? (
                 <>
                   <DonutChart
@@ -1131,7 +1131,7 @@ export function Analytics() {
                       </div>
                     ))}
                     <div className="flex justify-between text-xs pt-2 border-t border-border">
-                      <span className="text-gray-300 font-medium">{t("common:total")}</span>
+                      <span className="text-gray-600 dark:text-gray-300 font-medium">{t("common:total")}</span>
                       <span className="text-emerald-400 font-mono font-semibold">
                         <Tip raw={fmtCostFull(costData?.total_cost ?? 0)}>
                           {fmtCost(costData?.total_cost ?? 0)}
@@ -1147,7 +1147,7 @@ export function Analytics() {
 
             {/* Cost by weekday */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-1">{t("costByWeekday")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">{t("costByWeekday")}</h3>
               {dailyCostsLocal.length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noDailyCostData")}</p>
               ) : (
@@ -1180,7 +1180,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Agent type distribution */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("subagentTypes")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("subagentTypes")}</h3>
               {(data?.agent_types ?? []).length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noSubagentData")}</p>
               ) : (
@@ -1200,13 +1200,13 @@ export function Analytics() {
 
             {/* Agent status donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("agentStatus")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("agentStatus")}</h3>
               <DonutChart segments={agentStatusSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{t("totalAgentsLabel")}</span>
                   <Tip raw={(data?.overview.total_agents ?? 0).toLocaleString()}>
-                    <span className="text-gray-300 font-mono">
+                    <span className="text-gray-600 dark:text-gray-300 font-mono">
                       {fmt(data?.overview.total_agents ?? 0)}
                     </span>
                   </Tip>
@@ -1233,7 +1233,7 @@ export function Analytics() {
 
             {/* Event type breakdown */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("eventTypes")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("eventTypes")}</h3>
               {(data?.event_types ?? []).length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noEventData")}</p>
               ) : (
@@ -1257,7 +1257,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Top tools */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("toolUsage")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("toolUsage")}</h3>
               {(data?.tool_usage ?? []).length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noToolData")}</p>
               ) : (
@@ -1277,13 +1277,13 @@ export function Analytics() {
 
             {/* Session outcomes donut */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("sessionOutcomes")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("sessionOutcomes")}</h3>
               <DonutChart segments={sessionOutcomeSegments} />
               <div className="mt-4 pt-4 border-t border-border space-y-1.5">
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{t("totalSessionsLabel")}</span>
                   <Tip raw={(data?.overview.total_sessions ?? 0).toLocaleString()}>
-                    <span className="text-gray-300 font-mono">
+                    <span className="text-gray-600 dark:text-gray-300 font-mono">
                       {fmt(data?.overview.total_sessions ?? 0)}
                     </span>
                   </Tip>
@@ -1310,7 +1310,7 @@ export function Analytics() {
 
             {/* Daily session trends */}
             <div className="card p-5">
-              <h3 className="text-sm font-medium text-gray-300 mb-5">{t("dailySessionTrends")}</h3>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-5">{t("dailySessionTrends")}</h3>
               {dailySessionsLocal.length === 0 ? (
                 <p className="text-sm text-gray-500">{t("noSessionTrendData")}</p>
               ) : (

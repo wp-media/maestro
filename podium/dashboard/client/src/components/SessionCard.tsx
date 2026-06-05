@@ -59,7 +59,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
             <FolderOpen className="w-3.5 h-3.5" />
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="text-sm font-medium text-gray-200 truncate">{title}</p>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{title}</p>
             <p className="text-[11px] text-gray-500 font-mono truncate">
               {session.id.slice(0, 12)}
             </p>

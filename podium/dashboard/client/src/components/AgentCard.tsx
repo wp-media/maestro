@@ -92,7 +92,7 @@ export function AgentCard({ agent, session, label, onClick }: AgentCardProps) {
           </div>
           <div className="min-w-0 overflow-hidden">
             <p
-              className={`text-sm text-gray-200 truncate ${
+              className={`text-sm text-gray-700 dark:text-gray-200 truncate ${
                 useTaskAsHeadline ? "font-semibold" : "font-medium"
               }`}
               title={headline}

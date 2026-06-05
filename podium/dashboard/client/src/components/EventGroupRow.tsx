@@ -88,7 +88,7 @@ export function EventGroupRow({
           aria-label={expanded ? "Collapse group" : "Expand group"}
           disabled={!canExpand}
           className={`p-1 rounded flex-shrink-0 -mr-3 ${
-            canExpand ? "text-gray-500 hover:text-gray-200 cursor-pointer" : "text-transparent"
+            canExpand ? "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 cursor-pointer" : "text-transparent"
           }`}
         >
           <ChevronRight
@@ -127,7 +127,7 @@ export function EventGroupRow({
             );
             return (
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-300 truncate">
+                <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
                   {origin && (
                     <span className="text-gray-500 mr-1" title={`${sid ?? ""} · ${agentId ?? ""}`}>
                       {origin} ·

@@ -189,7 +189,7 @@ export function Sessions() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-100">{t("title")}</h1>
+              <h1 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t("title")}</h1>
               {wsConnected ? (
                 <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -250,7 +250,7 @@ export function Sessions() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent w-full text-sm text-gray-200 outline-none pl-3 pr-8 appearance-none cursor-pointer whitespace-nowrap"
+              className="bg-transparent w-full text-sm text-gray-800 dark:text-gray-200 outline-none pl-3 pr-8 appearance-none cursor-pointer whitespace-nowrap"
             >
               <option value="time">Sort by Time ({sortDesc ? "Newest" : "Oldest"})</option>
               <option value="duration">
@@ -263,7 +263,7 @@ export function Sessions() {
           <div className="w-px h-4 bg-border mx-1" />
           <button
             onClick={() => setSortDesc(!sortDesc)}
-            className="p-1.5 rounded hover:bg-surface-3 text-gray-400 hover:text-gray-200 transition-colors shrink-0"
+            className="p-1.5 rounded hover:bg-surface-3 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors shrink-0"
             title={sortDesc ? "Descending" : "Ascending"}
           >
             {sortDesc ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />}
@@ -278,8 +278,8 @@ export function Sessions() {
               onClick={() => setFilter(opt.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === opt.value
-                  ? "bg-surface-4 text-gray-200"
-                  : "text-gray-500 hover:text-gray-300"
+                  ? "bg-surface-4 text-gray-800 dark:text-gray-200"
+                  : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {opt.label}
@@ -343,7 +343,7 @@ export function Sessions() {
                     <td className="px-5 py-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-200">
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                             {session.name || `${t("defaultName")}${session.id.slice(0, 8)}`}
                           </p>
                           {dashboardRunIds.has(session.id) && (
@@ -407,7 +407,7 @@ export function Sessions() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {t("common:pagination.previous")}
                 </button>
@@ -417,7 +417,7 @@ export function Sessions() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {t("common:pagination.next")}
                 </button>
