@@ -78,8 +78,8 @@ function TerminalBlock({ text, stream }: { text: string; stream: "stdout" | "std
   const cleaned = stripAnsi(text).replace(/^\n+|\n+$/g, "");
   const isErr = stream === "stderr";
   const accent = isErr
-    ? "border-red-500/30 bg-red-950/30 text-red-200/90"
-    : "border-surface-3 bg-surface-4/60 text-gray-200";
+    ? "border-red-500/30 bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-200/90"
+    : "border-surface-3 bg-surface-4/60 text-gray-700 dark:text-gray-200";
   const labelColor = isErr ? "text-red-300/80" : "text-gray-600 dark:text-gray-400";
   return (
     <div className={`rounded-lg border ${accent} overflow-hidden`}>
@@ -237,7 +237,7 @@ export function MessageList({ messages, loading }: MessageListProps) {
         const isAssistant = msg.type === "assistant";
         const accentBar = isAssistant ? "before:bg-violet-500/40" : "before:bg-blue-500/40";
         const avatarRing = isAssistant
-          ? "bg-gradient-to-br from-violet-500/30 to-fuchsia-500/20 text-violet-200 ring-1 ring-violet-400/30"
+          ? "bg-accent/20 text-accent border border-accent/30"
           : "bg-gradient-to-br from-blue-500/30 to-cyan-500/20 text-blue-200 ring-1 ring-blue-400/30";
 
         return (
@@ -258,7 +258,9 @@ export function MessageList({ messages, loading }: MessageListProps) {
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`text-xs font-semibold tracking-wide ${
-                    isAssistant ? "text-violet-200" : "text-blue-200"
+                    isAssistant
+                      ? "text-accent"
+                      : "text-blue-600 dark:text-blue-200"
                   }`}
                 >
                   {isAssistant ? "Assistant" : "User"}
