@@ -243,7 +243,7 @@ function PatternDetail({ pattern }: { pattern: WorkflowPattern }) {
           <Info className="w-3 h-3 text-indigo-700 dark:text-indigo-400" />
           {t("patterns.detail.narrativeHeading")}
         </p>
-        <p className="text-xs text-gray-300 leading-relaxed">{narrative}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">{narrative}</p>
       </div>
 
       {/* Suggestion */}
@@ -252,7 +252,7 @@ function PatternDetail({ pattern }: { pattern: WorkflowPattern }) {
           <Lightbulb className="w-3 h-3" />
           {t("patterns.detail.suggestionHeading")}
         </p>
-        <p className="text-xs text-gray-300 leading-relaxed">{suggestion}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">{suggestion}</p>
       </div>
     </div>
   );
@@ -325,7 +325,7 @@ export function WorkflowPatterns({ data, onPatternClick }: WorkflowPatternsProps
 
   return (
     <div className="card p-5">
-      <h2 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">
+      <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-4">
         {t("patterns.label")}
       </h2>
 

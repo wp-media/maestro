@@ -251,7 +251,7 @@ function renderInline(text: string, baseKey = ""): React.ReactNode[] {
     const italicM = rest.match(/^(\*|_)([^*_\n]+?)\1/);
     if (italicM) {
       push(
-        <em className="italic text-gray-200">{renderInline(italicM[2]!, `${baseKey}-i${n}`)}</em>
+        <em className="italic text-gray-800 dark:text-gray-200">{renderInline(italicM[2]!, `${baseKey}-i${n}`)}</em>
       );
       i += italicM[0].length;
       continue;
@@ -343,8 +343,8 @@ const HEADING_STYLES = [
   "text-[16px] font-semibold text-gray-950 dark:text-gray-50 mt-2",
   "text-[15px] font-semibold text-gray-900 dark:text-gray-100",
   "text-sm font-semibold text-gray-900 dark:text-gray-100",
-  "text-sm font-medium text-gray-200",
-  "text-xs font-medium text-gray-300 uppercase tracking-wider",
+  "text-sm font-medium text-gray-800 dark:text-gray-200",
+  "text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider",
 ];
 
 export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
@@ -352,7 +352,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
   const gap = dense ? "space-y-1.5" : "space-y-2.5";
 
   return (
-    <div className={`text-sm text-gray-300 leading-relaxed ${gap}`}>
+    <div className={`text-sm text-gray-700 dark:text-gray-300 leading-relaxed ${gap}`}>
       {blocks.map((b, idx) => {
         switch (b.kind) {
           case "code":
@@ -375,7 +375,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
                   className="list-decimal pl-5 space-y-1 marker:text-gray-500 marker:font-mono marker:text-xs"
                 >
                   {b.items.map((item, i) => (
-                    <li key={i} className="text-sm text-gray-300">
+                    <li key={i} className="text-sm text-gray-700 dark:text-gray-300">
                       {renderListItem(item, `li${idx}-${i}`)}
                     </li>
                   ))}
@@ -385,7 +385,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
             return (
               <ul key={idx} className="list-disc pl-5 space-y-1 marker:text-violet-400/60">
                 {b.items.map((item, i) => (
-                  <li key={i} className="text-sm text-gray-300">
+                  <li key={i} className="text-sm text-gray-700 dark:text-gray-300">
                     {renderListItem(item, `li${idx}-${i}`)}
                   </li>
                 ))}
@@ -424,7 +424,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
                       {b.header.map((cell, i) => (
                         <th
                           key={i}
-                          className={`px-3 py-1.5 font-semibold text-gray-200 border-b border-surface-3 ${alignClass(b.aligns[i] ?? null)}`}
+                          className={`px-3 py-1.5 font-semibold text-gray-800 dark:text-gray-200 border-b border-surface-3 ${alignClass(b.aligns[i] ?? null)}`}
                         >
                           {renderInline(cell, `th${idx}-${i}`)}
                         </th>
@@ -440,7 +440,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
                         {row.map((cell, ci) => (
                           <td
                             key={ci}
-                            className={`px-3 py-1.5 text-gray-300 align-top ${alignClass(b.aligns[ci] ?? null)}`}
+                            className={`px-3 py-1.5 text-gray-700 dark:text-gray-300 align-top ${alignClass(b.aligns[ci] ?? null)}`}
                           >
                             {renderInline(cell, `td${idx}-${ri}-${ci}`)}
                           </td>
@@ -455,7 +455,7 @@ export function MarkdownContent({ text, dense = false }: MarkdownContentProps) {
 
           case "para":
             return (
-              <p key={idx} className="text-sm text-gray-300 whitespace-pre-wrap break-words">
+              <p key={idx} className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words">
                 {renderInline(b.text, `p${idx}`)}
               </p>
             );

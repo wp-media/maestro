@@ -355,7 +355,7 @@ function CodeView({ value }: { value: unknown }) {
         </span>
         <CopyButton text={text} />
       </div>
-      <pre className="px-3 py-2 text-gray-200 whitespace-pre-wrap break-words max-h-96 overflow-auto">
+      <pre className="px-3 py-2 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words max-h-96 overflow-auto">
         {text}
       </pre>
     </div>

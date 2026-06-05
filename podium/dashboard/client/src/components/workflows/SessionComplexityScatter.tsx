@@ -67,7 +67,7 @@ function Tooltip({ state }: { state: TooltipState }) {
 
   return (
     <div
-      className="fixed z-50 px-3 py-2 text-xs bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-xl text-gray-200 pointer-events-none whitespace-nowrap"
+      className="fixed z-50 px-3 py-2 text-xs bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-xl text-gray-800 dark:text-gray-200 pointer-events-none whitespace-nowrap"
       style={{
         left: nearRight ? state.x - 12 : state.x + 12,
         top: state.y - 10,

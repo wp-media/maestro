@@ -1151,7 +1151,7 @@ function LimitationsBanner() {
           <Lightbulb className="w-3 h-3 text-amber-700 dark:text-amber-300" />
         </span>
         <span className="text-[11.5px] text-gray-600 dark:text-gray-400 truncate">
-          <span className="text-gray-200 font-medium">{t("limitations.title")}</span>
+          <span className="text-gray-800 dark:text-gray-200 font-medium">{t("limitations.title")}</span>
           <span className="text-gray-600 mx-1.5">·</span>
           <span>
             {t(
@@ -1198,18 +1198,18 @@ function LimitationsBanner() {
             <CheckCircle2 className="w-3.5 h-3.5" />
             {t("limitations.supported")}
           </div>
-          <ul className="text-[11.5px] text-gray-300 leading-[1.55] space-y-1 marker:text-emerald-500/40 list-disc pl-4">
+          <ul className="text-[11.5px] text-gray-700 dark:text-gray-300 leading-[1.55] space-y-1 marker:text-emerald-500/40 list-disc pl-4">
             <li>Live streaming output — text, thinking, tool calls, tool results</li>
             <li>Multi-turn conversations &amp; resuming any past session</li>
             <li>User / project / plugin slash commands (template expansion)</li>
             <li>
-              <code className="text-[10.5px] text-gray-200">@</code>-references to files in the
+              <code className="text-[10.5px] text-gray-800 dark:text-gray-200">@</code>-references to files in the
               working directory
             </li>
             <li>Live token / context-window meter</li>
             <li>
               Active-runs switcher; full transcripts in{" "}
-              <code className="text-[10.5px] text-gray-200">/sessions</code>
+              <code className="text-[10.5px] text-gray-800 dark:text-gray-200">/sessions</code>
             </li>
           </ul>
         </div>
@@ -1218,12 +1218,12 @@ function LimitationsBanner() {
             <XCircle className="w-3.5 h-3.5" />
             {t("limitations.limited")}
           </div>
-          <ul className="text-[11.5px] text-gray-300 leading-[1.55] space-y-1 marker:text-rose-500/40 list-disc pl-4">
+          <ul className="text-[11.5px] text-gray-700 dark:text-gray-300 leading-[1.55] space-y-1 marker:text-rose-500/40 list-disc pl-4">
             <li>
-              Built-in slash commands (<code className="text-[10.5px] text-gray-200">/help</code>,{" "}
-              <code className="text-[10.5px] text-gray-200">/model</code>,{" "}
-              <code className="text-[10.5px] text-gray-200">/clear</code>,{" "}
-              <code className="text-[10.5px] text-gray-200">/compact</code>) — they mutate CLI-only
+              Built-in slash commands (<code className="text-[10.5px] text-gray-800 dark:text-gray-200">/help</code>,{" "}
+              <code className="text-[10.5px] text-gray-800 dark:text-gray-200">/model</code>,{" "}
+              <code className="text-[10.5px] text-gray-800 dark:text-gray-200">/clear</code>,{" "}
+              <code className="text-[10.5px] text-gray-800 dark:text-gray-200">/compact</code>) — they mutate CLI-only
               state
             </li>
             <li>Mid-session permission prompts — pick the mode at spawn time</li>
@@ -1236,7 +1236,7 @@ function LimitationsBanner() {
       <div className="mt-3 pl-12 pr-1 flex items-center gap-2">
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-300 inline-flex items-center gap-1.5 transition-colors"
+          className="text-[11px] font-medium px-2.5 py-1 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300 inline-flex items-center gap-1.5 transition-colors"
           aria-expanded={expanded}
         >
           <ChevronDown className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`} />
@@ -1478,7 +1478,7 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
       <span className="inline-flex items-center gap-1.5">
         <Activity className="w-3 h-3 text-gray-700 dark:text-gray-500" />
         <span className="text-gray-700 dark:text-gray-500">{t("tokens.label")}</span>
-        <span className="font-mono text-gray-200">
+        <span className="font-mono text-gray-800 dark:text-gray-200">
           {formatNum(total)} / {formatNum(cap)}
         </span>
         <span
@@ -1496,11 +1496,11 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
       <span className="inline-flex items-center gap-3">
         <span>
           <span className="text-gray-700 dark:text-gray-500">{t("tokens.input")}:</span>{" "}
-          <span className="font-mono text-gray-300">{formatNum(stats.inputTokens)}</span>
+          <span className="font-mono text-gray-700 dark:text-gray-300">{formatNum(stats.inputTokens)}</span>
         </span>
         <span>
           <span className="text-gray-700 dark:text-gray-500">{t("tokens.output")}:</span>{" "}
-          <span className="font-mono text-gray-300">{formatNum(stats.outputTokens)}</span>
+          <span className="font-mono text-gray-700 dark:text-gray-300">{formatNum(stats.outputTokens)}</span>
         </span>
         {stats.cacheReadTokens > 0 && (
           <span>
@@ -1511,7 +1511,7 @@ function TokenMeter({ stats }: { stats: TokenStats }) {
         {stats.costUsd != null && (
           <span>
             <span className="text-gray-700 dark:text-gray-500">{t("tokens.cost")}:</span>{" "}
-            <span className="font-mono text-gray-200">${stats.costUsd.toFixed(4)}</span>
+            <span className="font-mono text-gray-800 dark:text-gray-200">${stats.costUsd.toFixed(4)}</span>
           </span>
         )}
       </span>
@@ -1894,7 +1894,7 @@ function PromptEditor({
                 }`}
               >
                 <FileCode className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-                <span className="font-mono text-[11px] text-gray-200 truncate">{p}</span>
+                <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 truncate">{p}</span>
               </button>
             ))
           )}
@@ -2075,7 +2075,7 @@ function ActiveRunsSwitcher({
         className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
           liveCount > 0
             ? "border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-500/15"
-            : "border-border bg-surface-2 text-gray-300 hover:bg-surface-3"
+            : "border-border bg-surface-2 text-gray-700 dark:text-gray-300 hover:bg-surface-3"
         }`}
       >
         <ListOrdered className="w-3.5 h-3.5" />
@@ -2358,7 +2358,7 @@ function FilterChipGroup<T extends string>({
             className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full border transition-colors disabled:opacity-40 ${
               active
                 ? "bg-accent/15 border-accent/50 text-accent"
-                : "bg-surface-2 border-border text-gray-300 hover:bg-surface-3 hover:border-border-strong"
+                : "bg-surface-2 border-border text-gray-700 dark:text-gray-300 hover:bg-surface-3 hover:border-border-strong"
             }`}
           >
             {opt.label}
@@ -2439,7 +2439,7 @@ function UnifiedRunRowView({
           {canView && (
             <button
               onClick={onView}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-300 hover:text-gray-100 px-2 py-0.5 text-[10.5px] font-medium transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 px-2 py-0.5 text-[10.5px] font-medium transition-colors"
             >
               <Eye className="w-3 h-3" />
               {t("runs.viewLabel", "View")}
@@ -2448,7 +2448,7 @@ function UnifiedRunRowView({
         </span>
       </div>
       {row.promptPreview && (
-        <div className="text-[12px] text-gray-300 line-clamp-2 leading-snug">
+        <div className="text-[12px] text-gray-700 dark:text-gray-300 line-clamp-2 leading-snug">
           {row.promptPreview}
         </div>
       )}
@@ -2608,7 +2608,7 @@ function ConfigCard(props: ConfigCardProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 px-4 py-3">
         <Field label={t("fields.cwd")}>
           {isResume && props.resumeSession ? (
-            <div className="bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-300 flex items-center gap-2">
+            <div className="bg-surface-2 border border-border rounded-md px-3 py-1.5 text-[11px] font-mono text-gray-700 dark:text-gray-300 flex items-center gap-2">
               <Lock className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
               <span className="truncate">{props.resumeSession.cwd}</span>
             </div>
@@ -2719,7 +2719,7 @@ function ModeOption({
         active ? "border-accent/40 bg-accent/10" : "border-border bg-surface-2 hover:bg-surface-3"
       }`}
     >
-      <div className={`text-sm font-medium ${active ? "text-accent" : "text-gray-200"}`}>
+      <div className={`text-sm font-medium ${active ? "text-accent" : "text-gray-800 dark:text-gray-200"}`}>
         {label}
       </div>
       <div className="text-[11px] text-gray-700 dark:text-gray-500 mt-0.5">{hint}</div>
@@ -2870,7 +2870,7 @@ function CwdAutocomplete({
                         isActive ? "bg-accent/15" : "hover:bg-surface-3"
                       }`}
                     >
-                      <div className="text-[11px] text-gray-200 truncate">{s.label}</div>
+                      <div className="text-[11px] text-gray-800 dark:text-gray-200 truncate">{s.label}</div>
                       <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate">{s.path}</div>
                     </button>
                   );
@@ -2941,13 +2941,13 @@ function SessionPicker({
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent border border-accent/30">
               {t("resume.selectedBadge")}
             </span>
-            <span className="font-mono text-[11px] text-gray-200 truncate">{selected.id}</span>
+            <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 truncate">{selected.id}</span>
           </div>
           <div className="font-mono text-[10px] text-gray-700 dark:text-gray-500 truncate mt-0.5">{selected.cwd}</div>
         </div>
         <button
           onClick={() => onSelect(null)}
-          className="text-[10px] font-medium px-2 py-0.5 rounded border border-border bg-surface-2 hover:bg-surface-3 text-gray-300 inline-flex items-center gap-1 flex-shrink-0"
+          className="text-[10px] font-medium px-2 py-0.5 rounded border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300 inline-flex items-center gap-1 flex-shrink-0"
         >
           <X className="w-3 h-3" />
           {t("resume.clear")}
@@ -3008,7 +3008,7 @@ function SessionPicker({
                     >
                       {s.status}
                     </span>
-                    <span className="font-mono text-[11px] text-gray-200 truncate">
+                    <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 truncate">
                       {s.id.slice(0, 12)}…
                     </span>
                     <span className="text-[10px] text-gray-600 ml-auto flex-shrink-0">
@@ -3156,7 +3156,7 @@ function Select<T extends string>({
                 <div className="flex items-center gap-2">
                   <span
                     className={`text-[11px] flex-1 truncate ${
-                      isSelected ? "text-accent font-medium" : "text-gray-200"
+                      isSelected ? "text-accent font-medium" : "text-gray-800 dark:text-gray-200"
                     }`}
                   >
                     {opt.label}
@@ -3315,7 +3315,7 @@ function RunSession(props: RunSessionProps) {
         {props.handle.sessionId && (
           <Link
             to={`/sessions/${encodeURIComponent(props.handle.sessionId)}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-300 hover:text-gray-100 px-2.5 py-1 text-[11px] font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 px-2.5 py-1 text-[11px] font-medium transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
             {t("actions.viewSession")}
@@ -3500,7 +3500,7 @@ function UserTurn({ env }: { env: UserMessage }) {
       <Avatar tone="indigo" letter={t("events.you").charAt(0)} />
       <div className="flex-1 min-w-0">
         <div className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 mb-1">{t("events.you")}</div>
-        <div className="rounded-lg border border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-sm text-gray-200 whitespace-pre-wrap break-words">
+        <div className="rounded-lg border border-indigo-200 dark:border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
           {text || "—"}
         </div>
       </div>
@@ -3536,7 +3536,7 @@ function AssistantTurn({ env }: { env: AssistantMessage }) {
           <ThinkingBlock key={`th-${i}`} text={th.thinking || ""} />
         ))}
         {text && (
-          <div className="text-sm text-gray-200 leading-relaxed prose-claude">
+          <div className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed prose-claude">
             <MarkdownContent text={text} />
           </div>
         )}
@@ -3592,7 +3592,7 @@ function ToolUseBlock({ toolUse }: { toolUse: Extract<ContentBlock, { type: "too
         <span className="text-[10px] text-gray-600 ml-auto">{t("events.tool")}</span>
       </button>
       {open && (
-        <pre className="px-3 py-2 text-[11px] font-mono text-gray-300 whitespace-pre-wrap break-words border-t border-amber-200 dark:border-amber-500/30 max-h-72 overflow-auto">
+        <pre className="px-3 py-2 text-[11px] font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words border-t border-amber-200 dark:border-amber-500/30 max-h-72 overflow-auto">
           {JSON.stringify(toolUse.input, null, 2)}
         </pre>
       )}

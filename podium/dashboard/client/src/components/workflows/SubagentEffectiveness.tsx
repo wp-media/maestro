@@ -228,7 +228,7 @@ function SparklineTooltip({
     <div
       ref={ref}
       role="tooltip"
-      className="fixed z-[60] px-2 py-1 bg-[#12121f] border border-[#2a2a4a] rounded-md shadow-xl text-[10px] text-gray-200 whitespace-nowrap pointer-events-none"
+      className="fixed z-[60] px-2 py-1 bg-[#12121f] border border-[#2a2a4a] rounded-md shadow-xl text-[10px] text-gray-800 dark:text-gray-200 whitespace-nowrap pointer-events-none"
       style={{ left: pos.left, top: pos.top }}
     >
       <span className="font-medium">{label}</span>
@@ -249,7 +249,7 @@ interface MetricBoxProps {
 function MetricBox({ label, value }: MetricBoxProps) {
   return (
     <div className="flex flex-col items-center gap-0.5 bg-surface-3 rounded-lg px-2 py-2 flex-1 min-w-0 overflow-hidden">
-      <span className="text-xs font-semibold text-gray-200 tabular-nums truncate w-full text-center">
+      <span className="text-xs font-semibold text-gray-800 dark:text-gray-200 tabular-nums truncate w-full text-center">
         {value}
       </span>
       <span className="text-[9px] text-gray-700 dark:text-gray-500 uppercase tracking-wider truncate w-full text-center">
@@ -284,7 +284,7 @@ function ScoreCard({ item, colorIndex }: ScoreCardProps) {
           style={{ backgroundColor: color }}
           aria-hidden="true"
         />
-        <span className="text-sm font-medium text-gray-200 truncate" title={item.subagent_type}>
+        <span className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate" title={item.subagent_type}>
           {item.subagent_type}
         </span>
       </div>

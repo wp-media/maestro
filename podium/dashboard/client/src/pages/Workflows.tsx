@@ -402,24 +402,24 @@ function ChartInfoPopover({ infoKey, title }: { infoKey: string; title: string }
         <div
           ref={popoverRef}
           role="tooltip"
-          className="fixed z-50 p-3.5 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-300 pointer-events-none"
+          className="fixed z-50 p-3.5 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-700 dark:text-gray-300 pointer-events-none"
           style={{ left: coords.left, top: coords.top, width: POPOVER_W }}
         >
           <p className="text-xs font-semibold text-gray-900 dark:text-gray-100 mb-2.5 pb-2 border-b border-[#2a2a4a]">
             {title}
           </p>
 
-          <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.what")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.what`)}</p>
 
-          <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.howToRead")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(`chartInfo.${infoKey}.howToRead`)}</p>
 
-          <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("chartInfo.labels.why")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug">{t(`chartInfo.${infoKey}.why`)}</p>

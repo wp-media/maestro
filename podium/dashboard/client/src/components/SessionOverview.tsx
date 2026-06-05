@@ -48,7 +48,7 @@ function StatTile({
   tone?: "default" | "violet" | "emerald" | "amber" | "rose" | "cyan" | "blue";
 }) {
   const palette = {
-    default: "border-surface-3 bg-surface-2 text-gray-200",
+    default: "border-surface-3 bg-surface-2 text-gray-800 dark:text-gray-200",
     violet: "border-violet-200 dark:border-violet-500/20 bg-violet-500/5 text-violet-800 dark:text-violet-200",
     emerald: "border-emerald-200 dark:border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:text-emerald-200",
     amber: "border-amber-200 dark:border-amber-500/20 bg-amber-500/5 text-amber-800 dark:text-amber-200",
@@ -301,7 +301,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
         {/* Tool usage */}
         <div className="lg:col-span-2 rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
               <Wrench className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400" />
               Top tools
             </h3>
@@ -360,7 +360,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
             return (
               <>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
                     <GitBranch className="w-3.5 h-3.5 text-cyan-700 dark:text-cyan-400" />
                     Subagents
                   </h3>
@@ -379,7 +379,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
                         <div key={r.key} className="flex items-center gap-2">
                           <span
                             className={`font-mono text-xs truncate flex-1 min-w-0 ${
-                              r.isCompaction ? "text-amber-700 dark:text-amber-300" : "text-gray-300"
+                              r.isCompaction ? "text-amber-700 dark:text-amber-300" : "text-gray-700 dark:text-gray-300"
                             }`}
                             title={r.label}
                           >
@@ -409,7 +409,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
       {totalTokens > 0 && (
         <div className="rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
           <div className="flex items-center justify-between mb-2.5">
-            <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider flex items-center gap-1.5">
               <Coins className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
               Token flow
             </h3>
@@ -422,7 +422,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
       {/* Event-type breakdown — secondary, only top 6 */}
       {stats.events_by_type.length > 0 && (
         <div className="rounded-lg border border-surface-3 bg-surface-2/60 p-3.5">
-          <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <Activity className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
             Event mix
           </h3>
@@ -434,7 +434,7 @@ export function SessionOverview({ session, agents }: SessionOverviewProps) {
               >
                 <span className="text-gray-600 dark:text-gray-400">{e.event_type}</span>
                 <span className="text-gray-700 dark:text-gray-500">·</span>
-                <span className="text-gray-200">{e.count.toLocaleString()}</span>
+                <span className="text-gray-800 dark:text-gray-200">{e.count.toLocaleString()}</span>
               </span>
             ))}
           </div>

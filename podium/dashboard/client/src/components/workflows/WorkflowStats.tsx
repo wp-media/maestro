@@ -182,7 +182,7 @@ function InfoPopover({ calculationKey, interp, valueDisplay, metricPhraseKey }: 
         <div
           ref={popoverRef}
           role="tooltip"
-          className="fixed z-50 p-3 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-300 pointer-events-none"
+          className="fixed z-50 p-3 bg-[#12121f] border border-[#2a2a4a] rounded-lg shadow-2xl text-[11px] text-gray-700 dark:text-gray-300 pointer-events-none"
           style={{ left: coords.left, top: coords.top, width: POPOVER_W }}
         >
           <div className="flex items-baseline gap-2 mb-2 pb-2 border-b border-[#2a2a4a]">
@@ -194,12 +194,12 @@ function InfoPopover({ calculationKey, interp, valueDisplay, metricPhraseKey }: 
             </span>
           </div>
 
-          <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("stats.tooltip.howCalc")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug mb-2.5">{t(calculationKey)}</p>
 
-          <p className="font-semibold text-gray-200 uppercase tracking-wider text-[9px] mb-1">
+          <p className="font-semibold text-gray-800 dark:text-gray-200 uppercase tracking-wider text-[9px] mb-1">
             {t("stats.tooltip.whatItMeans")}
           </p>
           <p className="text-gray-600 dark:text-gray-400 leading-snug">{valueMeans}</p>

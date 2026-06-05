@@ -749,7 +749,7 @@ export function OrchestrationDAG({ data, onNodeClick, selectedNode }: Orchestrat
             <line x1="8" y1="13" x2="16" y2="17" />
           </svg>
         </div>
-        <h3 className="text-base font-medium text-gray-300 mb-2">{t("orchestration.noData")}</h3>
+        <h3 className="text-base font-medium text-gray-700 dark:text-gray-300 mb-2">{t("orchestration.noData")}</h3>
         <p className="text-sm text-gray-700 dark:text-gray-500 max-w-sm">{t("orchestration.noDataDesc")}</p>
       </div>
     );
@@ -835,7 +835,7 @@ function buildDAGTooltipContent(el: HTMLDivElement, node: DAGNode, t: TFn) {
   const meta = describeNode(node, t);
 
   const title = document.createElement("p");
-  title.className = "text-xs font-semibold text-gray-200";
+  title.className = "text-xs font-semibold text-gray-800 dark:text-gray-200";
   title.textContent = node.label;
   el.appendChild(title);
 
