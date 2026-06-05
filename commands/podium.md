@@ -11,32 +11,21 @@ description: >
 
 ## How Podium works
 
-Podium captures every `Agent` and `Workflow` tool invocation through Claude
-Code hooks — **zero tokens, zero orchestrator changes**. The hook script
-(`podium/hook.mjs`) fires on every agent spawn, appends one JSON line to
-`{TEMP_ROOT}/podium/{session_id}/events.jsonl`, and exits in under 1 s.
-The server tails those files and streams them to the browser via SSE.
+Podium is a forked and WP Media branded version of Claude Code Agent Monitor (MIT).
+It captures every Claude Code event through native hooks, stores them in SQLite,
+and streams updates to the browser via WebSocket. Zero extra LLM calls.
 
-## Config loading
+## Config
 
-Read `.claude/maestro.json`:
+| Variable | Value |
+|---|---|
+| `DASHBOARD_ROOT` | `/Users/gaelrobin/Desktop/Work/maestro/podium/dashboard` |
+| `INSTALL_SCRIPT` | `{DASHBOARD_ROOT}/scripts/install-hooks.js` |
+| `HOOK_HANDLER` | `{DASHBOARD_ROOT}/scripts/hook-handler.js` |
+| `PORT` | `4820` |
+| `LOG_FILE` | `{TEMP_ROOT}/podium/server.log` (fallback: `/tmp/podium/server.log`) |
 
-| Variable | JSON path | Default |
-|---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
-| `PORT` | `.ai.podium.port` | `7337` |
-
-## Resolve Maestro plugin root
-
-This skill is at `{root}/commands/podium.md`. The plugin root is one level up.
-
-```
-SERVER_PATH  = {root}/podium/app/server/index.mjs
-INSTALL_PATH = {root}/podium/install.mjs
-LOG_FILE     = {TEMP_ROOT}/podium/server.log
-```
-
-Fallback: look for `podium/app/server/index.mjs` in `~/.claude/plugins/maestro/`.
+`TEMP_ROOT` is read from `.claude/maestro.json` at `.ai.temp_root`, defaulting to `.maestro`.
 
 ---
 
@@ -44,36 +33,27 @@ Fallback: look for `podium/app/server/index.mjs` in `~/.claude/plugins/maestro/`
 
 First-time wiring of Claude Code hooks. Run once per project (or globally).
 
-**a. Check if already set up**
+**a. Register hooks**
 
 ```bash
-node {INSTALL_PATH} --check
+node /Users/gaelrobin/Desktop/Work/maestro/podium/dashboard/scripts/install-hooks.js
 ```
 
-Exit 0 → already installed, tell the user and stop.
+Registers the Podium hook handler in `.claude/settings.json` so every Claude Code
+event is captured by `hook-handler.js`.
 
-**b. Register hooks**
+**b. Optional: install globally** (all projects on this machine)
 
 ```bash
-node {INSTALL_PATH}
+node /Users/gaelrobin/Desktop/Work/maestro/podium/dashboard/scripts/install-hooks.js --global
 ```
 
-Registers `SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`,
-`PostToolUseFailure`, `SubagentStart`, `SubagentStop`, `SessionEnd`
-in `.claude/settings.json`.
-
-**c. Optional: install globally** (all projects on this machine)
-
-```bash
-node {INSTALL_PATH} --global
-```
-
-**d. Confirm**
+**c. Confirm**
 
 Print:
 ```
-✓ Podium hooks registered in .claude/settings.json
-  → Restart Claude Code to activate, then run /podium start
+Podium hooks registered in .claude/settings.json
+  -> Restart Claude Code to activate, then run /podium start
 ```
 
 ---
@@ -84,50 +64,44 @@ Start the dashboard server (hooks must be set up first).
 
 **a. Warn if hooks are missing**
 
-```bash
-node {INSTALL_PATH} --check
-```
-
-If exit 1: print a gentle warning — "Hooks not set up. Run `/podium setup`
-first, then restart Claude Code." — but continue anyway (server still useful
-for browsing past runs).
+Check `.claude/settings.json` for the presence of `hook-handler.js`. If absent,
+print a gentle warning: "Hooks not set up. Run `/podium setup` first, then restart
+Claude Code." — but continue anyway (the server is still useful for browsing past runs).
 
 **b. Check if already running**
 
 ```bash
-curl -s --max-time 2 http://localhost:{PORT}/health
+curl -s --max-time 2 http://localhost:4820/health
 ```
 
 HTTP 200 → already up, skip to step d.
 
-**c. Start server in background, log to file**
+**c. Start server in background**
 
 ```bash
-node {SERVER_PATH} --temp-root {TEMP_ROOT} --port {PORT} >> {LOG_FILE} 2>&1 &
+cd /Users/gaelrobin/Desktop/Work/maestro/podium/dashboard && npm run start >> {LOG_FILE} 2>&1 &
 ```
 
-> For dev mode (auto-reload): `cd {root}/podium/app && npm run dev`
-
-Wait 1.5 s, then verify:
+Wait 2 s, then verify:
 
 ```bash
-curl -s --max-time 2 http://localhost:{PORT}/health
+curl -s --max-time 2 http://localhost:4820/health
 ```
 
 If still unreachable: "Podium failed to start. Check `{LOG_FILE}` for errors."
 
-**d. Show current sessions**
+**d. Show current stats**
 
 ```bash
-curl -s http://localhost:{PORT}/api/runs
+curl -s http://localhost:4820/api/stats
 ```
 
-Print a compact summary (last 5 sessions: status dot, short ID, agents, duration).
+Print a compact summary (total sessions, active agents, recent activity).
 
 **e. Print URL**
 
 ```
-◆ Podium running → http://localhost:{PORT}
+Podium running -> http://localhost:4820
 ```
 
 ---
@@ -135,7 +109,7 @@ Print a compact summary (last 5 sessions: status dot, short ID, agents, duration
 ## `/podium stop`
 
 ```bash
-lsof -ti:{PORT}
+lsof -ti:4820
 ```
 
 No output → "Podium is not running."
@@ -143,10 +117,10 @@ No output → "Podium is not running."
 Otherwise:
 
 ```bash
-kill $(lsof -ti:{PORT})
+kill $(lsof -ti:4820)
 ```
 
-Confirm: "◆ Podium stopped."
+Confirm: "Podium stopped."
 
 ---
 
@@ -161,26 +135,30 @@ Run `/podium stop`, wait 1 s, then run `/podium start`.
 Full health snapshot.
 
 ```bash
-curl -s --max-time 2 http://localhost:{PORT}/health
+curl -s --max-time 2 http://localhost:4820/health
 ```
 
 **If not running:** "Podium is not running. Run `/podium start` to launch it."
 
-**If running,** show:
-- Server: port · TEMP\_ROOT · uptime
-- Hooks: run `node {INSTALL_PATH} --check` → installed / not installed
-- Sessions: `curl -s http://localhost:{PORT}/api/runs` → table of all runs
+**If running,** also fetch:
+
+```bash
+curl -s http://localhost:4820/api/stats
+```
+
+Display:
+- Server: port 4820 · uptime
+- Hooks: present in `.claude/settings.json` → installed / not installed
+- Stats summary from `/api/stats`
 
 ```
-◆ Podium status
-  Server  http://localhost:7337  uptime 4m 12s
-  Hooks   ✓ installed (.claude/settings.json)
-  
-  Sessions (3)
+Podium status
+  Server  http://localhost:4820  uptime 4m 12s
+  Hooks   installed (.claude/settings.json)
+
+  Stats
   ─────────────────────────────────────────────────
-  ● issue-42   running   grooming · backend · qa     —
-  ✓ issue-41   2m 14s    grooming · backend · qa     done
-  ✗ issue-39   failed    grooming                    escalated
+  Sessions  12   Agents  47   Tool calls  312
 ```
 
 ---
@@ -202,10 +180,10 @@ If the file doesn't exist: "No log file found. Has Podium been started yet?"
 Remove hooks from settings.json:
 
 ```bash
-node {INSTALL_PATH} --uninstall
+node /Users/gaelrobin/Desktop/Work/maestro/podium/dashboard/scripts/install-hooks.js --uninstall
 ```
 
-Confirm: "◆ Podium hooks removed. Restart Claude Code to apply."
+Confirm: "Podium hooks removed. Restart Claude Code to apply."
 
 Does **not** stop a running server — run `/podium stop` first if needed.
 
@@ -225,7 +203,7 @@ Alias for `/podium start`.
 | `/podium start` | Start the dashboard server |
 | `/podium stop` | Stop the server |
 | `/podium restart` | Stop then start |
-| `/podium status` | Health + hooks + session list |
+| `/podium status` | Health + hooks + stats |
 | `/podium logs` | Tail server log |
 | `/podium uninstall` | Remove hooks from settings.json |
 
@@ -233,11 +211,10 @@ Alias for `/podium start`.
 
 ## Notes
 
-- Hooks fire **per-project**: the hook reads `cwd` from the harness event and
-  resolves TEMP\_ROOT from `.claude/maestro.json` in that directory.
-- Token cost: **zero**. The hook exits before Claude Code processes its next
-  turn.
+- Hooks fire **per-project**: the hook handler reads the Claude Code event payload
+  and stores data in SQLite under the dashboard's data directory.
+- Token cost: **zero**. Hooks execute outside the LLM turn.
 - Podium is read-only — it never modifies code or project files.
-- Sessions appear in the sidebar automatically; refresh with the ↺ button.
-- The React app requires Node 18+. Run `npm install` in `podium/app/` before first use.
-- For production with Docker: `cd podium && docker-compose up -d`
+- The dashboard is served as a static SPA from `{DASHBOARD_ROOT}/index.html`.
+- Requires Node 18+. Run `npm install` inside `{DASHBOARD_ROOT}` before first use.
+- The server listens on port **4820** by default.

@@ -16,6 +16,31 @@
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import http from 'node:http'
+
+/**
+ * Fire-and-forget POST to the Podium dashboard server.
+ * Never blocks — if the server is not running, silently fails.
+ */
+function postToDashboard(hookType, data) {
+  try {
+    const payload = JSON.stringify({ hook_type: hookType, data })
+    const req = http.request({
+      hostname: '127.0.0.1',
+      port: 4820,
+      path: '/api/hooks/event',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    })
+    req.setTimeout(1000, () => req.destroy())
+    req.on('error', () => {}) // silent — server may not be running
+    req.write(payload)
+    req.end()
+  } catch { /* silent */ }
+}
 
 // Returns the value if it's a non-empty string, otherwise null.
 function asString(v) {
@@ -246,4 +271,7 @@ function run(input) {
       appendFileSync(eventsFile, JSON.stringify(event) + '\n')
     } catch { /* disk full or permissions — silent */ }
   }
+
+  // ── Forward full payload to Podium dashboard (fire-and-forget) ───────────────
+  postToDashboard(p.hook_event_name, p)
 }
