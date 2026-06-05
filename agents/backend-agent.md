@@ -75,6 +75,14 @@ Follow the spec's **Implementation Plan** for backend files only. Do not touch J
 - Follow the project's option access pattern defined in `.claude/commands/{ARCH_SKILL}.md`.
 - WordPress hooks through a Subscriber — never direct `add_action`/`add_filter`.
 
+**Risk-tiered test execution** — use the command from the spec's "Test Command" section. If not specified, apply the default table:
+
+| Risk level | Command |
+|---|---|
+| LOW | Targeted group: `vendor/bin/phpunit --group FeatureName` |
+| MEDIUM | Group + regression: targeted group, then `composer test-integration -- --group FeatureName` |
+| HIGH | Full suite: `composer test-unit && composer test-integration` |
+
 ---
 
 ### Step 2.5 — Documentation update

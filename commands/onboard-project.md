@@ -104,7 +104,8 @@ confirmed values. Use this exact structure:
     "editions": null,
     "e2e": {
       "settings_path": null,
-      "ci_integration": false
+      "ci_integration": false,
+      "license_option_key": null
     },
     "podium": {
       "port": 4820

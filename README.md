@@ -344,9 +344,9 @@ Autonomy flags:
 
 ## Releasing a New Version
 
-1. Merge your changes to `main`
+1. Merge `develop` into `trunk`
 2. Bump `version` in `.claude-plugin/plugin.json`
-3. Create a GitHub Release with a matching tag (e.g. `v1.1.0`)
+3. Create a GitHub Release from `trunk` with a matching tag (e.g. `v0.3.2`)
 
 Every engineer using the plugin picks up the update automatically on their next Claude session — no action required.
 

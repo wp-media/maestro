@@ -26,6 +26,7 @@ Before any step, read `.claude/maestro.json` and extract:
 | `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
 | `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
 | `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
+| `LICENSE_KEY` | `.ai.e2e.license_option_key` | `wp_rocket_settings` (null if not applicable) |
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
 
@@ -75,7 +76,52 @@ Read `.claude/maestro.json` and resolve all variables from the config table abov
 2. Read the linked issue if there is one (`Fixes #N`).
 3. Read every changed frontend file in full — not just the diff.
 
+#### Step 1b — Regression proof (required when the PR fixes a bug)
+
+If the linked issue describes a bug (not a new feature), you must prove the bug is fixed:
+
+1. **Document the original failure mode** — from the issue body, extract the exact steps that triggered the bug and the expected-but-wrong behavior.
+2. **Verify the fix on the PR branch** — walk through those exact steps on the current branch (already checked out). Confirm the wrong behavior is gone.
+3. **Record the proof** — include a "Regression proof" row in your criteria results table:
+
+| Acceptance Criterion | Method | Result |
+|---|---|---|
+| Original bug: <one-line description> | Browser/API | ✅ Bug no longer reproducible — [what you observed] |
+
+If you cannot verify the original failure mode (the issue is too vague, or the environment doesn't support it), document the skip reason. Do not silently omit the regression check.
+
+---
+
 ### Step 2 — Bring up the environment
+
+#### Branch guard (run before booting)
+
+Verify you are on the correct branch before doing anything:
+
+```bash
+CURRENT_BRANCH=$(git branch --show-current)
+PR_BRANCH=$(gh pr view <PR_number> --json headRefName -q .headRefName)
+
+if [ "$CURRENT_BRANCH" != "$PR_BRANCH" ]; then
+  echo "BRANCH MISMATCH: current=$CURRENT_BRANCH expected=$PR_BRANCH — aborting"
+  exit 1
+fi
+```
+
+If the branches do not match, abort immediately. Report `CANNOT_VERIFY` with reason `"branch mismatch: testing was attempted on $CURRENT_BRANCH instead of $PR_BRANCH"` to `qa-engineer`.
+
+#### Display requirement
+
+Browser-based testing (Playwright MCP) requires a graphical display. Before booting:
+
+```bash
+# Check for a display (Linux/headless environments)
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && ! command -v open &>/dev/null; then
+  echo "No display detected — headless/SSH environment"
+fi
+```
+
+If running in a headless environment (SSH, CI without Xvfb, remote server), Playwright MCP cannot drive a browser. Return `CANNOT_VERIFY` with reason `"no graphical display available — browser testing requires a local display or Xvfb"` to `qa-engineer`. Do not silently attempt browser tests that will fail.
 
 ```bash
 {E2E_BOOT}
@@ -105,6 +151,24 @@ as a setup blocker to `qa-engineer` and stop. Do not attempt to proceed without 
 required plugin — results would be invalid.
 
 **Never install plugins that are not explicitly required by the issue or "How to test".**
+
+---
+
+#### Step 2c — License / premium feature check (conditional)
+
+If `{LICENSE_KEY}` is defined (non-null in maestro.json), verify the plugin license is active before testing any licensed or premium feature:
+
+```bash
+# Read the license option from the WordPress database
+LICENSE_VALUE=$(bin/wp option get {LICENSE_KEY} 2>/dev/null)
+if [ -z "$LICENSE_VALUE" ]; then
+  echo "License not active — {LICENSE_KEY} option is empty or missing"
+fi
+```
+
+If the license is not active and the acceptance criteria being tested involve premium or licensed features, return `CANNOT_VERIFY` with reason `"plugin license not active — {LICENSE_KEY} option empty; licensed feature tests skipped"` for those specific criteria. Do not mark them PASS or FAIL — they cannot be validly tested without a license.
+
+If `{LICENSE_KEY}` is null (not defined in maestro.json), skip this step entirely.
 
 ---
 
@@ -198,6 +262,21 @@ rm -rf .e2e-screenshots/
 rm -rf .e2e-temp/
 ```
 
+**6e — Spec coverage check (run before cleanup of specs):**
+
+Before deleting spec files, verify every `test()` or `it()` block you wrote has a matching entry in your criteria results:
+
+```bash
+# Count test blocks in all written specs
+grep -c -E "^\s*(test|it)\(" .e2e-temp/*.spec.js 2>/dev/null || echo 0
+```
+
+Compare the count against your `criteria_results` array length. If there are more test blocks than criteria entries:
+- For each unmatched `test()` / `it()` block: add a `SKIPPED` entry to `criteria_results` with the test description and reason (e.g. "spec written but not executed — environment limitation").
+- Never report fewer criteria results than spec test blocks.
+
+---
+
 ### Step 7 — Report back to qa-engineer
 
 Follow the `qa-engineer` output format. For every acceptance criterion:
@@ -270,3 +349,9 @@ After the prose report, return the following JSON object to `qa-engineer`:
 - ✅ **Always do:** read the PR's "How to test" before touching the browser; take screenshots at each checkpoint; publish screenshots via `gh gist create --public` before deleting them locally; include gist raw URLs in the report and return JSON; clean up all temp files; uninstall any plugins you installed in Step 2b
 - ⚠️ **Ask first (report as blocker):** if `gh` CLI is not authenticated; if the boot command is missing; if a "How to test" step is ambiguous; if a required premium plugin is not present and cannot be installed via `wp plugin install`
 - 🚫 **Never do:** commit screenshot files to the PR branch (use gist instead); commit `.e2e-temp/` spec files when `{E2E_CI}` is false; modify plugin source code; use `setTimeout`/`waitForTimeout` in specs; report PASS without screenshot or log evidence; leave `.e2e-screenshots/` or `.e2e-temp/` directories locally after the run; install plugins not explicitly required by the issue
+
+## Known limitations
+
+**Playwright video recording:** The Playwright MCP does not expose a video recording API. Video evidence is not available at this time. Screenshots remain the primary visual evidence mechanism. Status: not implemented — pending Playwright MCP support or migration to Playwright CLI.
+
+**Temp spec promotion to permanent suite:** There is no automated path to promote `.e2e-temp/` specs to the project's permanent E2E suite. When `{E2E_CI}` is false, all temp specs are deleted after the run. If the team decides to keep a spec permanently, it must be moved manually and committed outside of this pipeline. Status: not implemented — needs team decision on promotion criteria before a path can be designed.

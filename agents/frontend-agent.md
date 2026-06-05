@@ -94,6 +94,16 @@ Core rules (enforced by the skill files):
 - No unsafe `innerHTML` — use `textContent` or `createElement`.
 - Nonces localized via `wp_localize_script` — never hardcoded.
 
+**Risk-tiered test execution** — use the command from the spec's "Test Command" section. If not specified:
+
+| Risk level | Command |
+|---|---|
+| LOW | `npm run test -- --testPathPattern=<FeatureName>` (or equivalent targeted run) |
+| MEDIUM | Targeted + `npm run test:regression` if configured |
+| HIGH | Full suite: `npm run test && npm run build` |
+
+If no JS test suite is configured in `package.json`, mark `automated-tests` as `N/A` in DOD L1.
+
 ---
 
 ### Step 2.5 — Documentation update

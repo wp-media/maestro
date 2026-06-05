@@ -133,8 +133,8 @@ For details, read:
 - `.claude/agents/qa-engineer.md` — strategy selection and report format
 - `.claude/agents/e2e-qa-tester.md` — browser flow execution, spec authoring, screenshot publishing
 
-The extended tier writes Playwright specs to `.e2e-temp/` (gitignored, never committed)
-and screenshots to `.e2e-screenshots/`. Screenshots are published to a public GitHub Gist to get permanent, publicly accessible raw URLs — no commits to the PR branch.
+The extended tier writes Playwright specs to `.e2e-temp/` (gitignored, never committed when `{E2E_CI}` is false)
+and screenshots to `.e2e-screenshots/`. Screenshots are published to a public GitHub Gist (`gh gist create --public`) to get permanent, publicly accessible raw URLs — no commits to the PR branch. Gist raw URLs never 404 in PR comments, unlike commit-SHA-based URLs.
 
 ---
 
