@@ -50,7 +50,7 @@ export function EventFiltersInfo() {
 
         <Section title={t("eventFilters.help.lifecycleTitle")}>
           <p className="text-[11px] text-gray-600 dark:text-gray-400 mb-2">{t("eventFilters.help.lifecycleDesc")}</p>
-          <code className="block bg-black/40 border border-border rounded p-2 text-[11px] font-mono text-gray-300 whitespace-pre-wrap">
+          <code className="block bg-black/40 border border-border rounded p-2 text-[11px] font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
             {t("eventFilters.help.lifecycleFlow")}
           </code>
         </Section>
@@ -102,7 +102,7 @@ export function EventFiltersInfo() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <details className="group" open>
-      <summary className="cursor-pointer select-none px-3 py-1.5 text-[11px] text-gray-300 hover:bg-surface-2/60 flex items-center gap-2">
+      <summary className="cursor-pointer select-none px-3 py-1.5 text-[11px] text-gray-700 dark:text-gray-300 hover:bg-surface-2/60 flex items-center gap-2">
         <span className="text-gray-700 dark:text-gray-500 transition-transform group-open:rotate-90">▶</span>
         <span className="font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">{title}</span>
       </summary>
@@ -114,7 +114,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, desc }: { label: string; desc: string }) {
   return (
     <>
-      <dt className="font-semibold text-gray-300 whitespace-nowrap">{label}</dt>
+      <dt className="font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">{label}</dt>
       <dd className="text-gray-600 dark:text-gray-400">{desc}</dd>
     </>
   );

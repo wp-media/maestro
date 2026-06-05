@@ -207,7 +207,7 @@ export function ImportHistory() {
 
   return (
     <section>
-      <h3 className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-1">
+      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-1">
         <History className="w-4 h-4 text-gray-700 dark:text-gray-500" />
         {t("import.title")}
       </h3>
@@ -220,20 +220,20 @@ export function ImportHistory() {
             onClick={() => setInstructionsOpen((v) => !v)}
             className="w-full flex items-center justify-between px-4 py-3 bg-surface-2 hover:bg-surface-3 transition-colors"
           >
-            <span className="flex items-center gap-2 text-xs font-semibold text-gray-300 uppercase tracking-wider">
+            <span className="flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
               <ListChecks className="w-3.5 h-3.5 text-blue-700 dark:text-blue-400" />
               {t("import.instructions")}
             </span>
             <span className="text-[11px] text-gray-700 dark:text-gray-500">{instructionsOpen ? "▾" : "▸"}</span>
           </button>
           {instructionsOpen && (
-            <div className="px-4 py-4 space-y-4 text-sm text-gray-300 bg-surface-1">
+            <div className="px-4 py-4 space-y-4 text-sm text-gray-700 dark:text-gray-300 bg-surface-1">
               {/* Default location card */}
               {guide && (
                 <div className="flex flex-wrap items-center gap-2 text-xs bg-surface-2 border border-border rounded-md px-3 py-2">
                   <HardDrive className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
                   <span className="text-gray-600 dark:text-gray-400">{t("import.defaultLocation")}:</span>
-                  <code className="font-mono text-gray-200 truncate">
+                  <code className="font-mono text-gray-800 dark:text-gray-200 truncate">
                     {guide.default_projects_dir_display}
                   </code>
                   {guide.default_projects_dir_exists ? (
@@ -261,7 +261,7 @@ export function ImportHistory() {
                   {guide && (
                     <div className="mt-2 flex items-center gap-2 bg-surface-2 border border-border rounded-md px-3 py-2">
                       <Terminal className="w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-                      <code className="flex-1 text-xs font-mono text-gray-200 truncate">
+                      <code className="flex-1 text-xs font-mono text-gray-800 dark:text-gray-200 truncate">
                         {guide.archive_command}
                       </code>
                       <button
@@ -324,7 +324,7 @@ export function ImportHistory() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <FolderOpen className="w-4 h-4 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-                <code className="font-mono text-xs text-gray-300 truncate">
+                <code className="font-mono text-xs text-gray-700 dark:text-gray-300 truncate">
                   {guide?.default_projects_dir_display || "~/.claude/projects"}
                 </code>
               </div>
@@ -394,7 +394,7 @@ export function ImportHistory() {
                 }`}
               >
                 <UploadCloud className="w-6 h-6 text-gray-700 dark:text-gray-500 mx-auto mb-2" />
-                <p className="text-sm text-gray-300">{t("import.dropzoneHint")}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{t("import.dropzoneHint")}</p>
                 <p className="text-[11px] text-gray-700 dark:text-gray-500 mt-1">{t("import.dropzoneSub")}</p>
                 <input
                   ref={fileInputRef}
@@ -515,7 +515,7 @@ function Step({
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-gray-200">{title}</p>
+      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{title}</p>
       <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-line">{body}</p>
       {children}
     </div>
@@ -546,7 +546,7 @@ function ModeButton({
     >
       <div
         className={`flex items-center gap-1.5 text-xs font-medium mb-1 ${
-          active ? "text-blue-700 dark:text-blue-300" : "text-gray-300"
+          active ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"
         }`}
       >
         {icon}

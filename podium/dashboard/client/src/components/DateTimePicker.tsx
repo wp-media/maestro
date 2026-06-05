@@ -136,7 +136,7 @@ export function DateTimePicker({
               ? "bg-accent text-white font-medium"
               : isToday
                 ? "bg-surface-3 text-accent font-medium"
-                : "hover:bg-surface-2 text-gray-300 hover:text-white"
+                : "hover:bg-surface-2 text-gray-700 dark:text-gray-300 hover:text-white"
           }`}
       >
         {i}
@@ -159,7 +159,7 @@ export function DateTimePicker({
         className={`flex items-center gap-2 bg-surface-2 border ${isOpen ? "border-accent" : "border-border"} rounded px-2 py-1.5 min-w-[150px] text-xs focus:outline-none focus:border-accent transition-colors w-full text-left`}
       >
         <Calendar className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 shrink-0" />
-        <span className={`flex-1 truncate ${!dateObj ? "text-gray-700 dark:text-gray-500" : "text-gray-200"}`}>
+        <span className={`flex-1 truncate ${!dateObj ? "text-gray-700 dark:text-gray-500" : "text-gray-800 dark:text-gray-200"}`}>
           {dateObj ? formatDisplay(dateObj) : placeholder}
         </span>
         {dateObj && (
@@ -182,7 +182,7 @@ export function DateTimePicker({
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-xs font-medium text-gray-200">
+            <span className="text-xs font-medium text-gray-800 dark:text-gray-200">
               {viewDate.toLocaleString(undefined, { month: "long", year: "numeric" })}
             </span>
             <button
@@ -218,7 +218,7 @@ export function DateTimePicker({
               type="time"
               value={timeValue}
               onChange={handleTimeChange}
-              className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-gray-200 focus:outline-none focus:border-accent w-[85px] time-input-custom"
+              className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-gray-800 dark:text-gray-200 focus:outline-none focus:border-accent w-[85px] time-input-custom"
             />
           </div>
         </div>

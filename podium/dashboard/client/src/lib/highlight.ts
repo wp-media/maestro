@@ -639,7 +639,7 @@ export function tokenClass(type: TokenType): string {
       return "text-violet-700 dark:text-violet-300";
     case "plain":
     default:
-      return "text-gray-200";
+      return "text-gray-800 dark:text-gray-200";
   }
 }
 

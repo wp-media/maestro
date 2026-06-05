@@ -50,7 +50,7 @@ export function Terminal({ command, description }: { command: string; descriptio
         <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide">terminal</span>
         <CopyButton text={command} />
       </div>
-      <pre className="px-3 py-2 text-gray-200 whitespace-pre-wrap break-words">
+      <pre className="px-3 py-2 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
         {description && <div className="text-gray-700 dark:text-gray-500 mb-1"># {description}</div>}
         <div>
           <span className="text-emerald-700 dark:text-emerald-400 select-none">$ </span>
@@ -110,7 +110,7 @@ function OutputBlock({
   text: string;
   variant: "out" | "err";
 }) {
-  const color = variant === "err" ? "text-red-700 dark:text-red-300" : "text-gray-200";
+  const color = variant === "err" ? "text-red-700 dark:text-red-300" : "text-gray-800 dark:text-gray-200";
   return (
     <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
       <div className="flex items-center justify-between px-3 py-1 border-b border-border bg-black/40">
@@ -154,7 +154,7 @@ export function LineNumberedCode({
                 <td className="px-2 text-right text-gray-600 select-none bg-black/40 border-r border-border align-top">
                   {i + startLine}
                 </td>
-                <td className="px-3 text-gray-200 whitespace-pre-wrap break-words">{line}</td>
+                <td className="px-3 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">{line}</td>
               </tr>
             ))}
           </tbody>
@@ -209,7 +209,7 @@ function HunkView({ hunk }: { hunk: DiffHunk }) {
                 ? "bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-200"
                 : kind === "remove"
                   ? "bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-200"
-                  : "text-gray-300";
+                  : "text-gray-700 dark:text-gray-300";
             const oldCell = showOld ? oldLine++ : "";
             const newCell = showNew ? newLine++ : "";
             const sign = kind === "add" ? "+" : kind === "remove" ? "-" : " ";
@@ -260,7 +260,7 @@ export function KeyValueCard({
             <td className="text-gray-700 dark:text-gray-500 align-top py-1.5 px-2 font-mono bg-surface-3/60 w-[28%] break-all">
               {k}
             </td>
-            <td className="text-gray-300 align-top py-1.5 px-2">
+            <td className="text-gray-700 dark:text-gray-300 align-top py-1.5 px-2">
               <ValueCell value={v} />
             </td>
           </tr>
@@ -284,16 +284,16 @@ function ValueCell({ value }: { value: unknown }) {
         {String(value)}
       </span>
     );
-  if (typeof value === "number") return <span className="font-mono text-gray-300">{value}</span>;
+  if (typeof value === "number") return <span className="font-mono text-gray-700 dark:text-gray-300">{value}</span>;
   if (typeof value === "string") {
     if (value.length > 120 || value.includes("\n")) {
       return (
-        <pre className="bg-surface-3 text-gray-300 text-[11px] font-mono p-2 rounded border border-border whitespace-pre-wrap break-words max-h-48 overflow-auto">
+        <pre className="bg-surface-3 text-gray-700 dark:text-gray-300 text-[11px] font-mono p-2 rounded border border-border whitespace-pre-wrap break-words max-h-48 overflow-auto">
           {value}
         </pre>
       );
     }
-    return <span className="font-mono text-gray-300 break-all">{value}</span>;
+    return <span className="font-mono text-gray-700 dark:text-gray-300 break-all">{value}</span>;
   }
   if (Array.isArray(value)) {
     if (value.length === 0) return <span className="text-gray-700 dark:text-gray-500 italic">[]</span>;
@@ -308,7 +308,7 @@ function ValueCell({ value }: { value: unknown }) {
     );
   }
   return (
-    <pre className="bg-surface-3 text-gray-300 text-[11px] font-mono p-2 rounded border border-border whitespace-pre-wrap break-words max-h-48 overflow-auto">
+    <pre className="bg-surface-3 text-gray-700 dark:text-gray-300 text-[11px] font-mono p-2 rounded border border-border whitespace-pre-wrap break-words max-h-48 overflow-auto">
       {safeStringify(value)}
     </pre>
   );
@@ -329,7 +329,7 @@ export function FileList({ paths }: { paths: string[] }) {
   return (
     <ul className="divide-y divide-border border border-border rounded overflow-hidden text-[11px] max-h-80 overflow-y-auto">
       {paths.map((p, i) => (
-        <li key={i} className="px-3 py-1 font-mono text-gray-300 break-all">
+        <li key={i} className="px-3 py-1 font-mono text-gray-700 dark:text-gray-300 break-all">
           {p}
         </li>
       ))}
@@ -348,7 +348,7 @@ export function MatchList({ matches }: { matches: GrepMatch[] }) {
   return (
     <ul className="divide-y divide-border border border-border rounded overflow-hidden text-[11px] max-h-80 overflow-y-auto font-mono">
       {matches.map((m, i) => (
-        <li key={i} className="px-3 py-1 text-gray-300 break-all">
+        <li key={i} className="px-3 py-1 text-gray-700 dark:text-gray-300 break-all">
           {m.file && <span className="text-cyan-700 dark:text-cyan-300">{m.file}</span>}
           {m.line != null && <span className="text-gray-700 dark:text-gray-500">:{m.line}</span>}
           {m.text && <span className="text-gray-600 dark:text-gray-400">: {m.text}</span>}

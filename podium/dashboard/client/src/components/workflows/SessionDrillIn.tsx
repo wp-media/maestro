@@ -137,7 +137,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
 
         {/* Name */}
         <span
-          className={`text-sm font-medium truncate ${isMain ? "text-indigo-700 dark:text-indigo-300" : "text-gray-200"}`}
+          className={`text-sm font-medium truncate ${isMain ? "text-indigo-700 dark:text-indigo-300" : "text-gray-800 dark:text-gray-200"}`}
         >
           {node.name}
         </span>
@@ -520,7 +520,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
           type="text"
           value={search}
           placeholder={t("drillIn.searchPlaceholder")}
-          className="flex-1 bg-transparent text-xs text-gray-200 placeholder-gray-600 outline-none min-w-0"
+          className="flex-1 bg-transparent text-xs text-gray-800 dark:text-gray-200 placeholder-gray-600 outline-none min-w-0"
           onFocus={() => setOpen(true)}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -570,7 +570,7 @@ function SessionSelector({ onSelectSession }: SessionSelectorProps) {
                         {s.status}
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="block text-xs font-medium text-gray-200 truncate">
+                        <span className="block text-xs font-medium text-gray-800 dark:text-gray-200 truncate">
                           {s.name ?? s.id}
                         </span>
                         {s.name && (

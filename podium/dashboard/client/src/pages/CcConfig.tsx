@@ -515,7 +515,7 @@ function Header({
           <ScopeToggle value={scope} onChange={onScopeChange} />
           <button
             onClick={onOpenBackups}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-gray-200 hover:bg-surface-3 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-gray-800 dark:text-gray-200 hover:bg-surface-3 transition-colors"
           >
             <History className="w-3.5 h-3.5" />
             {t("backups.openButton")}
@@ -523,7 +523,7 @@ function Header({
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-gray-200 hover:bg-surface-3 disabled:opacity-60 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-gray-800 dark:text-gray-200 hover:bg-surface-3 disabled:opacity-60 transition-colors"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             {loading ? t("refreshing") : t("refresh")}
@@ -663,7 +663,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
         <button
           onClick={() => scrollByButton(-1)}
           aria-label="scroll tabs left"
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md w-7 h-7 flex items-center justify-center bg-surface-2 border border-border text-gray-300 hover:text-gray-100 hover:bg-surface-3"
+          className="absolute left-1 top-1/2 -translate-y-1/2 z-20 rounded-md w-7 h-7 flex items-center justify-center bg-surface-2 border border-border text-gray-700 dark:text-gray-300 hover:text-gray-100 hover:bg-surface-3"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -714,7 +714,7 @@ function Tabs({ current, onSelect, counts }: TabsProps) {
         <button
           onClick={() => scrollByButton(1)}
           aria-label="scroll tabs right"
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 rounded-md w-7 h-7 flex items-center justify-center bg-surface-2 border border-border text-gray-300 hover:text-gray-100 hover:bg-surface-3"
+          className="absolute right-1 top-1/2 -translate-y-1/2 z-20 rounded-md w-7 h-7 flex items-center justify-center bg-surface-2 border border-border text-gray-700 dark:text-gray-300 hover:text-gray-100 hover:bg-surface-3"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -1109,7 +1109,7 @@ function RootRow({
         <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
           {label}
         </div>
-        <div className="font-mono text-[11px] text-gray-200 truncate">{value}</div>
+        <div className="font-mono text-[11px] text-gray-800 dark:text-gray-200 truncate">{value}</div>
       </div>
       <CopyButton value={value} />
     </div>
@@ -1224,14 +1224,14 @@ function MdItemCard({ item, onOpen, onEdit, onDelete, kind }: MdItemCardProps) {
         <div className="flex flex-col gap-1.5 flex-shrink-0">
           <button
             onClick={() => onOpen(filePath)}
-            className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+            className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
           >
             <ExternalLink className="w-3 h-3" />
             {t("common.viewSource")}
           </button>
           <button
             onClick={() => onEdit(artifactType, { scope: item.scope, name: item.name, filePath })}
-            className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+            className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
           >
             <Pencil className="w-3 h-3" />
             {t("edit.editButton")}
@@ -1369,7 +1369,7 @@ function PluginCard({ plugin: p }: { plugin: CcPlugin }) {
                 {contribCounts.map((c) => (
                   <span
                     key={c.key}
-                    className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-surface-3 text-gray-300 border border-border"
+                    className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-surface-3 text-gray-700 dark:text-gray-300 border border-border"
                   >
                     {c.label}
                   </span>
@@ -1507,7 +1507,7 @@ function McpCard({ server }: { server: CcMcpServer }) {
         {server.kind === "stdio" && (
           <>
             <Field label={t("mcp.command")}>
-              <span className="font-mono text-gray-300">{server.command}</span>
+              <span className="font-mono text-gray-700 dark:text-gray-300">{server.command}</span>
             </Field>
             {server.args && server.args.length > 0 && (
               <Field label={t("mcp.args")}>
@@ -1524,7 +1524,7 @@ function McpCard({ server }: { server: CcMcpServer }) {
         {server.kind === "http" && (
           <>
             <Field label={t("mcp.url")}>
-              <span className="font-mono text-gray-300">{server.url}</span>
+              <span className="font-mono text-gray-700 dark:text-gray-300">{server.url}</span>
             </Field>
             {server.headers && server.headers.length > 0 && (
               <Field label={t("mcp.headers")}>
@@ -1595,7 +1595,7 @@ function HooksPanel({
               {src.exists ? (
                 <button
                   onClick={() => onOpen(src.file)}
-                  className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+                  className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
                 >
                   <ExternalLink className="w-3 h-3" />
                   {t("common.viewSource")}
@@ -1611,7 +1611,7 @@ function HooksPanel({
                 <div className="space-y-3">
                   {filteredEvents.map(([event, entries]) => (
                     <div key={event}>
-                      <div className="text-[11px] font-semibold text-gray-300 mb-1.5 inline-flex items-center gap-2">
+                      <div className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1.5 inline-flex items-center gap-2">
                         <Wrench className="w-3 h-3 text-gray-700 dark:text-gray-500" />
                         {event}
                         <span className="text-[10px] text-gray-600">({entries.length})</span>
@@ -1633,7 +1633,7 @@ function HooksPanel({
                               )}
                             </div>
                             {h.command && (
-                              <div className="mt-1 font-mono text-[11px] text-gray-300 break-all">
+                              <div className="mt-1 font-mono text-[11px] text-gray-700 dark:text-gray-300 break-all">
                                 {h.command}
                               </div>
                             )}
@@ -1666,7 +1666,7 @@ function HooksPanel({
                 className="w-full text-left rounded-md border border-border bg-surface-1 hover:bg-surface-3 px-3 py-1.5 inline-flex items-center gap-2"
               >
                 <FileText className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-                <span className="font-mono text-[11px] text-gray-200 flex-1 truncate">
+                <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 flex-1 truncate">
                   {s.name}
                 </span>
                 <span className="text-[10px] text-gray-700 dark:text-gray-500">{formatBytes(s.size)}</span>
@@ -1734,7 +1734,7 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
             <div className="text-[11px] font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-500 mb-1.5">
               {t("statusline.configured")}
             </div>
-            <div className="rounded-md border border-border bg-surface-1 px-3 py-2 text-[11px] font-mono text-gray-200">
+            <div className="rounded-md border border-border bg-surface-1 px-3 py-2 text-[11px] font-mono text-gray-800 dark:text-gray-200">
               <span className="text-gray-700 dark:text-gray-500">type:</span> {data.config.type ?? "—"}
               {data.config.command && (
                 <>
@@ -1760,7 +1760,7 @@ function StatuslineBlock({ data, onOpen }: { data: CcStatusline; onOpen: (p: str
                   className="w-full text-left rounded-md border border-border bg-surface-1 hover:bg-surface-3 px-3 py-1.5 inline-flex items-center gap-2"
                 >
                   <FileText className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-                  <span className="font-mono text-[11px] text-gray-200 flex-1 truncate">
+                  <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 flex-1 truncate">
                     {s.file}
                   </span>
                   <span className="text-[10px] text-gray-700 dark:text-gray-500">{formatBytes(s.size)}</span>
@@ -1794,13 +1794,13 @@ function SettingsBlock({
           <>
             <button
               onClick={() => setShowRaw((v) => !v)}
-              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100"
+              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100"
             >
               {showRaw ? "Structured" : "Raw JSON"}
             </button>
             <button
               onClick={() => onOpen(source.file)}
-              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
             >
               <ExternalLink className="w-3 h-3" />
               {t("common.viewSource")}
@@ -1812,7 +1812,7 @@ function SettingsBlock({
       </div>
       {source.exists &&
         (showRaw ? (
-          <pre className="p-3 text-[11px] font-mono text-gray-300 overflow-auto max-h-96">
+          <pre className="p-3 text-[11px] font-mono text-gray-700 dark:text-gray-300 overflow-auto max-h-96">
             {JSON.stringify(source.data, null, 2)}
           </pre>
         ) : (
@@ -1864,10 +1864,10 @@ function SettingsValue({ value }: { value: unknown }) {
     );
   }
   if (typeof value === "number") {
-    return <span className="font-mono text-[11px] text-gray-200">{value}</span>;
+    return <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200">{value}</span>;
   }
   if (typeof value === "string") {
-    return <span className="font-mono text-[11px] text-gray-200 break-all">{value}</span>;
+    return <span className="font-mono text-[11px] text-gray-800 dark:text-gray-200 break-all">{value}</span>;
   }
   if (Array.isArray(value)) {
     if (value.length === 0) return <span className="text-[11px] text-gray-600">[]</span>;
@@ -1876,7 +1876,7 @@ function SettingsValue({ value }: { value: unknown }) {
         {value.map((item, i) => (
           <span
             key={i}
-            className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-300 border border-border break-all"
+            className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-3 text-gray-700 dark:text-gray-300 border border-border break-all"
           >
             {typeof item === "object" ? JSON.stringify(item) : String(item)}
           </span>
@@ -1891,7 +1891,7 @@ function SettingsValue({ value }: { value: unknown }) {
       {Object.entries(obj).map(([k, v]) => (
         <div key={k} className="font-mono text-[11px]">
           <span className="text-gray-700 dark:text-gray-500">{k}:</span>{" "}
-          <span className="text-gray-200 break-all">
+          <span className="text-gray-800 dark:text-gray-200 break-all">
             {typeof v === "object" ? JSON.stringify(v) : String(v)}
           </span>
         </div>
@@ -1939,14 +1939,14 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
             <span className="text-[10px] text-gray-600">{formatBytes(m.size)}</span>
             <button
               onClick={() => onOpen(m.file)}
-              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
             >
               <ExternalLink className="w-3 h-3" />
               {t("common.viewSource")}
             </button>
             <button
               onClick={() => onEdit("memory", { scope: m.scope, name: "", filePath: m.file })}
-              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
+              className="text-[11px] font-medium px-2 py-1 rounded-md border border-border bg-surface-1 hover:bg-surface-3 text-gray-700 dark:text-gray-300 hover:text-gray-100 inline-flex items-center gap-1.5"
             >
               <Pencil className="w-3 h-3" />
               {t("edit.editButton")}
@@ -1959,7 +1959,7 @@ function MemoryPanel({ items, onOpen, onEdit, onDelete, onCreate }: MemoryPanelP
               {t("edit.deleteButton")}
             </button>
           </div>
-          <pre className="p-3 text-[11px] font-mono text-gray-300 whitespace-pre-wrap break-words max-h-72 overflow-auto">
+          <pre className="p-3 text-[11px] font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words max-h-72 overflow-auto">
             {m.preview}
             {m.truncated && (
               <span className="text-gray-600 italic">
@@ -2128,14 +2128,14 @@ function KeybindingsPanel({ data, search }: { data: CcKeybindings | null; search
         if (filtered.length === 0) return null;
         return (
           <div key={g.context} className="rounded-lg border border-border bg-surface-2">
-            <div className="border-b border-border px-4 py-2 text-xs font-medium text-gray-300">
+            <div className="border-b border-border px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300">
               {t("keybindings.context")}: <span className="text-gray-900 dark:text-gray-100">{g.context}</span>
               <span className="ml-2 text-[10px] text-gray-600">({filtered.length})</span>
             </div>
             <div className="divide-y divide-border">
               {filtered.map((b) => (
                 <div key={b.key} className="px-4 py-1.5 flex items-center gap-3">
-                  <kbd className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-3 border border-border text-gray-200 min-w-20 text-center">
+                  <kbd className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-3 border border-border text-gray-800 dark:text-gray-200 min-w-20 text-center">
                     {b.key}
                   </kbd>
                   <span className="font-mono text-[11px] text-gray-600 dark:text-gray-400">{b.action}</span>
@@ -2249,7 +2249,7 @@ function FileViewer({
       >
         <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
           <FileText className="w-4 h-4 text-gray-700 dark:text-gray-500" />
-          <span className="font-mono text-[12px] text-gray-300 truncate flex-1">{state.path}</span>
+          <span className="font-mono text-[12px] text-gray-700 dark:text-gray-300 truncate flex-1">{state.path}</span>
           <CopyButton value={state.path} />
           <button
             onClick={onClose}
@@ -2268,7 +2268,7 @@ function FileViewer({
           ) : !state.data ? (
             <div className="text-sm text-gray-700 dark:text-gray-500">…</div>
           ) : (
-            <pre className="text-[11px] font-mono text-gray-200 whitespace-pre-wrap break-words">
+            <pre className="text-[11px] font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
               {state.data.text}
               {state.data.truncated && (
                 <span className="text-gray-700 dark:text-gray-500 italic">
@@ -2447,7 +2447,7 @@ function EditorModal({ state, onClose, onSave }: EditorModalProps) {
         <div className="border-t border-border px-4 py-3 flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-300"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300"
           >
             {t("edit.cancel")}
           </button>
@@ -2511,7 +2511,7 @@ function ConfirmDeleteModal({ state, onCancel, onConfirm }: ConfirmDeleteModalPr
         </div>
         <div className="p-4 space-y-3">
           <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{t("edit.confirmDeleteBody")}</p>
-          <div className="rounded-md border border-border bg-surface-2 px-3 py-2 font-mono text-[11px] text-gray-300 break-all">
+          <div className="rounded-md border border-border bg-surface-2 px-3 py-2 font-mono text-[11px] text-gray-700 dark:text-gray-300 break-all">
             {t("edit.confirmDeletePath", { path: state.path })}
           </div>
         </div>
@@ -2519,7 +2519,7 @@ function ConfirmDeleteModal({ state, onCancel, onConfirm }: ConfirmDeleteModalPr
           <button
             onClick={onCancel}
             disabled={busy}
-            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-300 disabled:opacity-60"
+            className="text-[12px] font-medium px-3 py-1.5 rounded-md border border-border bg-surface-2 hover:bg-surface-3 text-gray-700 dark:text-gray-300 disabled:opacity-60"
           >
             {t("edit.cancel")}
           </button>
@@ -2611,7 +2611,7 @@ function CommandSnippet({ command, label }: { command: string; label?: string })
   return (
     <div className="rounded-md border border-border bg-surface-2 px-2.5 py-1.5 flex items-center gap-2">
       <Terminal className="w-3 h-3 text-gray-700 dark:text-gray-500 flex-shrink-0" />
-      <code className="font-mono text-[11px] text-gray-200 truncate flex-1">{command}</code>
+      <code className="font-mono text-[11px] text-gray-800 dark:text-gray-200 truncate flex-1">{command}</code>
       {label && (
         <span className="text-[10px] text-gray-700 dark:text-gray-500 hidden md:inline truncate">{label}</span>
       )}

@@ -144,7 +144,7 @@ export function TabbyPanel({
         {/* ask */}
         <form onSubmit={submit} className="flex items-center gap-1.5">
           <input
-            className="flex-1 rounded-lg border border-border bg-surface-1 px-2.5 py-1.5 text-xs text-gray-200 placeholder-gray-500 transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
+            className="flex-1 rounded-lg border border-border bg-surface-1 px-2.5 py-1.5 text-xs text-gray-800 dark:text-gray-200 placeholder-gray-500 transition-colors focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
             placeholder="Ask Tabby… (e.g. any errors?)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -159,7 +159,7 @@ export function TabbyPanel({
           </button>
         </form>
         {answer && (
-          <p className="mt-2 rounded-lg bg-surface-1/70 px-2.5 py-2 text-xs leading-relaxed text-gray-300">
+          <p className="mt-2 rounded-lg bg-surface-1/70 px-2.5 py-2 text-xs leading-relaxed text-gray-700 dark:text-gray-300">
             {answer}
           </p>
         )}
@@ -176,7 +176,7 @@ interface Tone {
 
 const TONE_MUTED: Tone = {
   wrap: "border-border bg-surface-1",
-  value: "text-gray-300",
+  value: "text-gray-700 dark:text-gray-300",
   icon: "text-gray-700 dark:text-gray-500",
 };
 
@@ -227,7 +227,7 @@ function ActionButton({
 }) {
   return (
     <button
-      className="flex items-center gap-1.5 rounded-lg bg-surface-1 px-2 py-1.5 text-xs text-gray-300 transition-colors hover:bg-surface-4 hover:text-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+      className="flex items-center gap-1.5 rounded-lg bg-surface-1 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 transition-colors hover:bg-surface-4 hover:text-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
       onClick={onClick}
       disabled={disabled}
     >

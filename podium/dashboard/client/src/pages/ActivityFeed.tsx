@@ -420,7 +420,7 @@ export function ActivityFeed() {
                             );
                             return (
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm text-gray-300 truncate">
+                                <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
                                   {origin && (
                                     <span
                                       className="text-gray-700 dark:text-gray-500 mr-1"

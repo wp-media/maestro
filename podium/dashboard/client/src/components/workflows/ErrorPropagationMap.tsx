@@ -157,7 +157,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
                     className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                     style={{ backgroundColor: DEPTH_COLORS[Math.min(i, DEPTH_COLORS.length - 1)] }}
                   />
-                  <span className="text-xs text-gray-300 truncate flex-1 min-w-0">
+                  <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 min-w-0">
                     {t.subagent_type}
                   </span>
                   <div className="w-16 h-1.5 bg-surface-4 rounded-full overflow-hidden flex-shrink-0">
@@ -203,7 +203,7 @@ export function ErrorPropagationMap({ data }: ErrorPropagationMapProps) {
                   <line x1="12" y1="9" x2="12" y2="13" />
                   <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
-                <span className="text-xs text-gray-300 truncate flex-1 min-w-0" title={e.summary}>
+                <span className="text-xs text-gray-700 dark:text-gray-300 truncate flex-1 min-w-0" title={e.summary}>
                   {e.summary}
                 </span>
                 <span className="flex-shrink-0 text-[11px] font-semibold text-amber-700 dark:text-amber-400 tabular-nums">
