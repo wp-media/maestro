@@ -109,6 +109,66 @@ function formatUptime(seconds: number): string {
   return `${m}m`;
 }
 
+// --- Draggable health-card ordering -----------------------------------------
+
+const HEALTH_CARD_ORDER_KEY = "podium-dashboard-order";
+const DEFAULT_HEALTH_CARD_ORDER = [
+  "runtime",
+  "storage",
+  "health",
+  "tokens",
+  "concurrency",
+  "tools",
+  "subagents",
+  "integration",
+  "platform",
+] as const;
+
+function loadHealthCardOrder(): string[] {
+  try {
+    const saved = localStorage.getItem(HEALTH_CARD_ORDER_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as string[];
+      // Only honour a saved order that still contains every known card id,
+      // so adding a new card in a future release falls back to the default.
+      if (
+        Array.isArray(parsed) &&
+        DEFAULT_HEALTH_CARD_ORDER.every((id) => parsed.includes(id))
+      ) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore malformed localStorage and fall through to default
+  }
+  return [...DEFAULT_HEALTH_CARD_ORDER];
+}
+
+function SortableCard({ id, children }: { id: string; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <button
+        {...attributes}
+        {...listeners}
+        type="button"
+        className="absolute top-3 right-3 z-10 p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-grab active:cursor-grabbing touch-none"
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+      {children}
+    </div>
+  );
+}
+
 function SystemHealthTab() {
   const [info, setInfo] = useState<SystemInfo | null>(null);
   const [workflow, setWorkflow] = useState<WorkflowData | null>(null);
@@ -163,6 +223,31 @@ function SystemHealthTab() {
       heapUsedPct,
     };
   }, [info, workflow]);
+
+  const [order, setOrder] = useState<string[]>(loadHealthCardOrder);
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setOrder((prev) => {
+        const next = arrayMove(
+          prev,
+          prev.indexOf(String(active.id)),
+          prev.indexOf(String(over.id))
+        );
+        try {
+          localStorage.setItem(HEALTH_CARD_ORDER_KEY, JSON.stringify(next));
+        } catch {
+          // best-effort persistence; ignore quota/availability errors
+        }
+        return next;
+      });
+    }
+  }, []);
 
   if (!info || !workflow || !stats) {
     return (
@@ -222,11 +307,10 @@ function SystemHealthTab() {
     )
   );
 
-  return (
-    <div className="space-y-6 animate-fade-in pb-10">
-      {/* Row 1: Runtime + Storage + Health Score */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Runtime Environment */}
+  const cardMap: Record<string, React.ReactNode> = {
+    runtime: (
+      /* Runtime Environment */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -303,8 +387,11 @@ function SystemHealthTab() {
             </Tip>
           </div>
         </div>
-
-        {/* Storage Engine */}
+      )
+    ),
+    storage: (
+      /* Storage Engine */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -437,8 +524,11 @@ function SystemHealthTab() {
             </div>
           </div>
         </div>
-
-        {/* Health Score */}
+      )
+    ),
+    health: (
+      /* Health Score */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -550,11 +640,11 @@ function SystemHealthTab() {
             </Tip>
           </div>
         </div>
-      </div>
-
-      {/* Row 2: Model Usage + Concurrency */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Model Token Distribution */}
+      )
+    ),
+    tokens: (
+      /* Model Token Distribution */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -609,8 +699,11 @@ function SystemHealthTab() {
             )}
           </div>
         </div>
-
-        {/* Concurrency Timeline */}
+      )
+    ),
+    concurrency: (
+      /* Concurrency Timeline */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -687,11 +780,11 @@ function SystemHealthTab() {
             </Tip>
           </div>
         </div>
-      </div>
-
-      {/* Row 3: Tool Usage + Subagent Effectiveness */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Tool Invocations */}
+      )
+    ),
+    tools: (
+      /* Tool Invocations */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -745,8 +838,11 @@ function SystemHealthTab() {
             )}
           </div>
         </div>
-
-        {/* Subagent Effectiveness */}
+      )
+    ),
+    subagents: (
+      /* Subagent Effectiveness */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -795,11 +891,11 @@ function SystemHealthTab() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Row 4: Integration Gateway + Platform Config */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Integration Gateway */}
+      )
+    ),
+    integration: (
+      /* Integration Gateway */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -855,8 +951,11 @@ function SystemHealthTab() {
             </div>
           </Tip>
         </div>
-
-        {/* Platform Config */}
+      )
+    ),
+    platform: (
+      /* Platform Config */
+      (
         <div className="card p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -900,7 +999,29 @@ function SystemHealthTab() {
             </div>
           </Tip>
         </div>
-      </div>
+      )
+    ),
+  };
+
+  return (
+    <div className="animate-fade-in pb-10">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={order} strategy={rectSortingStrategy}>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+            {order.map((id) =>
+              cardMap[id] ? (
+                <SortableCard key={id} id={id}>
+                  {cardMap[id]}
+                </SortableCard>
+              ) : null
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
