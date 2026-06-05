@@ -280,7 +280,7 @@ export function Sidebar({ wsConnected, collapsed, onToggle }: SidebarProps) {
           {!collapsed && (
             <div className="min-w-0">
               <h1 className="text-sm font-bold text-gray-900 dark:text-white truncate">Podium</h1>
-              <p className="text-[11px] text-accent">{"{wpmedia}"}</p>
+              <p className="text-[11px] text-amber-700 dark:text-accent font-semibold">{"{wpmedia}"}</p>
             </div>
           )}
         </div>

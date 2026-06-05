@@ -585,7 +585,7 @@ export function SessionDetail() {
           }}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "agents"
-              ? "border-accent text-accent"
+              ? "border-accent text-gray-900 dark:text-accent font-semibold"
               : "border-transparent text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
@@ -599,7 +599,7 @@ export function SessionDetail() {
           }}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "conversation"
-              ? "border-accent text-accent"
+              ? "border-accent text-gray-900 dark:text-accent font-semibold"
               : "border-transparent text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
@@ -613,7 +613,7 @@ export function SessionDetail() {
           }}
           className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "timeline"
-              ? "border-accent text-accent"
+              ? "border-accent text-gray-900 dark:text-accent font-semibold"
               : "border-transparent text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
           }`}
         >
@@ -890,7 +890,7 @@ export function SessionDetail() {
                 aria-pressed={grouped}
                 className={`text-[11px] px-3 py-1 cursor-pointer ${
                   grouped
-                    ? "bg-accent/20 text-accent"
+                    ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
                     : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
@@ -902,7 +902,7 @@ export function SessionDetail() {
                 aria-pressed={!grouped}
                 className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
                   !grouped
-                    ? "bg-accent/20 text-accent"
+                    ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
                     : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                 }`}
               >
