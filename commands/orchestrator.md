@@ -154,18 +154,30 @@ user can see what mode you picked.
 
 ## Run log
 
+**Check config first:** read `.ai.html_log` from `.claude/maestro.json`.
+
+- `html_log: false` (default) — **skip all workflow-log.html writes entirely**.
+  Podium captures every agent event via zero-token Claude Code hooks — no token cost,
+  no context bloat from writing HTML on every step. Use Podium at `http://localhost:4820`.
+- `html_log: true` — enable the legacy HTML log (described below). Set this only if
+  Podium is not set up and you need a static log file.
+
+**When `html_log: false` (default):** still maintain in context:
+- Which agents have been invoked and their return JSON
+- Loop counters per decision point (`grooming_loop`, `dod_loop`, `review_loop`, `qa_loop`)
+- Non-blocking NTH tasks dispatched
+- Escalation reason if stopped
+- Calibration mode chosen
+
+---
+
+**When `html_log: true` (legacy):**
+
 Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
 
 - **Create** the log at startup with just the header and an empty event list.
 - **Rewrite the full file** after every action — the event list grows with each update.
 - See `.claude/commands/orchestrator/html-log-format.md` for the full HTML structure and event patterns. Load it on demand (not at session start) to keep context lean.
-
-Maintain in your context tracking:
-- Which agents have been invoked and their return JSON
-- Loop counters per decision point (`grooming_loop`, `dod_loop`, `review_loop`, `qa_loop`)
-- Non-blocking NTH tasks dispatched (log ticket URLs when created)
-- Escalation reason if stopped
-- Calibration mode chosen
 
 **Synthesis rule:** Read routing-relevant fields from each agent's `result_path` (in
 `tasks.json`) rather than holding full agent JSONs in this context. This keeps the
