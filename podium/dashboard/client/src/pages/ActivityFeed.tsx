@@ -255,7 +255,7 @@ export function ActivityFeed() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("title")}</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("title")}</h1>
               {wsConnected ? (
                 <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -268,16 +268,25 @@ export function ActivityFeed() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t("subtitle")}
               {paused && (
-                <span className="ml-2 text-yellow-400">{t("paused", { count: bufferCount })}</span>
+                <span className="ml-2 text-amber-700 dark:text-amber-400 font-medium">
+                  {t("paused", { count: bufferCount })}
+                </span>
               )}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <button onClick={() => (paused ? resume() : setPaused(true))} className="btn-ghost">
+          <button
+            onClick={() => (paused ? resume() : setPaused(true))}
+            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors duration-150 cursor-pointer ${
+              paused
+                ? "bg-accent/20 dark:bg-accent/10 border-accent/30 text-amber-700 dark:text-accent hover:bg-accent/25"
+                : "bg-white dark:bg-surface-3 border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-4"
+            }`}
+          >
             {paused ? (
               <>
                 <Play className="w-4 h-4" /> {t("resume")}
@@ -288,7 +297,11 @@ export function ActivityFeed() {
               </>
             )}
           </button>
-          <button onClick={load} className="btn-ghost">
+          <button
+            onClick={load}
+            title={t("common:refresh", "Refresh")}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border bg-white dark:bg-surface-3 border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-4 transition-colors duration-150 cursor-pointer"
+          >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -313,16 +326,16 @@ export function ActivityFeed() {
         <div
           role="group"
           aria-label="view mode"
-          className="inline-flex rounded-md border border-border overflow-hidden"
+          className="inline-flex rounded-md border border-gray-200 dark:border-border overflow-hidden"
         >
           <button
             type="button"
             onClick={() => setGrouped(true)}
             aria-pressed={grouped}
-            className={`text-[11px] px-3 py-1 cursor-pointer ${
+            className={`text-[11px] px-3 py-1 cursor-pointer transition-colors ${
               grouped
-                ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
-                : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
+                ? "bg-accent/20 text-gray-900 dark:bg-accent/10 dark:text-accent font-medium"
+                : "bg-white dark:bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3"
             }`}
           >
             {t("common:eventFilters.grouped")}
@@ -331,10 +344,10 @@ export function ActivityFeed() {
             type="button"
             onClick={() => setGrouped(false)}
             aria-pressed={!grouped}
-            className={`text-[11px] px-3 py-1 border-l border-border cursor-pointer ${
+            className={`text-[11px] px-3 py-1 border-l border-gray-200 dark:border-border cursor-pointer transition-colors ${
               !grouped
-                ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent"
-                : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
+                ? "bg-accent/20 text-gray-900 dark:bg-accent/10 dark:text-accent font-medium"
+                : "bg-white dark:bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3"
             }`}
           >
             {t("common:eventFilters.flat")}
@@ -393,17 +406,17 @@ export function ActivityFeed() {
                             }
                           }}
                           aria-expanded={isOpen}
-                          className="flex items-center px-5 py-3.5 gap-4 hover:bg-surface-4 transition-colors cursor-pointer select-none"
+                          className="flex items-center px-5 py-3.5 gap-4 hover:bg-gray-50 dark:hover:bg-surface-3 transition-colors cursor-pointer select-none"
                         >
                           <ChevronRight
-                            className={`w-3.5 h-3.5 text-gray-700 dark:text-gray-500 transition-transform flex-shrink-0 -mr-1.5 ${isOpen ? "rotate-90" : ""}`}
+                            className={`w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform flex-shrink-0 -mr-1.5 ${isOpen ? "rotate-90" : ""}`}
                           />
 
                           <div className="w-16 flex-shrink-0 text-right font-mono leading-tight">
-                            <div className="text-[11px] text-gray-700 dark:text-gray-500">
+                            <div className="text-[11px] text-gray-500 dark:text-gray-400 tabular-nums">
                               {formatTime(event.created_at)}
                             </div>
-                            <div className="text-[9px] text-gray-600">
+                            <div className="text-[9px] text-gray-400 dark:text-gray-500 tabular-nums">
                               {formatDateShort(event.created_at)}
                             </div>
                           </div>
@@ -423,10 +436,10 @@ export function ActivityFeed() {
                                 <p className="text-sm text-gray-700 dark:text-gray-300 truncate">
                                   {origin && (
                                     <span
-                                      className="text-gray-700 dark:text-gray-500 mr-1"
+                                      className="text-amber-700 dark:text-accent bg-accent/10 rounded px-1.5 py-0.5 mr-1.5 text-xs"
                                       title={`${event.session_id} · ${event.agent_id ?? ""}`}
                                     >
-                                      {origin} ·
+                                      {origin}
                                     </span>
                                   )}
                                   {buildEventTitle(event)}
@@ -436,12 +449,12 @@ export function ActivityFeed() {
                           })()}
 
                           {event.tool_name && (
-                            <span className="text-[11px] px-2 py-0.5 bg-surface-2 rounded text-gray-700 dark:text-gray-500 font-mono flex-shrink-0">
+                            <span className="text-xs px-1.5 py-0.5 bg-gray-100 dark:bg-surface-3 rounded-md text-gray-700 dark:text-gray-300 font-mono flex-shrink-0">
                               {event.tool_name}
                             </span>
                           )}
 
-                          <span className="text-[11px] text-gray-600 flex-shrink-0 w-16 text-right">
+                          <span className="text-[11px] text-gray-400 dark:text-gray-500 tabular-nums flex-shrink-0 w-16 text-right">
                             {timeAgo(event.created_at)}
                           </span>
 
@@ -449,7 +462,7 @@ export function ActivityFeed() {
                             to={`/sessions/${event.session_id}`}
                             onClick={(e) => e.stopPropagation()}
                             title={t("viewSession")}
-                            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-accent hover:bg-accent/10 border border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
+                            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-white dark:bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-amber-700 dark:hover:text-accent hover:bg-accent/10 border border-gray-200 dark:border-border hover:border-accent/30 transition-colors flex-shrink-0 font-medium"
                           >
                             {t("viewSession")}
                             <ExternalLink className="w-3 h-3" />
@@ -463,7 +476,7 @@ export function ActivityFeed() {
           </div>
           {total > 0 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-sm text-gray-600 dark:text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
@@ -474,7 +487,7 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage(0)}
                   disabled={page === 0}
-                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-surface-2 border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
                   aria-label="First page"
                 >
                   «
@@ -482,7 +495,7 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-surface-2 border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
                   {t("common:pagination.previous")}
                 </button>
@@ -507,7 +520,7 @@ export function ActivityFeed() {
                     p === "..." ? (
                       <span
                         key={`ellipsis-${idx}`}
-                        className="px-2 py-1.5 text-xs text-gray-600 select-none"
+                        className="px-2 py-1.5 text-xs text-gray-400 dark:text-gray-500 select-none"
                       >
                         ...
                       </span>
@@ -516,10 +529,10 @@ export function ActivityFeed() {
                         key={p}
                         onClick={() => setPage(p)}
                         aria-current={p === page ? "page" : undefined}
-                        className={`min-w-[32px] px-2.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors ${
+                        className={`min-w-[32px] px-2.5 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors border ${
                           p === page
-                            ? "bg-accent/25 text-gray-900 dark:bg-accent/20 dark:text-accent border border-accent/30"
-                            : "bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200"
+                            ? "bg-accent/20 text-gray-900 dark:bg-accent/10 dark:text-accent border-accent/30"
+                            : "bg-white dark:bg-surface-2 border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3"
                         }`}
                       >
                         {p + 1}
@@ -530,14 +543,14 @@ export function ActivityFeed() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-surface-2 border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 >
                   {t("common:pagination.next")}
                 </button>
                 <button
                   onClick={() => setPage(totalPages - 1)}
                   disabled={page >= totalPages - 1}
-                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-600 dark:text-gray-400 hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-2 py-1.5 text-xs font-medium rounded-md bg-white dark:bg-surface-2 border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
                   aria-label="Last page"
                 >
                   »

@@ -85,20 +85,21 @@ describe("AgentCard", () => {
 
   it("should apply active border for working agents", () => {
     const { container } = renderCard(<AgentCard agent={makeAgent({ status: "working" })} />);
-    const card = container.querySelector(".card-hover");
+    const card = container.firstElementChild;
     expect(card?.className).toContain("border-l-2");
+    expect(card?.className).toContain("border-l-emerald-500");
   });
 
-  it("should apply yellow border for waiting agents even without awaiting_input_since", () => {
+  it("should apply waiting border for waiting agents even without awaiting_input_since", () => {
     const { container } = renderCard(<AgentCard agent={makeAgent({ status: "waiting" })} />);
-    const card = container.querySelector(".card-hover");
+    const card = container.firstElementChild;
     expect(card?.className).toContain("border-l-2");
-    expect(card?.className).toContain("border-l-yellow-500/60");
+    expect(card?.className).toContain("border-l-amber-400");
   });
 
   it("should not apply active border for completed agents", () => {
     const { container } = renderCard(<AgentCard agent={makeAgent({ status: "completed" })} />);
-    const card = container.querySelector(".card-hover");
+    const card = container.firstElementChild;
     expect(card?.className).not.toContain("border-l-2");
   });
 
@@ -119,8 +120,8 @@ describe("AgentCard", () => {
       />
     );
     expect(screen.getByText("Waiting")).toBeInTheDocument();
-    const card = container.querySelector(".card-hover");
-    expect(card?.className).toContain("border-l-yellow-500/60");
+    const card = container.firstElementChild;
+    expect(card?.className).toContain("border-l-amber-400");
   });
 
   it("ignores awaiting_input_since once the agent has completed", () => {

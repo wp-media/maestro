@@ -189,7 +189,7 @@ export function EventDetail({ event, agentInfoById, sessionNameById }: EventDeta
   const hasToolResponse = parsed != null && "tool_response" in parsed;
 
   return (
-    <div className="bg-surface-2/60 border-t border-border px-5 py-4 animate-slide-up space-y-3">
+    <div className="bg-gray-50 dark:bg-surface-1 border-t border-gray-200 dark:border-border px-5 py-4 animate-slide-up space-y-3">
       {summary && (
         <SummaryBlock
           summary={summary}
@@ -230,9 +230,9 @@ function SummaryBlock({
   const hint =
     refs.length > 0 ? t("eventDetail.seeDetailsBelow", { fields: refs.join(" · ") }) : null;
   return (
-    <div className="border border-border rounded overflow-hidden bg-surface-3/30">
-      <div className="px-3 py-1 border-b border-border bg-black/20">
-        <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide font-semibold">
+    <div className="border border-gray-200 dark:border-border rounded-lg overflow-hidden bg-white dark:bg-surface-2">
+      <div className="px-3 py-1.5 border-b border-gray-200 dark:border-border bg-gray-50 dark:bg-surface-3/40">
+        <span className="text-gray-500 dark:text-gray-400 text-[10px] uppercase tracking-wider font-semibold">
           {t("eventDetail.summary")}
         </span>
       </div>
@@ -253,7 +253,7 @@ function SummaryBlock({
           </ul>
         )}
         {hint && (
-          <div className="text-[11px] text-gray-700 dark:text-gray-500 italic pt-1 border-t border-border/40">
+          <div className="text-[11px] text-gray-500 dark:text-gray-500 italic pt-1 border-t border-gray-200 dark:border-border/40">
             ↓ {hint}
           </div>
         )}
@@ -285,7 +285,7 @@ function FieldRow({
     if (view) {
       return (
         <div className="grid grid-cols-[160px_1fr] gap-x-4 items-start text-[11px]">
-          <div className="text-gray-700 dark:text-gray-500 font-mono pt-2">{label}</div>
+          <div className="text-gray-500 dark:text-gray-400 font-mono pt-2">{label}</div>
           <div>{view}</div>
         </div>
       );
@@ -296,7 +296,7 @@ function FieldRow({
     if (view) {
       return (
         <div className="grid grid-cols-[160px_1fr] gap-x-4 items-start text-[11px]">
-          <div className="text-gray-700 dark:text-gray-500 font-mono pt-2">{label}</div>
+          <div className="text-gray-500 dark:text-gray-400 font-mono pt-2">{label}</div>
           <div>{view}</div>
         </div>
       );
@@ -306,8 +306,8 @@ function FieldRow({
   if (isInlineScalar(value)) {
     return (
       <div className="grid grid-cols-[160px_1fr] gap-x-4 items-start text-[11px]">
-        <div className="text-gray-700 dark:text-gray-500 font-mono pt-0.5">{label}</div>
-        <div className="text-gray-600 dark:text-gray-300 font-mono break-all">
+        <div className="text-gray-500 dark:text-gray-400 font-mono pt-0.5">{label}</div>
+        <div className="text-gray-800 dark:text-gray-300 font-mono break-all">
           <ScalarValue value={value} />
         </div>
       </div>
@@ -330,7 +330,7 @@ function isInlineScalar(value: unknown): boolean {
 }
 
 function ScalarValue({ value }: { value: unknown }) {
-  if (value == null) return <span className="text-gray-700 dark:text-gray-500 italic">null</span>;
+  if (value == null) return <span className="text-gray-400 dark:text-gray-500 italic">null</span>;
   if (typeof value === "boolean") {
     const color = value
       ? "text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30 bg-green-50 dark:bg-green-500/10"
@@ -348,14 +348,14 @@ function CodeView({ value }: { value: unknown }) {
   const text = typeof value === "string" ? value : safeStringify(value);
 
   return (
-    <div className="relative bg-black/70 border border-border rounded font-mono text-[11px] overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border bg-black/40">
-        <span className="text-gray-700 dark:text-gray-500 text-[10px] uppercase tracking-wide">
+    <div className="relative bg-gray-900 dark:bg-surface-0 border border-gray-800 dark:border-border rounded-lg font-mono text-xs overflow-hidden shadow-sm">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-white/10 bg-black/30">
+        <span className="text-gray-400 dark:text-gray-500 text-[10px] uppercase tracking-wider">
           {typeof value === "string" ? "text" : Array.isArray(value) ? "array" : "json"}
         </span>
         <CopyButton text={text} />
       </div>
-      <pre className="px-3 py-2 text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words max-h-96 overflow-auto">
+      <pre className="px-3 py-2 text-green-400 whitespace-pre-wrap break-words max-h-96 overflow-auto">
         {text}
       </pre>
     </div>

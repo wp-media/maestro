@@ -343,7 +343,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
               <select
                 value={selectedTranscript || ""}
                 onChange={(e) => setSelectedTranscript(e.target.value || null)}
-                className="appearance-none bg-surface-2 border border-surface-3 rounded-lg px-3 py-1.5 pr-8 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:border-violet-500/50 hover:border-violet-500/30 cursor-pointer transition-colors"
+                className="appearance-none bg-surface-2 border border-surface-3 rounded-lg px-3 py-1.5 pr-8 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:border-accent/50 hover:border-accent/30 dark:border-accent/20 cursor-pointer transition-colors"
               >
                 {transcripts.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -364,7 +364,7 @@ export function ConversationView({ sessionId, initialTranscriptId }: Conversatio
             disabled={refreshing || loading}
             title="Refresh conversation"
             aria-label="Refresh conversation"
-            className="inline-flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-200 bg-surface-2 border border-surface-3 hover:border-violet-500/30 rounded-md px-2 py-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-200 bg-surface-2 border border-surface-3 hover:border-accent/30 dark:border-accent/20 rounded-md px-2 py-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
             Refresh

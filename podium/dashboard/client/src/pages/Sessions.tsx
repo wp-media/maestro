@@ -189,7 +189,7 @@ export function Sessions() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t("title")}</h1>
               {wsConnected ? (
                 <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2 py-0.5 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -202,7 +202,7 @@ export function Sessions() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t("sessionCount", { count: total })}
               {filter ? ` ${filter}` : ""}
             </p>
@@ -214,10 +214,10 @@ export function Sessions() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 mb-6 bg-surface-2/40 p-2 rounded-xl border border-border w-full">
+      <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 mb-6 bg-white/60 dark:bg-surface-2/40 p-2 rounded-xl border border-gray-100 dark:border-border w-full">
         {/* Search */}
         <div className="relative flex-1 min-w-[180px] max-w-[340px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 dark:text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder={t("searchPlaceholder")}
@@ -278,8 +278,8 @@ export function Sessions() {
               onClick={() => setFilter(opt.value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                 filter === opt.value
-                  ? "bg-surface-4 text-gray-800 dark:text-gray-200"
-                  : "text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
+                  ? "bg-accent/20 text-amber-700 dark:bg-accent/15 dark:text-accent"
+                  : "text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-300"
               }`}
             >
               {opt.label}
@@ -299,32 +299,32 @@ export function Sessions() {
           <div className="card overflow-x-auto">
             <table className="w-full min-w-[800px]">
               <thead>
-                <tr className="border-b border-border text-left">
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                <tr className="border-b border-gray-100 dark:border-border text-left bg-gray-50/50 dark:bg-transparent">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableSession")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableStatus")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableLastActive")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableDuration")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableAgents")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableCost")}
                   </th>
-                  <th className="px-5 py-3 text-[11px] font-semibold text-gray-700 dark:text-gray-500 uppercase tracking-wider">
+                  <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t("tableDirectory")}
                   </th>
                   <th className="w-10"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-gray-100 dark:divide-border">
                 {loading && paged.length === 0
                   ? Array.from({ length: 8 }).map((_, i) => (
                       <TableRowSkeleton
@@ -338,12 +338,12 @@ export function Sessions() {
                   <tr
                     key={session.id}
                     onClick={() => navigate(`/sessions/${session.id}`)}
-                    className="hover:bg-surface-4 transition-colors cursor-pointer group"
+                    className="hover:bg-gray-50 dark:hover:bg-surface-3 transition-colors cursor-pointer group"
                   >
                     <td className="px-5 py-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                             {session.name || `${t("defaultName")}${session.id.slice(0, 8)}`}
                           </p>
                           {dashboardRunIds.has(session.id) && (
@@ -358,7 +358,7 @@ export function Sessions() {
                             </Link>
                           )}
                         </div>
-                        <p className="text-[11px] text-gray-600 font-mono">
+                        <p className="text-[11px] text-gray-400 dark:text-gray-500 font-mono">
                           {session.id.slice(0, 12)}
                         </p>
                       </div>
@@ -366,28 +366,28 @@ export function Sessions() {
                     <td className="px-5 py-4">
                       <SessionStatusBadge status={effectiveSessionStatus(session)} />
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {formatDateTime(session.last_activity || session.started_at)}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 font-mono">
+                    <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400 font-mono">
                       {session.ended_at
                         ? formatDuration(session.started_at, session.ended_at)
                         : t("common:running")}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
                       {session.agent_count ?? "-"}
                     </td>
-                    <td className="px-5 py-4 text-sm text-gray-600 dark:text-gray-400 font-mono">
+                    <td className="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white font-mono">
                       {session.cost != null && session.cost > 0 ? fmtCost(session.cost) : "-"}
                     </td>
                     <td
-                      className="px-5 py-4 text-[11px] text-gray-700 dark:text-gray-500 font-mono"
+                      className="px-5 py-4 text-[11px] text-gray-500 dark:text-gray-500 font-mono"
                       title={session.cwd || undefined}
                     >
                       {session.cwd ? truncate(session.cwd, 30) : "-"}
                     </td>
                     <td className="px-3 py-4">
-                      <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
+                      <ChevronRight className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-amber-500 dark:group-hover:text-accent transition-colors" />
                     </td>
                   </tr>
                 ))}
@@ -396,7 +396,7 @@ export function Sessions() {
           </div>
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4 px-1">
-              <span className="text-sm text-gray-600 dark:text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {t("common:pagination.showing", {
                   from: page * PAGE_SIZE + 1,
                   to: Math.min((page + 1) * PAGE_SIZE, total),
@@ -407,17 +407,17 @@ export function Sessions() {
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-surface-3 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {t("common:pagination.previous")}
                 </button>
-                <span className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-500">
+                <span className="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-500">
                   {page + 1} / {totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page >= totalPages - 1}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-surface-2 text-gray-700 dark:text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-gray-200 dark:border-border text-gray-600 dark:text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-surface-3 dark:hover:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   {t("common:pagination.next")}
                 </button>

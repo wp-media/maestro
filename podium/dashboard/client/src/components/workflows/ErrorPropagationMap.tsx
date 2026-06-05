@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { ErrorPropagationData } from "../../lib/types";
 
-const DEPTH_COLORS = ["#ef4444", "#f97316", "#eab308", "#a855f7"];
+const DEPTH_COLORS = ["#ef4444", "#f97316", "#eab308", "#6366f1"];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 

@@ -27,7 +27,7 @@ export function Layout({ wsConnected }: LayoutProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-surface-0">
+    <div className="min-h-screen bg-surface-0 transition-colors duration-200">
       <UpdateNotifier />
       <Sidebar wsConnected={wsConnected} collapsed={collapsed} onToggle={toggle} />
       <main

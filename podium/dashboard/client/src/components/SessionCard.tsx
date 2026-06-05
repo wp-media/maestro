@@ -45,22 +45,22 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
   return (
     <div
       onClick={handleClick}
-      className={`card-hover p-4 cursor-pointer animate-fade-in overflow-hidden ${
+      className={`group relative p-4 cursor-pointer animate-fade-in overflow-hidden rounded-xl bg-white dark:bg-surface-2 border border-gray-100 dark:border-border shadow-sm hover:shadow-md dark:shadow-none hover:ring-1 hover:ring-black/5 dark:hover:ring-white/5 transition-all duration-200 ${
         isWaiting
-          ? "border-l-2 border-l-yellow-500/60"
+          ? "border-l-2 border-l-amber-400 dark:border-l-amber-500/60"
           : isActive
-            ? "border-l-2 border-l-emerald-500/50"
+            ? "border-l-2 border-l-emerald-500"
             : ""
       }`}
     >
       <div className="flex items-start justify-between gap-2 mb-3 min-w-0">
         <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
-          <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 bg-accent/25 dark:bg-accent/15 text-gray-900 dark:text-accent">
+          <div className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 bg-accent/25 dark:bg-accent/15 text-amber-700 dark:text-accent">
             <FolderOpen className="w-3.5 h-3.5" />
           </div>
           <div className="min-w-0 overflow-hidden">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{title}</p>
-            <p className="text-[11px] text-gray-700 dark:text-gray-500 font-mono truncate">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{title}</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 font-mono truncate">
               {session.id.slice(0, 12)}
             </p>
           </div>
@@ -74,7 +74,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
         </p>
       )}
 
-      <div className="flex items-center gap-3 text-[11px] text-gray-700 dark:text-gray-500 min-w-0 overflow-hidden flex-wrap">
+      <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 min-w-0 overflow-hidden flex-wrap">
         <span className="flex items-center gap-1 flex-shrink-0">
           <Bot className="w-3 h-3" />
           {t("session.agentSummary", { count: agentCount })}
@@ -97,7 +97,7 @@ export function SessionCard({ session, onClick }: SessionCardProps) {
             ? `${t("ran")}${formatDuration(session.started_at, session.ended_at)}`
             : `${t("running")}${formatDuration(session.started_at, new Date().toISOString())}`}
         </span>
-        <span className="text-gray-600 flex-shrink-0 ml-auto">
+        <span className="text-gray-400 dark:text-gray-500 flex-shrink-0 ml-auto">
           {timeAgo(session.ended_at || lastActivity)}
         </span>
       </div>

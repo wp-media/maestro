@@ -112,7 +112,7 @@ function renderInput(toolUse: TranscriptContent) {
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-          <FileText className="w-3.5 h-3.5 text-violet-700 dark:text-violet-400" />
+          <FileText className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
           <span className="font-mono">{obj.file_path}</span>
           {obj.replace_all === true && (
             <span className="text-[10px] uppercase tracking-wider text-amber-700 dark:text-amber-300/80 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded px-1.5 py-0.5">
@@ -220,7 +220,7 @@ export function ToolCallBlock({ toolUse, toolResult }: ToolCallBlockProps) {
   const Icon = style.Icon;
 
   const wrapperBorder = isError ? "border-red-200 dark:border-red-500/30" : style.border;
-  const wrapperBg = isError ? "bg-red-500/5" : "bg-surface-2/60";
+  const wrapperBg = isError ? "bg-red-500/5" : "bg-gray-50 dark:bg-surface-3";
 
   return (
     <div
@@ -229,7 +229,7 @@ export function ToolCallBlock({ toolUse, toolResult }: ToolCallBlockProps) {
       {/* Collapsed/expanded toggle */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-surface-3/40 transition-colors"
+        className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-surface-4 transition-colors"
       >
         <ChevronRight
           className={`w-3.5 h-3.5 text-gray-700 dark:text-gray-500 flex-shrink-0 transition-transform duration-150 ${

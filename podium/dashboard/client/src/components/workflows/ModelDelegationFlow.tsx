@@ -32,10 +32,10 @@ function fmtTokens(n: number): string {
 
 const FAMILY_COLORS = {
   opus: {
-    grad: ["#7c3aed", "#a855f7"] as [string, string],
-    stroke: "#a855f7",
-    text: "#e9d5ff",
-    badge: "rgba(168,85,247,0.15)",
+    grad: ["#d4a017", "#FED23A"] as [string, string],
+    stroke: "#FED23A",
+    text: "#fef3c7",
+    badge: "rgba(254,210,58,0.18)",
   },
   sonnet: {
     grad: ["#1d4ed8", "#3b82f6"] as [string, string],

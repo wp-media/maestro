@@ -38,10 +38,10 @@ interface PipelineLink extends d3.SimulationLinkDatum<PipelineNode> {
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const PALETTE = [
+  "#FED23A",
   "#6366f1",
   "#3b82f6",
   "#22c55e",
-  "#a855f7",
   "#f59e0b",
   "#ec4899",
   "#06b6d4",
@@ -51,11 +51,11 @@ const PALETTE = [
 ];
 
 const STROKE_PALETTE = [
+  "#fbbf24",
   "#818cf8",
   "#60a5fa",
   "#4ade80",
-  "#c084fc",
-  "#fbbf24",
+  "#fcd34d",
   "#f472b6",
   "#22d3ee",
   "#fb923c",
@@ -316,9 +316,9 @@ export function AgentCollaborationNetwork({
     nodeEls
       .append("circle")
       .attr("r", (d) => rScale(d.total))
-      .attr("fill", (d) => PALETTE[d.colorIndex] ?? "#6366f1")
+      .attr("fill", (d) => PALETTE[d.colorIndex] ?? "#FED23A")
       .attr("fill-opacity", 0.8)
-      .attr("stroke", (d) => STROKE_PALETTE[d.colorIndex] ?? "#818cf8")
+      .attr("stroke", (d) => STROKE_PALETTE[d.colorIndex] ?? "#fbbf24")
       .attr("stroke-width", 2);
 
     nodeEls

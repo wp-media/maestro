@@ -16,18 +16,18 @@ import { AgentStatusBadge } from "./StatusBadge";
 export function EventFiltersInfo() {
   const { t } = useTranslation("common");
   return (
-    <details className="card bg-surface-2/40 border border-border rounded overflow-hidden">
-      <summary className="cursor-pointer select-none px-3 py-2 flex items-center text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-200 hover:bg-surface-2/80">
+    <details className="card overflow-hidden">
+      <summary className="cursor-pointer select-none px-3 py-2 flex items-center text-[11px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-surface-4 transition-colors">
         <Info className="w-3.5 h-3.5 mr-2" />
-        <span className="font-semibold uppercase tracking-wide mr-1.5">
+        <span className="font-semibold uppercase tracking-wider mr-1.5">
           {t("eventFilters.help.title")}
         </span>
-        <span className="text-gray-700 dark:text-gray-500 font-normal">— {t("eventFilters.help.subtitle")}</span>
+        <span className="text-gray-400 dark:text-gray-500 font-normal">— {t("eventFilters.help.subtitle")}</span>
       </summary>
 
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-gray-200 dark:divide-border border-t border-gray-200 dark:border-border">
         <Section title={t("eventFilters.help.statusesTitle")}>
-          <p className="text-[11px] text-gray-700 dark:text-gray-500 mb-2">{t("eventFilters.help.statusesIntro")}</p>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-2">{t("eventFilters.help.statusesIntro")}</p>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[11px]">
             <dt>
               <AgentStatusBadge status="working" />
@@ -50,7 +50,7 @@ export function EventFiltersInfo() {
 
         <Section title={t("eventFilters.help.lifecycleTitle")}>
           <p className="text-[11px] text-gray-600 dark:text-gray-400 mb-2">{t("eventFilters.help.lifecycleDesc")}</p>
-          <code className="block bg-black/40 border border-border rounded p-2 text-[11px] font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+          <code className="block bg-gray-900 dark:bg-surface-0 border border-gray-800 dark:border-border rounded-lg p-2 text-[11px] font-mono text-green-400 whitespace-pre-wrap">
             {t("eventFilters.help.lifecycleFlow")}
           </code>
         </Section>
@@ -102,9 +102,9 @@ export function EventFiltersInfo() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <details className="group" open>
-      <summary className="cursor-pointer select-none px-3 py-1.5 text-[11px] text-gray-700 dark:text-gray-300 hover:bg-surface-2/60 flex items-center gap-2">
-        <span className="text-gray-700 dark:text-gray-500 transition-transform group-open:rotate-90">▶</span>
-        <span className="font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-400">{title}</span>
+      <summary className="cursor-pointer select-none px-3 py-1.5 text-[11px] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-4 transition-colors flex items-center gap-2">
+        <span className="text-gray-400 dark:text-gray-500 transition-transform group-open:rotate-90">▶</span>
+        <span className="font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{title}</span>
       </summary>
       <div className="px-3 pb-3 pt-1">{children}</div>
     </details>
