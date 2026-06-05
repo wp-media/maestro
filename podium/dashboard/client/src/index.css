@@ -19,14 +19,15 @@
 
 /* ── Light theme (default) ─────────────────────────────── */
 :root {
-  --surface-0: 245 245 243;
+  --surface-0: 242 242 240;
   --surface-1: 255 255 255;
-  --surface-2: 240 240 237;
-  --surface-3: 232 232 228;
-  --surface-4: 221 221 216;
-  --surface-5: 212 212 206;
-  --border: 212 212 206;
-  --border-light: 224 224 219;
+  --surface-2: 248 248 246;
+  --surface-3: 255 255 255;
+  --surface-4: 240 240 237;
+  --surface-5: 232 232 228;
+  --border: 214 214 208;
+  --border-light: 228 228 222;
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.05);
   --text-primary: 21 25 33;
   --text-muted: 102 102 102;
   --text-dim: 155 155 155;
@@ -51,6 +52,7 @@
   --accent: 254 210 58;
   --accent-hover: 224 187 53;
   --accent-muted: rgba(254,210,58,0.15);
+  --card-shadow: none;
 }
 
 body {
@@ -112,6 +114,7 @@ body {
 @layer components {
   .card {
     @apply bg-surface-3 border border-border rounded-xl;
+    box-shadow: var(--card-shadow);
   }
 
   .card-hover {
