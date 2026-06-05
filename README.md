@@ -31,11 +31,16 @@ Every engineer installs it once. Every project tunes it through a single committ
 
 ---
 
-## Podium — Agent Observer Dashboard
+## Podium — Agent Observer Dashboard (Optional)
 
-Maestro ships with **Podium**, a real-time observability dashboard for every Claude Code session. It captures every tool call, agent spawn, and session event through native Claude Code hooks — **zero token cost, zero orchestrator changes**.
+**Podium** is a real-time observability dashboard for every Claude Code session. It captures every tool call, agent spawn, and session event through native Claude Code hooks — **zero token cost, zero orchestrator changes**. It's now available as a separate plugin.
 
-![Podium Dashboard](docs/images/podium-dashboard.png)
+### Install Podium
+
+```bash
+/plugin marketplace add wp-media/claude-marketplace
+/plugin install podium@wp-media
+```
 
 ### What it shows
 
@@ -48,19 +53,12 @@ Maestro ships with **Podium**, a real-time observability dashboard for every Cla
 ### Quick start
 
 ```bash
-# Install hooks once per project (restart Claude Code after)
-/podium setup
-
-# Start the dashboard
+# Start the dashboard (after installing the plugin)
 /podium start
 # → http://localhost:4820
 ```
 
 The dashboard auto-imports all your existing Claude Code sessions on first launch.
-
-### Why not the HTML log?
-
-The previous `workflow-log.html` wrote HTML after every agent step, consuming tokens each time. Podium captures everything at the harness level — hooks fire outside the LLM turn. Set `"html_log": false` in your `maestro.json` (the default) to skip HTML log writes entirely.
 
 ```
 Without Maestro                    With Maestro
