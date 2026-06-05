@@ -62,10 +62,14 @@ Focus on `src/`, `inc/`, `tests/`. Understand:
 Try the project-specific template first, then fall back to the Maestro-bundled one:
 
 ```bash
+# Project-specific override
 if [ -f .github/refs/pr-template.md ]; then
   cat .github/refs/pr-template.md
-elif [ -f .claude/commands/issue-workflow/refs/pr-template.md ]; then
-  cat .claude/commands/issue-workflow/refs/pr-template.md
+else
+  # Maestro plugin cache (Maestro is a Claude Code plugin, not copied into the project)
+  find ~/.claude/plugins/cache/maestro ~/.claude/plugins/maestro \
+    -name "pr-template.md" -path "*issue-workflow*" 2>/dev/null \
+    | sort -V | tail -1 | xargs cat 2>/dev/null
 fi
 ```
 
