@@ -1,12 +1,6 @@
 ---
 name: orchestrator
-description: >
-  User-facing entry point for the issue workflow. Invoke directly to start a
-  delivery run from a GitHub issue number, URL, or raw description. Runs inline
-  in the conversation context; spawns specialist agents as isolated sub-agents;
-  invokes supporting skills inline. Routes based on structured JSON outputs from
-  each agent, manages loop counters, handles escalations, and maintains a live
-  HTML run log.
+description: Start a full delivery run from a GitHub issue number, URL, or raw description.
 ---
 
 ## Config loading (always first)

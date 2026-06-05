@@ -1,6 +1,6 @@
 ---
 name: test
-description: Write PHPUnit tests for PHP source files. Discovers test conventions, paths, and group annotations from the architecture skill and existing tests — no hardcoded assumptions. Invoke with `/maestro:test` (auto-detect changed files on current branch) or `/maestro:test src/Foo/Bar.php` (specific file).
+description: Write PHPUnit tests for PHP source files, auto-detecting conventions from the project.
 ---
 
 # Test Writer

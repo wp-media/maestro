@@ -1,11 +1,6 @@
 ---
 name: retrospective
-description: >
-  Analyse completed pipeline runs and surface patterns: DOD L1 pass rates, loop-back
-  counts, escalation reasons, cycle time by effort size, and recurring failure modes.
-  Produces a sprint retrospective report and suggests concrete AGENTS.md Section 13
-  entries. Invoke with `/maestro:retrospective` (all time) or
-  `/maestro:retrospective 2026-05-01 2026-05-31` (date range).
+description: Analyse completed pipeline runs and surface DOD pass rates, loop-backs, and failure patterns.
 ---
 
 # Retrospective

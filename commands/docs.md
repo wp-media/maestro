@@ -1,10 +1,6 @@
 ---
 name: docs
-description: >
-  Update developer-facing documentation to reflect code changes on the current branch.
-  Runs as an inline skill inside backend-agent and frontend-agent (step 2.5 of the
-  internal sequence) after implementation and before DOD. Receives the explicit list of
-  changed files from the implementation agent. No-op if no public API changes occurred.
+description: Update developer-facing documentation to reflect code changes on the current branch.
 ---
 
 # DOCS SKILL
@@ -51,7 +47,7 @@ Use the Read tool on the explicit list provided by the implementation agent. Do 
 Identify:
 - New or modified public API endpoints, hooks, AJAX actions, REST routes
 - Removed endpoints, hooks, or option keys (document as deprecated or removed)
-- New or modified capabilities (from the project's `wordpress-compliance` skill)
+- New or modified capabilities (from the project's `compliance` skill)
 
 ### Step 2 — Review existing documentation
 
@@ -104,5 +100,5 @@ For each gap:
 ## Notes
 
 - The docs root is `docs/`. The README at the repo root is for users; developer docs live in `docs/`.
-- For new capabilities, add them to `.claude/maestro.json` under `ai.capabilities` so the `wordpress-compliance` skill and PHPCS do not flag future uses.
+- For new capabilities, add them to `.claude/maestro.json` under `ai.capabilities` so the `compliance` skill and PHPCS do not flag future uses.
 - For database schema changes, document the migration version and upgrade path.

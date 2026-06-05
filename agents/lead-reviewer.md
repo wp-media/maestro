@@ -99,7 +99,7 @@ Check every changed file against:
 
 Load the project rule files using the Read tool:
 - `.claude/commands/{ARCH_SKILL}.md`
-- `.claude/commands/wordpress-compliance.md`
+- `.claude/commands/compliance.md`
 
 If `{FRONTEND_SKILL}` is not null and the diff contains frontend files, also load:
 - `.claude/commands/{FRONTEND_SKILL}.md`

@@ -1,9 +1,6 @@
 ---
 name: onboard-project
-description: >
-  One-command Maestro setup for a new WordPress plugin project. Run this in the
-  project root to generate maestro.json and create the temp directory structure.
-  Invoke with /maestro:onboard-project.
+description: Wire a new project — writes maestro.json and scaffolds the temp directory structure.
 ---
 
 # Onboard Project

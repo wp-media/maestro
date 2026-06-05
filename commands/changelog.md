@@ -1,6 +1,6 @@
 ---
-name: po-changelog
-description: Generate a PO-ready grouped changelog from merged PRs since the last release. Produces four groups — New features / Improvements / User-facing fixes / Engineering — with linked PR and issue references, plus a changelog.txt draft for copy-pasting to the website. Invoke with `/maestro:po-changelog` (auto-detect baseline) or `/maestro:po-changelog v3.x.x` (since a specific tag). Exports to {TEMP_ROOT}/changelog/.
+name: changelog
+description: Generate a PO-ready grouped changelog from merged PRs since the last release.
 ---
 
 # PO Changelog

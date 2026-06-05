@@ -1,12 +1,6 @@
 ---
 name: e2e
-description: >
-  Shared end-to-end test execution skill at two tiers. Basic tier
-  (grooming-agent + backend-agent + frontend-agent): behavioral verification and smoke
-  tests for the primary happy path. Extended tier (qa-engineer): full acceptance criteria,
-  regression, edge cases, screenshot evidence, and temporary spec authoring — extended
-  tier is owned by the `e2e-qa-tester` sub-agent. Pass tier: "basic" or tier: "extended"
-  when invoking.
+description: Run E2E smoke tests (basic) or full acceptance + regression suite (extended).
 ---
 
 # E2E SKILL

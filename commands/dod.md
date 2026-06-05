@@ -1,10 +1,6 @@
 ---
 name: dod
-description: >
-  Run the Definition of Done checklist for the current branch and report
-  PASS/WARN/FAIL with evidence. Two modes: layer 1 (self-correction inside backend-agent /
-  frontend-agent — resolves FAILs before handoff) and layer 2 (independent orchestrator
-  gate — fresh perspective after handoff). Pass layer: "1" or layer: "2" when invoking.
+description: Run the Definition of Done checklist for the current branch — PASS/WARN/FAIL with evidence.
 ---
 
 # DOD SKILL

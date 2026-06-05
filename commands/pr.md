@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Generate a comprehensive PR description for the current branch. Analyzes commits and changed files, uses the project PR template, and exports the result to {TEMP_ROOT}/issues/<N>/pull.md for review. Invoke with `/maestro:pr` from any feature branch. For automated pipeline use, the release-agent handles PR creation from a spec instead.
+description: Generate a PR description for the current branch using commits, diffs, and the project template.
 ---
 
 # PR Description

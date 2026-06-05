@@ -1,12 +1,6 @@
 ---
 name: knowledge-graph
-description: >
-  Read and refresh the project's pre-built dependency graph at .claude/graph/dependency-graph.json.
-  Use to locate a class file, trace dependencies, find the ServiceProvider that wires a service,
-  or enumerate Subscribers in a module — without re-scanning the codebase from scratch. This
-  skill is primarily a reader: the graph is built (and incrementally refreshed) by
-  `node bin/build-knowledge-graph.js`. Invoke this skill at session start (to refresh if stale)
-  and before grep/glob searches for class relationships.
+description: Read and refresh the project's dependency graph to trace classes, services, and modules.
 ---
 
 # Knowledge Graph

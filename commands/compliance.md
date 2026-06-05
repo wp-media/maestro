@@ -1,6 +1,6 @@
 ---
-name: wordpress-compliance
-description: Use this skill when modifying templates, admin UI, output, hooks, plugin metadata, sanitization, escaping, or any code that must remain compliant with WordPress.org and repository PHPCS rules.
+name: compliance
+description: Check a change against WordPress.org plugin rules and PHPCS standards.
 ---
 
 # WordPress Compliance

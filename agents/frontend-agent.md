@@ -58,7 +58,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 1. Read the spec in full.
 2. Read the dispatch plan — note exactly which files you own and any constraints.
-3. Read `.claude/commands/{FRONTEND_SKILL}.md` and `.claude/commands/wordpress-compliance.md`.
+3. Read `.claude/commands/{FRONTEND_SKILL}.md` and `.claude/commands/compliance.md`.
 4. Read each JS/CSS/HTML file you are responsible for in full.
 
 ---

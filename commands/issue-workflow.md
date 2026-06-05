@@ -1,6 +1,6 @@
 ---
 name: issue-workflow
-description: Work on a GitHub issue by number for the current project. Fetches the issue and hands control to the orchestrator skill (running inline in this conversation), which manages grooming, spec review, implementation, lead review, CI, and QA end-to-end.
+description: Fetch a GitHub issue and run the full grooming → implementation → review → QA pipeline.
 ---
 
 # Issue Workflow
