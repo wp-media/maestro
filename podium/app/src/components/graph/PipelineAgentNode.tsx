@@ -26,6 +26,30 @@ function initials(name: string): string {
   return p.length === 1 ? p[0].slice(0, 2).toUpperCase() : (p[0][0] + p[1][0]).toUpperCase()
 }
 
+/** Derive 2-letter initials from a plain-English task description. */
+function initialsFromTask(task: string | null): string {
+  if (!task) return 'AG'
+  // Pick the first two meaningful words (skip articles, prepositions)
+  const SKIP = new Set(['the','a','an','in','on','at','of','for','to','by','with','all','per'])
+  const words = task.trim().split(/\s+/).filter(w => w.length > 1 && !SKIP.has(w.toLowerCase()))
+  if (words.length === 0) return 'AG'
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return (words[0][0] + words[1][0]).toUpperCase()
+}
+
+/** Trim a task description to a title-length string. */
+function taskTitle(summary: string | null): string {
+  if (!summary) return 'Agent'
+  const s = summary.trim()
+  return s.length <= 38 ? s : s.slice(0, 35) + '…'
+}
+
+/** Return null when the summary is a trivially uninformative status word. */
+function meaningfulReturn(summary: string): string | null {
+  const TRIVIAL = new Set(['completed', 'success', 'done', 'ok', 'true', 'false', ''])
+  return TRIVIAL.has(summary.toLowerCase().trim()) ? null : summary
+}
+
 function hexToRgb(hex: string): string {
   const h = hex.replace('#', '')
   const r = parseInt(h.slice(0, 2), 16)
@@ -48,23 +72,29 @@ function formatDuration(ms: number | null): string {
 function PipelineAgentNodeInner({ data }: NodeProps<PipelineAgentNodeData>) {
   const { toolCall, stageLabel, isSelected } = data
   const name = cleanAgentName(toolCall.subagent_type)
-  const color = agentColor(name)
+  const isGeneric = name === 'agent'
+
+  // For generic unnamed agents, the task description IS the identity
+  const displayName  = isGeneric ? taskTitle(toolCall.summary) : name
+  const displayAbbrev = isGeneric ? initialsFromTask(toolCall.summary) : initials(name)
+  const color = agentColor(name)   // gold for all agents — keeps the visual language consistent
   const rgb = hexToRgb(color)
-  const abbrev = initials(name)
 
   const isRunning = toolCall.status === 'running'
-  const isFailed = toolCall.status === 'failed'
+  const isFailed  = toolCall.status === 'failed'
   const isSuccess = toolCall.status === 'success'
 
   const statusDotColor = isFailed ? '#ef4444' : isRunning ? color : '#22c55e'
 
-  const task = toolCall.summary || 'No task description'
-  const returnSummary = parseReturnSummary(toolCall.output_preview, name)
+  // For generic agents, the name row already shows the task — no need to repeat it
+  const task = isGeneric ? null : (toolCall.summary || null)
+  const rawReturn = parseReturnSummary(toolCall.output_preview, name)
+  const returnSummary = meaningfulReturn(rawReturn)
 
   return (
     <div
       style={{
-        width: 280,
+        width: 250,
         position: 'relative',
         boxSizing: 'border-box',
         background: '#1c2433',
@@ -139,24 +169,25 @@ function PipelineAgentNodeInner({ data }: NodeProps<PipelineAgentNodeData>) {
             fontFamily: "'Whitney HTF Bold','Inter',system-ui,sans-serif",
           }}
         >
-          {abbrev}
+          {displayAbbrev}
         </div>
 
-        {/* Name */}
+        {/* Name — for generic agents this is the full task description */}
         <div
           style={{
             flex: 1,
             minWidth: 0,
-            fontWeight: 700,
-            fontSize: 13.5,
+            fontWeight: isGeneric ? 600 : 700,
+            fontSize: isGeneric ? 12.5 : 13.5,
             color,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            lineHeight: 1.3,
+            // Generic agents get 2 lines since description is longer
+            ...(isGeneric
+              ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, lineHeight: 1.35 }
+              : { textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }),
           }}
         >
-          {name}
+          {displayName}
         </div>
 
         {/* Duration */}
@@ -187,62 +218,75 @@ function PipelineAgentNodeInner({ data }: NodeProps<PipelineAgentNodeData>) {
         />
       </div>
 
-      {/* Thin separator */}
-      <div style={{ height: 1, background: 'rgba(46,50,67,0.7)' }} />
+      {/* Task description — only shown for named agents (generic agents show task as title) */}
+      {task && (
+        <>
+          <div style={{ height: 1, background: 'rgba(46,50,67,0.7)' }} />
+          <div
+            style={{
+              padding: '8px 14px',
+              fontSize: 12,
+              fontStyle: 'italic',
+              color: '#9b9b9b',
+              lineHeight: 1.4,
+              overflow: 'hidden',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const,
+              ...(isRunning
+                ? {
+                    backgroundImage:
+                      `linear-gradient(90deg, rgba(${rgb},0) 0%, rgba(${rgb},0.12) 50%, rgba(${rgb},0) 100%)`,
+                    backgroundSize: '200% 100%',
+                    animation: 'podium-shimmer 1.6s linear infinite',
+                  }
+                : {}),
+            }}
+          >
+            {task}
+          </div>
+        </>
+      )}
 
-      {/* Task description */}
-      <div
-        style={{
-          padding: '8px 14px',
-          fontSize: 12,
-          fontStyle: 'italic',
-          color: '#9b9b9b',
-          lineHeight: 1.4,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical' as const,
-          ...(isRunning
-            ? {
-                backgroundImage:
-                  `linear-gradient(90deg, rgba(${rgb},0) 0%, rgba(${rgb},0.12) 50%, rgba(${rgb},0) 100%)`,
-                backgroundSize: '200% 100%',
-                animation: 'podium-shimmer 1.6s linear infinite',
-              }
-            : {}),
-        }}
-      >
-        {task}
-      </div>
+      {/* Running shimmer for generic agents (no separate task row) */}
+      {isRunning && isGeneric && (
+        <div style={{
+          height: 3, margin: '0 14px 8px',
+          backgroundImage: `linear-gradient(90deg, rgba(${rgb},0) 0%, rgba(${rgb},0.4) 50%, rgba(${rgb},0) 100%)`,
+          backgroundSize: '200% 100%',
+          borderRadius: 2,
+          animation: 'podium-shimmer 1.6s linear infinite',
+        }} />
+      )}
 
-      {/* Return value section — only when done */}
-      {(isSuccess || isFailed) && (
+      {/* Return value section — only when done AND we have something meaningful */}
+      {(isSuccess && returnSummary) && (
         <div
           style={{
-            padding: '8px 14px',
-            background: isFailed ? 'rgba(239,68,68,0.05)' : `rgba(${rgb},0.05)`,
+            padding: '7px 14px',
+            background: `rgba(${rgb},0.05)`,
             borderTop: '1px solid rgba(46,50,67,0.7)',
             display: 'flex',
-            gap: 7,
+            gap: 6,
             alignItems: 'flex-start',
             fontSize: 12,
             lineHeight: 1.4,
           }}
         >
-          {isFailed ? (
-            <span style={{ color: '#ef4444', fontWeight: 500 }}>
-              ✕ {toolCall.error?.slice(0, 80) || 'failed'}
-            </span>
-          ) : (
-            <>
-              <span style={{ color: `rgba(${rgb},0.9)`, flexShrink: 0 }}>↩</span>
-              {returnSummary ? (
-                <span style={{ color: `rgba(${rgb},0.9)`, fontWeight: 500 }}>{returnSummary}</span>
-              ) : (
-                <span style={{ color: '#9b9b9b' }}>completed</span>
-              )}
-            </>
-          )}
+          <span style={{ color: `rgba(${rgb},0.8)`, flexShrink: 0, fontSize: 11 }}>↩</span>
+          <span style={{ color: `rgba(${rgb},0.9)`, fontWeight: 500 }}>{returnSummary}</span>
+        </div>
+      )}
+
+      {/* Failed state */}
+      {isFailed && (
+        <div style={{
+          padding: '7px 14px', background: 'rgba(239,68,68,0.05)',
+          borderTop: '1px solid rgba(46,50,67,0.7)', fontSize: 12,
+        }}>
+          <span style={{ color: '#ef4444', fontWeight: 500 }}>
+            ✕ {toolCall.error?.slice(0, 80) || 'failed'}
+          </span>
         </div>
       )}
 

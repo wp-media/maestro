@@ -14,8 +14,8 @@ const AGENT_W = 230
 const AGENT_H = 80
 
 // Pipeline mode
-const PIPELINE_AGENT_W = 280
-const PIPELINE_AGENT_H = 130
+const PIPELINE_AGENT_W = 250
+const PIPELINE_AGENT_H = 120
 const PHANTOM_W = 12
 const PHANTOM_H = 12
 const ORCH_WORK_W = 200
@@ -118,7 +118,7 @@ function buildPipelineGraph(session: Session): { nodes: Node[]; edges: Edge[] } 
       dagreNodes.push({ id: 'end', w: END_W, h: END_H })
       edges.push(darkEdge('start', 'end'))
     }
-    layout(nodes, edges, dagreNodes, { rankdir: 'TB', ranksep: 100, nodesep: 60 })
+    layout(nodes, edges, dagreNodes, { rankdir: 'TB', ranksep: 80, nodesep: 36 })
     return { nodes, edges }
   }
 
@@ -127,24 +127,6 @@ function buildPipelineGraph(session: Session): { nodes: Node[]; edges: Edge[] } 
 
   pipeline.forEach((step, stepIndex) => {
     const ids: string[] = []
-
-    // Optional orchestrator-work node BEFORE this step when there's notable work.
-    let orchWorkId: string | null = null
-    if (step.orchestrator_work.length > 3) {
-      orchWorkId = `orchwork-${stepIndex}`
-      nodes.push({
-        id: orchWorkId,
-        type: 'orchestratorWorkNode',
-        position: { x: 0, y: 0 },
-        data: {
-          stepIndex,
-          toolCalls: step.orchestrator_work,
-          count: step.orchestrator_work.length,
-          primary: step.orchestrator_work[0],
-        },
-      })
-      dagreNodes.push({ id: orchWorkId, w: ORCH_WORK_W, h: ORCH_WORK_H })
-    }
 
     step.agents.forEach((agent) => {
       const id = `pagent-${agent.id}`
@@ -167,69 +149,28 @@ function buildPipelineGraph(session: Session): { nodes: Node[]; edges: Edge[] } 
       dagreNodes.push({ id, w: PIPELINE_AGENT_W, h: PIPELINE_AGENT_H })
     })
 
-    // If an orchestrator-work node exists, chain it before the agents:
-    //   prevStep ── ... ──▶ orchWork ──▶ agents
-    // We record orchWork as the step's "entry" so the inter-step wiring below
-    // can target it. The work→agent edges are dark solid (internal plumbing).
-    if (orchWorkId) {
-      for (const aid of ids) {
-        edges.push(darkEdge(orchWorkId, aid))
-      }
-      // The step's incoming connections should land on the orchWork node, so we
-      // expose it as the step's single entry id while keeping agent ids for the
-      // OUTGOING side.
-      stepAgentIds.push(ids)
-      ;(step as AgentPipelineStep & { __entryId?: string }).__entryId = orchWorkId
-    } else {
-      stepAgentIds.push(ids)
-    }
+    stepAgentIds.push(ids)
   })
 
-  // Helper: the ids that traffic should ENTER a step through.
-  const entryIds = (stepIndex: number): string[] => {
-    const entry = (pipeline[stepIndex] as AgentPipelineStep & { __entryId?: string }).__entryId
-    return entry ? [entry] : stepAgentIds[stepIndex]
-  }
-  // Helper: the ids that traffic LEAVES a step from (always the agent nodes).
-  const exitIds = (stepIndex: number): string[] => stepAgentIds[stepIndex]
+  // Simple helpers — no phantom nodes, no orchwork intermediaries.
+  const entryIds = (stepIndex: number): string[] => stepAgentIds[stepIndex]
+  const exitIds  = (stepIndex: number): string[] => stepAgentIds[stepIndex]
 
   // start → first step entry.
   for (const id of entryIds(0)) {
     edges.push(darkEdge('start', id))
   }
 
-  // Wire step i → step i+1 with fork/join phantom nodes as needed.
+  // Wire step i → step i+1 with direct fan-out/fan-in edges (no phantom nodes).
+  // dagre handles the layout naturally; direct edges produce cleaner visuals.
   for (let i = 0; i < lastStep; i++) {
     const fromIds = exitIds(i)
-    const toIds = entryIds(i + 1)
+    const toIds   = entryIds(i + 1)
 
-    const fromCount = fromIds.length
-    const toCount = toIds.length
-
-    if (fromCount === 1 && toCount > 1) {
-      // FORK: single agent → phantom → each parallel agent.
-      const phantomId = `phantom-fork-${i}`
-      pushPhantom(nodes, dagreNodes, phantomId)
-      const ret = returnLabelFor(pipeline[i])
-      edges.push(goldPipeEdge(fromIds[0], phantomId, ret))
+    for (let k = 0; k < fromIds.length; k++) {
+      const label = returnLabelForAgent(pipeline[i], k)
       for (const to of toIds) {
-        edges.push(goldPipeEdge(phantomId, to))
-      }
-    } else if (fromCount > 1 && toCount === 1) {
-      // JOIN: each parallel agent → phantom → next single agent.
-      const phantomId = `phantom-join-${i}`
-      pushPhantom(nodes, dagreNodes, phantomId)
-      for (let k = 0; k < fromIds.length; k++) {
-        edges.push(goldPipeEdge(fromIds[k], phantomId, returnLabelForAgent(pipeline[i], k)))
-      }
-      edges.push(goldPipeEdge(phantomId, toIds[0]))
-    } else {
-      // 1→1 or N→M: connect every exit to every entry directly.
-      for (let k = 0; k < fromIds.length; k++) {
-        const label = fromCount === 1 ? returnLabelFor(pipeline[i]) : returnLabelForAgent(pipeline[i], k)
-        for (const to of toIds) {
-          edges.push(goldPipeEdge(fromIds[k], to, label))
-        }
+        edges.push(goldPipeEdge(fromIds[k], to, label))
       }
     }
   }
