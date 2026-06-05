@@ -238,6 +238,12 @@ A FAIL here does not block hand-off automatically, but the orchestrator must ack
 
 ## Output format
 
+**Format constraints (enforced for L2 output):**
+- Total output: ≤ 400 words.
+- Evidence fields: one sentence maximum — no paragraphs, no log dumps.
+- PASS checks: collapsed into the summary table only — no prose elaboration.
+- WARN / FAIL checks: one prose sentence in "Blockers" or "Warnings" — no more.
+
 ```
 | Check | Status | Evidence |
 |-------|--------|----------|

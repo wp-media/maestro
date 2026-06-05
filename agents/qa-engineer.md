@@ -205,6 +205,31 @@ Produce the test report in the format below. Be specific — "tested locally" is
 After generating the report, post it as a PR comment so it is immediately visible to all reviewers.
 **Post the comment regardless of the overall result** (PASS, FAIL, or PARTIAL).
 
+#### Step 6d — Deduplication check (run first)
+
+Before posting, check whether a QA report already exists on this PR:
+
+```bash
+EXISTING_COMMENT=$(gh pr view <PR_number> --json comments \
+  -q '.comments[] | select(.body | startswith("## QA Report")) | .url' | head -1)
+```
+
+- **No existing comment** → post a new comment with the full report.
+- **Existing comment found** → post a delta-only follow-up comment:
+  ```
+  ## QA Re-run — <date>
+  Previous report: <EXISTING_COMMENT url>
+
+  **Changes since last run:**
+  [List only criteria whose result changed — PASS → FAIL, FAIL → PASS, etc.]
+  [If nothing changed: "No change in results."]
+  ```
+  Record the existing comment URL in `existing_comment_url` in the return JSON.
+
+This prevents multiple duplicate full QA reports on every pipeline re-run.
+
+---
+
 Emit an event to handle:
 ```json
 {
@@ -296,6 +321,7 @@ After producing the report, return the following JSON object to the orchestrator
   ],
   "tests_authored": ["list of new test files written and committed, or empty array"],
   "pr_comment_url": "URL of the posted QA report comment",
+  "existing_comment_url": "URL of the previous QA report comment if a re-run, or empty string on first run",
   "blockers": ["criterion: what failed — what to fix"],
   "recommendations": [
     {
