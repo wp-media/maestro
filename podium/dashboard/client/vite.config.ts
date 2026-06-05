@@ -1,5 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
+const { version: APP_VERSION } = JSON.parse(
+  readFileSync(resolve(__dirname, "../package.json"), "utf-8")
+) as { version: string };
 
 // Honour DASHBOARD_PORT so the proxy follows when `npm run dev:server` is
 // moved off the default 4820 (e.g. when an SSH `LocalForward` already holds
@@ -28,6 +34,9 @@ export default defineConfig({
         ws: true,
       },
     },
+  },
+  define: {
+    __APP_VERSION__: JSON.stringify(APP_VERSION),
   },
   build: {
     outDir: "dist",
