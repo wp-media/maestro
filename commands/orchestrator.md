@@ -181,10 +181,7 @@ Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
 - **Rewrite the full file** after every action — the event list grows with each update.
 - See `.claude/commands/orchestrator/html-log-format.md` for the full HTML structure and event patterns. Load it on demand (not at session start) to keep context lean.
 
-**Synthesis rule:** Read routing-relevant fields from each agent's `result_path` (in
-`tasks.json`) rather than holding full agent JSONs in this context. This keeps the
-orchestrator context lean across long pipeline runs. Full JSONs are written to the HTML log
-from the contract files.
+**Synthesis rule:** Route based on the JSON object returned directly from each agent call — `result_path` contract files are session-recovery fallbacks only, never the primary routing input. This prevents stale data from a prior run's contract file from influencing routing in the current run.
 
 ---
 
@@ -257,9 +254,7 @@ Two separate files, two separate purposes:
 - **`contracts/backend-api.json`** — API surface only (`hooks`, `option_keys`, `rest_endpoints`, `ajax_actions`). Written by backend-agent in Step 3c, before committing. The orchestrator reads this to share the actual API surface with frontend-agent.
 - **`contracts/backend-result.json`** — Full implementation result (`ticket_id`, `branch`, `files_changed`, `dod_layer1`, etc.). Written by backend-agent in Step 5. The orchestrator reads this for routing decisions. `result_path` in `tasks.json` points here.
 
-**Sequential mode:** when backend finishes before frontend starts, the orchestrator reads `backend-api.json`, extracts `hooks`, `option_keys`, and `rest_endpoints`, and includes them explicitly in the frontend agent's dispatch plan. The frontend agent never reads the file itself.
-
-**Parallel mode:** the frontend agent may read `contracts/backend-api.json` as a fallback — orchestrator-managed shared state only. If absent, frontend proceeds from spec and notes the skip.
+The frontend agent may read `contracts/backend-api.json` as a fallback — orchestrator-managed shared state only. If absent, frontend proceeds from spec and notes the skip. When scopes overlap (or `--sequential` was passed), the orchestrator reads `backend-api.json` after backend completes and passes its contents explicitly in the frontend dispatch plan. The frontend agent never reads the file itself in that path.
 
 ---
 
@@ -278,11 +273,15 @@ fields — prose is for human readability only.
   "test_plan": "string",
   "risks": [{ "description": "string", "severity": "LOW|MEDIUM|HIGH", "mitigation": "string" }],
   "effort": "XS|S|M|L|XL",
+  "effort_used": "LOW|MEDIUM|HIGH",
   "complexity": "LOW|MEDIUM|HIGH",
   "risk_level": "LOW|MEDIUM|HIGH",
   "risk_notes": "string",
   "grooming_confidence": "LOW|MEDIUM|HIGH",
   "open_questions": ["string"],
+  "pr_splitting_plan": [
+    { "slice": 1, "scope": ["file1", "file2"], "deliverable": "string" }
+  ],
   "comment_posted": true
 }
 ```
@@ -473,19 +472,15 @@ Pass the resolved model as the `model` parameter on every Agent tool spawn. For 
 
 **Complexity signal assessment:**
 Before invoking grooming-agent, classify the issue based on visible signals:
-```python
-def assess_complexity(title, body):
-    title_len, body_len = len(title), len(body)
-    complex_keywords = ["architecture", "refactor", "redesign", "module", "migration", "breaking"]
-    has_keywords = any(k in body.lower() for k in complex_keywords)
-    
-    if title_len < 50 and body_len < 200 and not has_keywords:
-        return "simple"  # → haiku model
-    elif body_len > 500 or has_keywords:
-        return "complex"  # → opus model
-    else:
-        return "medium"  # → sonnet model
-```
+
+| Condition | Signal | Model |
+|---|---|---|
+| Title < 50 chars AND body < 200 chars AND no complex keywords | `simple` | haiku |
+| Body > 500 chars OR any complex keyword present | `complex` | opus |
+| Otherwise | `medium` | sonnet |
+
+Complex keywords: `architecture`, `refactor`, `redesign`, `module`, `migration`, `breaking`
+
 Pass this as `complexity_signal` input to grooming-agent.
 
 **Opus escalation** — when `complexity == HIGH`: before proceeding to branch creation, ask the user:
@@ -917,7 +912,7 @@ All agents also receive `CURRENT_MODEL` and `session_learnings` (section 13 of `
 | `grooming-agent` | Issue object + repo access |
 | `challenger` | Issue object + grooming object + `session_learnings` |
 | `backend-agent` | Issue object + spec path + dispatch plan |
-| `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (sequential mode only) |
+| `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (when scopes overlap) |
 | `release-agent` | Issue #, branch name, base branch, acceptance criteria, spec path |
 | `lead-reviewer` | PR URL + spec path (`{TEMP_ROOT}/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
 | `qa-engineer` | PR number + acceptance criteria + base branch |

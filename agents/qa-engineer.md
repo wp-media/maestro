@@ -35,13 +35,22 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 Before testing anything, the local WordPress environment at `{E2E_URL}` must be running the code from the PR branch.
 
-**Always run these two commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
+**Always run these commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
 
 ```bash
-# 1. Check out the PR branch
-gh pr checkout <PR number>
+# 1. Resolve PR number from issue number (orchestrator passes ISSUE_NUMBER throughout)
+ISSUE_NUMBER=<N>
+PR_NUMBER=$(gh issue view $ISSUE_NUMBER --repo {REPO} --json pullRequests \
+  --jq '.pullRequests[0].number // empty')
+if [ -z "$PR_NUMBER" ]; then
+  echo "ERROR: No PR linked to issue #$ISSUE_NUMBER — cannot proceed"
+  exit 1
+fi
 
-# 2. Boot (or restart) the environment — always run this, whether or not it appears to be running already
+# 2. Check out the PR branch
+gh pr checkout $PR_NUMBER
+
+# 3. Boot (or restart) the environment — always run this, whether or not it appears to be running already
 {E2E_BOOT}
 ```
 
@@ -210,19 +219,20 @@ After generating the report, post it as a PR comment so it is immediately visibl
 Before posting, check whether a QA report already exists on this PR:
 
 ```bash
-EXISTING_COMMENT=$(gh pr view <PR_number> --json comments \
-  -q '.comments[] | select(.body | startswith("## QA Report")) | .url' | head -1)
+EXISTING=$(gh pr view $PR_NUMBER --repo {REPO} --json comments \
+  --jq '[.comments[] | select(.body | contains("**QA:"))] | last | .url // empty')
 ```
 
-- **No existing comment** → post a new comment with the full report.
-- **Existing comment found** → post a delta-only follow-up comment:
-  ```
-  ## QA Re-run — <date>
-  Previous report: <EXISTING_COMMENT url>
-
-  **Changes since last run:**
-  [List only criteria whose result changed — PASS → FAIL, FAIL → PASS, etc.]
-  [If nothing changed: "No change in results."]
+- **No existing comment** → post a new comment with the full report using `gh pr comment`.
+- **Existing comment found** → edit it in-place (one living comment rather than a thread):
+  ```bash
+  COMMENT_ID="${EXISTING##*/}"
+  gh api repos/{REPO}/issues/comments/$COMMENT_ID \
+    --method PATCH \
+    -f body="$(cat <<'REPORT'
+[full updated report content]
+REPORT
+)"
   ```
   Record the existing comment URL in `existing_comment_url` in the return JSON.
 

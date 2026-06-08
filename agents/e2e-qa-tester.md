@@ -41,8 +41,8 @@ If `{E2E_CI}` is false, any Playwright spec files you write are temporary — us
 - **Temp spec root:** `.e2e-temp/` (gitignored locally; never committed when `{E2E_CI}` is false)
 - **Screenshot publishing:** After all screenshots for a PR are taken, upload them to a **public GitHub Gist** to get permanent, publicly accessible URLs. No commits to the PR branch.
   ```bash
-  # Upload all screenshots in one shot — returns the gist HTML URL
-  GIST_URL=$(gh gist create --public .e2e-screenshots/*.png --json url -q .url)
+  # Upload all screenshots in one shot — returns the gist HTML URL as plain stdout
+  GIST_URL=$(gh gist create --public .e2e-screenshots/*.png)
   GIST_ID="${GIST_URL##*/}"
   GIST_USER=$(gh api user --jq .login)
 
@@ -61,6 +61,17 @@ Read from `config.ai.e2e.settings_path` (`{E2E_SETTINGS}`). Verify selectors aga
   ```bash
   curl -s -o /dev/null -w "%{http_code}" {E2E_URL}{E2E_SETTINGS}
   ```
+
+## Anti-rationalization table
+
+| You'll be tempted to say | Why you can't |
+|---|---|
+| "The selector might have changed, I'll skip this step" | Verify the selector against the current codebase first. Selector drift is real — fix it, don't skip. |
+| "The environment probably won't boot, I'll use CANNOT_VERIFY" | Boot it. `CANNOT_VERIFY` requires a documented boot failure — not a prediction of one. |
+| "One screenshot is enough evidence" | Take a screenshot at each meaningful checkpoint, not just the last one. |
+| "PARTIAL is fine for this criterion" | PARTIAL means you stopped before finishing. Finish, then classify. |
+
+---
 
 ## Your process
 
@@ -109,19 +120,6 @@ fi
 ```
 
 If the branches do not match, abort immediately. Report `CANNOT_VERIFY` with reason `"branch mismatch: testing was attempted on $CURRENT_BRANCH instead of $PR_BRANCH"` to `qa-engineer`.
-
-#### Display requirement
-
-Browser-based testing (Playwright MCP) requires a graphical display. Before booting:
-
-```bash
-# Check for a display (Linux/headless environments)
-if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && ! command -v open &>/dev/null; then
-  echo "No display detected — headless/SSH environment"
-fi
-```
-
-If running in a headless environment (SSH, CI without Xvfb, remote server), Playwright MCP cannot drive a browser. Return `CANNOT_VERIFY` with reason `"no graphical display available — browser testing requires a local display or Xvfb"` to `qa-engineer`. Do not silently attempt browser tests that will fail.
 
 ```bash
 {E2E_BOOT}
@@ -253,14 +251,9 @@ Store this output in your context as `specs_source`. It will be embedded verbati
 `specs_content` field of the return JSON and in the `### Playwright Specs` section of your
 report.
 
-**6c — Remove temporary files:**
-```bash
-# Screenshots were uploaded to a gist — safe to delete locally (gist is permanent)
-rm -rf .e2e-screenshots/
+**6c — Local temp files (keep for debugging):**
 
-# Spec files were never committed — just delete them locally
-rm -rf .e2e-temp/
-```
+Files under `.e2e-screenshots/` and `.e2e-temp/` are gitignored. Do not delete them — keep them locally so developers can inspect the QA run artifacts. The gist holds the permanent screenshot record; local files are useful for re-running or debugging failed flows.
 
 **6e — Spec coverage check (run before cleanup of specs):**
 
@@ -335,20 +328,19 @@ After the prose report, return the following JSON object to `qa-engineer`:
   "blockers": ["criterion: what failed — what to fix"],
   "environment_boot": "exit 0|exit N — last error line",
   "specs_run": true,
-  "specs_cleaned_up": true,
   "specs_content": [
     { "filename": ".e2e-temp/feature-criterion.spec.js", "source": "<full spec source>" }
   ]
 }
 ```
 
-`blockers` is an empty array when `overall == "PASS"`. `specs_run` is `false` if `npx playwright` was unavailable. `specs_cleaned_up` must always be `true` — if cleanup failed for any reason, state it explicitly in a `notes` field. `specs_content` is an empty array if no spec was written — never omit the field.
+`blockers` is an empty array when `overall == "PASS"`. `specs_run` is `false` if `npx playwright` was unavailable. `specs_content` is an empty array if no spec was written — never omit the field.
 
 ## Constraints
 
-- ✅ **Always do:** read the PR's "How to test" before touching the browser; take screenshots at each checkpoint; publish screenshots via `gh gist create --public` before deleting them locally; include gist raw URLs in the report and return JSON; clean up all temp files; uninstall any plugins you installed in Step 2b
+- ✅ **Always do:** read the PR's "How to test" before touching the browser; take screenshots at each checkpoint; publish screenshots via `gh gist create --public`; include gist raw URLs in the report and return JSON; uninstall any plugins you installed in Step 2b
 - ⚠️ **Ask first (report as blocker):** if `gh` CLI is not authenticated; if the boot command is missing; if a "How to test" step is ambiguous; if a required premium plugin is not present and cannot be installed via `wp plugin install`
-- 🚫 **Never do:** commit screenshot files to the PR branch (use gist instead); commit `.e2e-temp/` spec files when `{E2E_CI}` is false; modify plugin source code; use `setTimeout`/`waitForTimeout` in specs; report PASS without screenshot or log evidence; leave `.e2e-screenshots/` or `.e2e-temp/` directories locally after the run; install plugins not explicitly required by the issue
+- 🚫 **Never do:** commit screenshot files to the PR branch (use gist instead); commit `.e2e-temp/` spec files when `{E2E_CI}` is false; modify plugin source code; use `setTimeout`/`waitForTimeout` in specs; report PASS without screenshot or log evidence; install plugins not explicitly required by the issue
 
 ## Known limitations
 

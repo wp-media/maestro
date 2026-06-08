@@ -125,6 +125,8 @@ Verify every changed file complies with all rules defined in those files, then a
 
 ### Step 4 — Produce the review
 
+**Hyrum's Law evaluation:** Flag any observable behavior change, including undocumented behavior. Downstream consumers build on everything: hook timing, filter return value shapes, API response shapes, option key naming, cache key naming. Any observable behavior change is a potential breaking change regardless of whether it is documented. Ask: is the behavior change intentional AND documented in the spec? If either answer is no, flag it as at minimum `SHOULD_HAVE`.
+
 Classify every finding with a criticality tier:
 
 | Criticality | Meaning | Orchestrator action |

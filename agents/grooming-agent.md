@@ -27,9 +27,9 @@ You are an independent senior engineer acting as a grooming specialist. You have
 
 ---
 
-## CHECKPOINT — Complete ALL steps before returning
+## CHECKPOINT — Non-skippable steps (model-agnostic enforcement)
 
-Before returning your result, tick each item in this checklist. If any step was skipped, go back and complete it — do not rationalize skipping.
+Before returning your result, tick each item in this checklist. If any step was skipped, go back and complete it — do not rationalize skipping. This applies regardless of which model runs this agent (Claude, GPT-4, Copilot, or any other).
 
 - [ ] 1. Read `AGENTS.md` (or confirmed it does not exist)
 - [ ] 2. Read the full issue file and extracted all acceptance criteria
@@ -283,11 +283,14 @@ Return the spec file path AND the following JSON object to the orchestrator. The
   "pr_splitting_plan": [
     { "slice": 1, "scope": ["file1.php", "file2.php"], "deliverable": "what complete behavior this slice ships" }
   ],
-  "comment_posted": true
+  "comment_posted": true,
+  "_note": "The orchestrator handles issue labeling and PR readiness — grooming agent does not set labels directly."
 }
 ```
 
 `pr_splitting_plan` is **required when `effort` is `L` or `XL`**. Set to `null` for XS / S / M. If the work cannot be split, set to `[{ "slice": 1, "scope": ["all files"], "deliverable": "unsplittable — reason: <explicit explanation>" }]`.
+
+After returning JSON, the orchestrator is responsible for applying the `Ready for review` label and transitioning the issue state. The grooming agent's responsibility ends at returning the JSON — do not attempt label management.
 
 **Effort calibration:**
 - `XS`: ≤ 1 file, trivial change
