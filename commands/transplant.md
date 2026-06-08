@@ -49,7 +49,76 @@ fi
 **Upgrade mode** — if manifest found, print:
 > `Transplant manifest found (last run: {TRANSPLANTED_AT}, Maestro commit: {MAESTRO_COMMIT_AT_TRANSPLANT}).`
 > `Running in upgrade mode — team customizations will be preserved, only new Maestro changes will be merged in.`
-> No confirmation needed; proceed automatically.
+> `Stack recorded at last transplant: {manifest.interview.project_type} · {manifest.interview.languages} · tests: {manifest.interview.test_runners}`
+> `Has your tech stack changed since then? (y/n — if yes, describe what changed)`
+
+Wait for the answer. If **no**: proceed automatically. If **yes**: re-run Step 0b with a note that this is a stack update, then pass the updated interview context block to the analyst prompt.
+
+---
+
+## Step 0b — Project Interview (fresh mode only)
+
+Skip this step entirely in upgrade mode — the context already exists in `transplant-context.md`.
+
+In fresh mode, collect ground truth from the user **before** spawning the analyst. Ask all questions at once in a single message — do not ask one by one.
+
+Present this intake form:
+
+```
+Before analysing the project, I need a few answers to make the transplant as accurate as possible.
+Answer what you know — leave anything uncertain blank and the analyst will infer it from the codebase.
+
+1. Project type (pick one):
+   a) WordPress plugin or theme
+   b) Website / web app (React, Vue, Next.js, static, etc.)
+   c) Backend API (REST, GraphQL — no browser UI)
+   d) CLI tool or automation script
+   e) Monorepo (multiple apps)
+   f) Other — describe briefly
+
+2. Primary language(s):
+   e.g. PHP, TypeScript, Python, Go, Ruby — list all that apply
+
+3. Test runner(s):
+   e.g. PHPUnit, Jest, Vitest, Pytest, RSpec, Mocha, none yet
+
+4. Local dev environment:
+   a) Yes — Docker / docker compose
+   b) Yes — custom shell script (what command?)
+   c) Yes — other (describe)
+   d) No local dev environment
+
+   If yes: what URL does it run on? (e.g. http://localhost:3000)
+
+5. Does the project have a browser-testable UI?
+   (Admin panel, web app pages, settings page, etc. — yes / no)
+
+6. CI setup:
+   a) GitHub Actions
+   b) Other CI (name it)
+   c) No CI yet
+
+Anything else I should know? (framework conventions, monorepo structure, unusual tooling, etc.)
+```
+
+Wait for the user's answers. If they skip a question, note it as "infer from codebase" for that field.
+
+Once answers are received, build the **interview context block**:
+
+```
+## Project interview (user-provided ground truth — trust over codebase inference)
+
+project_type: <answer or "infer">
+languages: <answer or "infer">
+test_runners: <answer or "infer">
+local_dev_cmd: <boot command or "none" or "infer">
+local_url: <URL or "none" or "infer">
+has_browser_ui: <yes / no / infer>
+ci: <answer or "infer">
+notes: <free-text answer to "anything else" or empty>
+```
+
+This block is injected into the analyst prompt as the first section. It overrides any conflicting inference the analyst makes from reading the codebase.
 
 ---
 
@@ -57,14 +126,32 @@ fi
 
 Spawn the `transplant-analyst` agent with model **opus**:
 
-**Prompt to pass:**
+**Prompt to pass (fresh mode):**
 ```
 Analyse the project at {TARGET_ROOT} for transplanting the Maestro issue-workflow.
 
+mode: fresh
 maestro_root: {MAESTRO_ROOT}
 target_root: {TARGET_ROOT}
 
+{INTERVIEW_CONTEXT_BLOCK}
+
+The interview block above is user-provided ground truth — treat it as authoritative over anything you infer from the codebase. Use it to drive disposition decisions: non-PHP projects should have PHP-specific checks rewritten or dropped; projects with no browser UI should have e2e-qa-tester dropped; test runner answers directly determine what replaces PHPUnit in DOD Check 2 and implementation agents.
+
 Produce transplant-context.md at {TARGET_ROOT}/.claude/transplant-context.md and return the JSON summary.
+```
+
+**Prompt to pass (upgrade mode):**
+```
+Analyse the project at {TARGET_ROOT} for a Maestro workflow upgrade.
+
+mode: upgrade
+maestro_root: {MAESTRO_ROOT}
+target_root: {TARGET_ROOT}
+refs_path: {TARGET_ROOT}/.claude/transplant-refs
+manifest_path: {TARGET_ROOT}/.claude/transplant-manifest.json
+
+Produce an updated transplant-context.md and an upgrade plan. Return the JSON summary.
 ```
 
 When the analyst returns, print:
@@ -91,7 +178,11 @@ Context doc: {analyst.context_path}
 
 Then ask the user:
 
+**Fresh mode:**
 > "Review the context doc at `{analyst.context_path}` and confirm to generate the workflow — or describe what needs correcting."
+
+**Upgrade mode:**
+> "Here is the upgrade plan (Section 10 of the context doc). `MERGE` components will be semantically merged preserving team edits. `APPLY` components will be re-transplanted as-is (no team changes detected). `PRESERVE` and `SKIP` components will not be touched. Confirm to proceed — or describe what needs adjusting."
 
 **Wait for explicit confirmation before continuing.**
 
@@ -153,6 +244,7 @@ Each dispatch plan follows this structure (replace placeholders with resolved ab
 
 ```json
 {
+  "mode": "fresh | upgrade",
   "maestro_root": "{MAESTRO_ROOT}",
   "target_root": "{TARGET_ROOT}",
   "context_path": "{TARGET_ROOT}/.claude/transplant-context.md",
@@ -161,12 +253,16 @@ Each dispatch plan follows this structure (replace placeholders with resolved ab
     {
       "name": "component-name",
       "disposition": "DISPOSITION-FROM-CONTEXT-DOC",
-      "source_path": "/absolute/source/path",
-      "output_path": "/absolute/output/path"
+      "source_path": "/absolute/source/path (current Maestro)",
+      "output_path": "/absolute/output/path",
+      "ref_maestro_path": "/absolute/path/to/transplant-refs/maestro/{component} (upgrade mode only, null in fresh)",
+      "ref_output_path": "/absolute/path/to/transplant-refs/output/{component} (upgrade mode only, null in fresh)"
     }
   ]
 }
 ```
+
+In upgrade mode, `disposition` values come from the context doc's **Section 10 — Upgrade Plan** (SKIP / PRESERVE / APPLY / MERGE) rather than Section 8. Writers handle each disposition differently — see `transplant-writer.md`.
 
 **Cluster groupings:**
 
@@ -199,12 +295,69 @@ Read the context doc at {TARGET_ROOT}/.claude/transplant-context.md, then proces
 
 ---
 
-## Phase 2 — Collect Results
+## Phase 2 — Collect Results + Finalize
 
 After all writers complete, collect their return JSON. Aggregate `files_written`, `files_skipped`, and `fixme_values`.
 
+**Write reference snapshots** (run after writers complete, before manifest):
+
+```bash
+# Maestro sources at this point in time — used for future upgrade diffs
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/agents"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/scripts"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/refs"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/bin"
+
+cp "$MAESTRO_ROOT/agents/"*.md "$TARGET_ROOT/.claude/transplant-refs/maestro/agents/" 2>/dev/null || true
+for cmd in orchestrator issue-workflow dod e2e docs compliance knowledge-graph; do
+  cp "$MAESTRO_ROOT/commands/$cmd.md" "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/" 2>/dev/null || true
+done
+cp "$MAESTRO_ROOT/commands/issue-workflow/scripts/"*.sh "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/scripts/" 2>/dev/null || true
+cp "$MAESTRO_ROOT/commands/issue-workflow/refs/"*.md "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/refs/" 2>/dev/null || true
+cp "$MAESTRO_ROOT/bin/"*.sh "$TARGET_ROOT/.claude/transplant-refs/maestro/bin/" 2>/dev/null || true
+
+# Output files as written — used to detect team modifications on next upgrade
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/agents"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/scripts"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/refs"
+mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/bin"
+
+cp "$TARGET_ROOT/.claude/agents/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/agents/" 2>/dev/null || true
+cp "$TARGET_ROOT/.claude/commands/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/commands/" 2>/dev/null || true
+cp "$TARGET_ROOT/.claude/commands/issue-workflow/scripts/"*.sh "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/scripts/" 2>/dev/null || true
+cp "$TARGET_ROOT/.claude/commands/issue-workflow/refs/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/refs/" 2>/dev/null || true
+cp "$TARGET_ROOT/bin/"*.sh "$TARGET_ROOT/.claude/transplant-refs/output/bin/" 2>/dev/null || true
+```
+
+**Write transplant manifest:**
+
+```bash
+MAESTRO_COMMIT="$(git -C "$MAESTRO_ROOT" rev-parse HEAD 2>/dev/null || echo 'unknown')"
+cat > "$TARGET_ROOT/.claude/transplant-manifest.json" << EOF
+{
+  "version": "1",
+  "transplanted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "maestro_commit": "$MAESTRO_COMMIT",
+  "project_type": "{analyst.project_type}",
+  "context_path": ".claude/transplant-context.md",
+  "refs_path": ".claude/transplant-refs",
+  "interview": {
+    "project_type": "{interview.project_type}",
+    "languages": "{interview.languages}",
+    "test_runners": "{interview.test_runners}",
+    "local_dev_cmd": "{interview.local_dev_cmd}",
+    "local_url": "{interview.local_url}",
+    "has_browser_ui": "{interview.has_browser_ui}",
+    "ci": "{interview.ci}",
+    "notes": "{interview.notes}"
+  }
+}
+EOF
+```
+
 Print the final summary:
 
+**Fresh mode:**
 ```
 ─────────────────────────────────────────
 Transplant Complete
@@ -212,25 +365,20 @@ Transplant Complete
 Target: {TARGET_ROOT}
 
 Files written ({total count}):
-  Agents ({count}):
-    {list of .claude/agents/*.md written}
-  Commands ({count}):
-    {list of .claude/commands/*.md written}
-  Scripts ({count}):
-    {list of bin/ and scripts/ written}
-  Config:
-    .claude/maestro.json
+  Agents:   {list of .claude/agents/*.md written}
+  Commands: {list of .claude/commands/*.md written}
+  Scripts:  {list of bin/ and scripts/ written}
+  Config:   .claude/maestro.json
 
-Dropped ({count}):
-  {list — or "none"}
+Dropped: {list or "none"}
 
-{if fixme_values is non-empty:}
+{if fixme_values non-empty:}
 ⚠️  Manual steps required:
-  {each fixme_value on its own line}
+  {each fixme_value}
 
-{if any writer reported errors:}
+{if writer errors:}
 ⚠️  Writer errors:
-  {cluster}: {error description}
+  {cluster}: {error}
 ─────────────────────────────────────────
 Next steps:
   1. Fill any FIXME values in .claude/maestro.json
@@ -238,6 +386,28 @@ Next steps:
   3. Run: chmod +x {TARGET_ROOT}/bin/*.sh
   4. Commit .claude/ and bin/ to the target repo
   5. Test: cd {TARGET_ROOT} && bash bin/dev-start.sh
+─────────────────────────────────────────
+```
+
+**Upgrade mode:**
+```
+─────────────────────────────────────────
+Transplant Upgrade Complete
+─────────────────────────────────────────
+Target: {TARGET_ROOT}
+
+  MERGED   ({count}): {list — team edits preserved, Maestro delta applied}
+  APPLIED  ({count}): {list — re-transplanted, no team edits detected}
+  PRESERVED({count}): {list — team-only changes, Maestro unchanged, not touched}
+  SKIPPED  ({count}): {list — no changes on either side}
+
+{if fixme_values non-empty:}
+⚠️  Manual review needed:
+  {each fixme_value}
+
+{if merge_conflicts non-empty:}
+⚠️  Merge conflicts (manual resolution required):
+  {component}: {description of conflict}
 ─────────────────────────────────────────
 ```
 

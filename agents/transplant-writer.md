@@ -179,6 +179,57 @@ Mark any value you cannot determine as `"FIXME — description"`.
 
 ---
 
+---
+
+## Upgrade mode dispositions (when dispatch.mode == "upgrade")
+
+### SKIP
+Nothing changed on either side. Write nothing. Record as skipped.
+
+### PRESERVE
+Team changed the file; Maestro did not. Write nothing. Record as preserved. This is team-owned — do not touch it.
+
+### APPLY
+Maestro changed; team did not customize the output. Re-run the standard fresh-mode disposition for this component (using its original KEEP_AS_IS / ADAPT / REWRITE / GENERATE disposition from the context doc Section 8). Write to `output_path`.
+
+### MERGE
+Both Maestro and the team changed this component. This is the most important case — execute it carefully.
+
+**Inputs:**
+- `ref_maestro_path` — Maestro source as it was at the last transplant (the baseline)
+- `source_path` — Maestro source now (the new version)
+- `output_path` — team's current file (their adapted/customized version)
+
+**Process:**
+
+1. Read all three files.
+
+2. **Identify the Maestro delta**: What changed between `ref_maestro_path` and `source_path`?
+   - Read both files carefully.
+   - Identify every changed section, added step, new rule, removed content, updated JSON contract, etc.
+   - Summarize the delta as a list of semantic changes: "Added Step 4d (anti-scope-creep gate)", "Updated model routing table to add e2e-qa-tester row", "Changed QA loop limit from 2 to 3", etc.
+
+3. **Identify the team's customizations**: What changed between what the transplant would have produced and the current team file?
+   - The team's file is `output_path` (their current version).
+   - Read the context doc's upgrade plan (Section 10) — the analyst has already summarized the team delta. Use this as a guide.
+   - Identify team-added content, team-modified sections, team-removed steps.
+
+4. **Apply the Maestro delta to the team's file**:
+   - For each Maestro change, find the equivalent location in the team's file (it may have been adapted to a different stack — find the semantic equivalent).
+   - Apply the change without overwriting surrounding team customizations.
+   - If the team removed something that Maestro also changed — respect the team's removal (don't re-add it).
+   - If the team added something new — preserve it untouched.
+
+5. **Conflict detection**: If the Maestro delta and a team customization are in the same section and are incompatible, do NOT attempt the merge. Instead:
+   - Write the team's file unchanged to `output_path` (preserve status quo).
+   - Record the conflict in the return JSON with a precise description: which section, what Maestro wanted to change, what the team has.
+
+6. Write the merged result to `output_path`.
+
+**The goal**: the merged file should look like the team wrote it — with their stack, their conventions, their customizations — but also incorporating the new Maestro capability as if they had written it themselves for their project.
+
+---
+
 ## Step 3 — Scripts cluster special handling
 
 When your cluster is `scripts`, the `bin/dev-start.sh` and `bin/dev-down.sh` files need careful treatment.
@@ -244,9 +295,21 @@ Before returning, verify each file you wrote:
 ```json
 {
   "cluster": "string",
+  "mode": "fresh | upgrade",
   "files_written": ["/absolute/path/to/output/file", "..."],
-  "files_skipped": ["component-name (DROP)", "..."],
+  "files_merged": ["/absolute/path/to/merged/file", "..."],
+  "files_preserved": ["component-name (team-owned, untouched)", "..."],
+  "files_skipped": ["component-name (DROP or SKIP)", "..."],
+  "merge_conflicts": [
+    {
+      "component": "agents/backend-agent.md",
+      "section": "Step 5 — Implementation",
+      "maestro_intent": "Replaced Workflow tool call with direct Agent spawning",
+      "team_customization": "Team restructured Step 5 entirely for their deploy pipeline",
+      "resolution": "Preserved team version — manual merge required"
+    }
+  ],
   "fixme_values": ["maestro.json: repo slug not determinable — fill in owner/repo", "..."],
-  "notes": "string — key adaptations made or anything the user should review"
+  "notes": "string — key adaptations or merges made, anything the user should review"
 }
 ```

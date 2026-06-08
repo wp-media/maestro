@@ -194,6 +194,76 @@ Build the "areas" table that goes into `maestro.json`. List every meaningful dir
 
 ---
 
+## Upgrade Mode — Steps 9a–9c (run only when mode == upgrade)
+
+When `mode: upgrade` is passed, run Steps 1–8 as normal (re-analyse the project state — it may have evolved), then run these additional steps before building the context doc.
+
+### Step 9a — Read the manifest
+
+```bash
+cat {manifest_path}
+```
+
+Extract `maestro_commit` and `project_type`.
+
+### Step 9b — Diff every transplanted component
+
+For each component in the standard disposition table (Section 8), compute four states:
+
+```bash
+# Did Maestro change since last transplant?
+diff "{refs_path}/maestro/{component}" "{maestro_root}/{component}" > /dev/null 2>&1
+MAESTRO_CHANGED=$?  # 0 = identical, 1 = changed
+
+# Did the team modify the output since last transplant?
+diff "{refs_path}/output/{component}" "{target_root}/.claude/{component}" > /dev/null 2>&1
+TEAM_CHANGED=$?  # 0 = identical, 1 = changed
+```
+
+Compute the upgrade disposition:
+
+| Maestro changed | Team changed | Upgrade disposition |
+|---|---|---|
+| No | No | `SKIP` — nothing to do |
+| Yes | No | `APPLY` — re-run writer, no team customs to preserve |
+| No | Yes | `PRESERVE` — team's work, nothing new from Maestro |
+| Yes | Yes | `MERGE` — semantic 3-way merge required |
+
+For `MERGE` components, also note:
+- A one-line summary of what changed in Maestro (read the diff and describe it)
+- A one-line summary of what the team changed (read the diff and describe it)
+- Whether the changes are in the same or different sections (same-section = higher conflict risk)
+
+### Step 9c — Build the upgrade plan table
+
+Add **Section 10 — Upgrade Plan** to the context doc:
+
+```markdown
+## 10. Upgrade Plan
+
+| Component | Upgrade Disposition | Maestro delta | Team delta | Conflict risk |
+|---|---|---|---|---|
+| `agents/backend-agent.md` | MERGE | Added Step 4b scope-creep gate | Updated test runner to Jest | Low — different sections |
+| `agents/challenger.md` | SKIP | No change | No change | — |
+| `commands/orchestrator.md` | APPLY | New Workflow tool in Step 5 | No change | — |
+| `agents/frontend-agent.md` | PRESERVE | No change | Rewrote for Vue 3 | — |
+| `bin/dev-start.sh` | MERGE | Added --no-seed flag | Added npm ci step | Medium — both in setup block |
+```
+
+For MERGE rows, add a `merge_notes` column with specific guidance for the writer agent.
+
+### Step 9d — Conflict flagging
+
+For any component where:
+- Both sides changed **the same section** (e.g., both modified Step 5 — Implementation), AND
+- The changes are semantically incompatible (e.g., Maestro restructured the section; team also restructured it differently)
+
+Flag it as a **conflict** rather than MERGE. The writer will not attempt an automatic merge — instead it will surface the conflict to the user for manual resolution.
+
+Add a `## 11. Conflicts` section to the context doc listing any such cases.
+
+---
+
 ## Step 9 — Build the context doc
 
 Create the output directory and write `{target_root}/.claude/transplant-context.md`:
@@ -382,8 +452,10 @@ Every component must have a decision. Use the rules below.
 
 ## Step 10 — Return JSON
 
+**Fresh mode:**
 ```json
 {
+  "mode": "fresh",
   "project_name": "string",
   "project_type": "wp-plugin|wp-theme|nextjs|laravel|express|django|rails|go-api|cli|library|other",
   "context_path": "{target_root}/.claude/transplant-context.md",
@@ -398,5 +470,24 @@ Every component must have a decision. Use the rules below.
   "drop_count": 3,
   "drops": ["agents/frontend-agent.md", "commands/e2e.md", "commands/compliance.md"],
   "analyst_notes": "one-line summary of the most important constraint or finding"
+}
+```
+
+**Upgrade mode:**
+```json
+{
+  "mode": "upgrade",
+  "project_name": "string",
+  "project_type": "string",
+  "context_path": "{target_root}/.claude/transplant-context.md",
+  "repo": "owner/repo",
+  "merge_count": 3,
+  "apply_count": 2,
+  "preserve_count": 5,
+  "skip_count": 15,
+  "conflict_count": 0,
+  "merges": ["agents/backend-agent.md", "commands/orchestrator.md", "bin/dev-start.sh"],
+  "conflicts": [],
+  "analyst_notes": "one-line summary of key changes and risk level"
 }
 ```
