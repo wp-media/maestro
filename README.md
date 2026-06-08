@@ -106,9 +106,6 @@ Twelve specialists. Each one has a single job.
 | `qa-engineer` | Tests the PR against acceptance criteria |
 | `e2e-qa-tester` | Browser QA via Playwright MCP |
 | `release-agent` | Pushes branch, creates draft PR |
-| `pr-agent` | Generates PR descriptions on demand |
-| `test-writer` | Writes PHPUnit tests for PHP source files |
-| `changelog-agent` | Generates PO-ready changelogs from merged PRs |
 | `ticket-writer` | Creates well-formed GitHub issues for follow-ups |
 
 ---
@@ -235,15 +232,13 @@ One file, everything tunable:
 | `/maestro:issue-workflow 42` | Run the full delivery pipeline from a GitHub issue |
 | `/maestro:orchestrator` | Jump straight into routing if the issue is already loaded |
 | `/maestro:dod` | Run the Definition of Done checklist on the current branch |
-| `/maestro:pr` | Generate a PR description for the current branch |
-| `/maestro:test` | Write PHPUnit tests for PHP source files |
 | `/maestro:docs` | Update developer documentation |
 | `/maestro:e2e` | Run E2E smoke tests manually |
 | `/maestro:knowledge-graph` | Explore codebase dependencies |
 | `/maestro:compliance` | Check a change against WordPress.org rules |
-| `/maestro:changelog` | Generate a PO-ready grouped changelog from merged PRs |
 | `/maestro:sprint` | Plan and estimate issues for a sprint |
-| `/maestro:retrospective` | Analyse a completed pipeline run |
+
+> **Looking for changelog, PR description, test-writing, or retrospective commands?** These are now available as standalone agents in [Cadenza](https://github.com/wp-media/cadenza) — a companion plugin that pairs with Maestro.
 
 **Autonomy flags** — pass on any `/maestro:issue-workflow` run:
 
