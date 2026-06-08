@@ -243,8 +243,6 @@ Read `{TARGET_ROOT}/.claude/transplant-context.md` to extract the disposition ta
 | `agents/e2e-qa-tester.md` | `{M}/agents/e2e-qa-tester.md` | `{T}/.claude/agents/e2e-qa-tester.md` |
 | `agents/release-agent.md` | `{M}/agents/release-agent.md` | `{T}/.claude/agents/release-agent.md` |
 | `agents/ticket-writer.md` | `{M}/agents/ticket-writer.md` | `{T}/.claude/agents/ticket-writer.md` |
-| `agents/test-writer.md` | `{M}/agents/test-writer.md` | `{T}/.claude/agents/test-writer.md` |
-| `agents/pr-agent.md` | `{M}/agents/pr-agent.md` | `{T}/.claude/agents/pr-agent.md` |
 | `commands/orchestrator.md` | `{M}/commands/orchestrator.md` | `{T}/.claude/commands/orchestrator.md` |
 | `commands/issue-workflow.md` | `{M}/commands/issue-workflow.md` | `{T}/.claude/commands/issue-workflow.md` |
 | `commands/dod.md` | `{M}/commands/dod.md` | `{T}/.claude/commands/dod.md` |
@@ -294,9 +292,9 @@ In upgrade mode, `disposition` values come from the context doc's **Section 10 â
 | `config` | `maestro.json` (always GENERATE) |
 | `orchestration` | `commands/orchestrator.md`, `commands/issue-workflow.md` |
 | `grooming` | `agents/grooming-agent.md`, `agents/challenger.md` |
-| `implementation` | `agents/backend-agent.md`, `agents/frontend-agent.md`, `agents/test-writer.md` |
+| `implementation` | `agents/backend-agent.md`, `agents/frontend-agent.md` |
 | `quality` | `agents/lead-reviewer.md`, `agents/qa-engineer.md`, `agents/e2e-qa-tester.md` |
-| `release` | `agents/release-agent.md`, `agents/ticket-writer.md`, `agents/pr-agent.md` |
+| `release` | `agents/release-agent.md`, `agents/ticket-writer.md` |
 | `skills` | `commands/dod.md`, `commands/e2e.md`, `commands/docs.md`, `commands/knowledge-graph.md`, `commands/compliance.md` |
 | `scripts` | `bin/dev-start.sh`, `bin/dev-seed.sh`, `bin/dev-down.sh`, `scripts/issue-sync.sh`, `scripts/make-issue-branch.sh`, `scripts/init-pr-draft.sh`, `refs/pr-template.md` |
 

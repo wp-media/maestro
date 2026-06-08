@@ -417,7 +417,6 @@ Every component must have a decision. Use the rules below.
 **Default dispositions (override only with evidence):**
 - `agents/challenger.md` → always KEEP_AS_IS (100% agnostic)
 - `agents/release-agent.md` → always KEEP_AS_IS (generic git/gh)
-- `agents/pr-agent.md` → always KEEP_AS_IS
 - `commands/docs.md` → always KEEP_AS_IS
 - `scripts/issue-sync.sh` → always KEEP_AS_IS
 - `scripts/make-issue-branch.sh` → always KEEP_AS_IS
@@ -442,8 +441,6 @@ Every component must have a decision. Use the rules below.
 | `agents/e2e-qa-tester.md` | {ADAPT\|DROP} | {reason} |
 | `agents/release-agent.md` | KEEP_AS_IS | Generic git/gh |
 | `agents/ticket-writer.md` | ADAPT | Repo reference only |
-| `agents/test-writer.md` | {ADAPT\|REWRITE} | {reason} |
-| `agents/pr-agent.md` | KEEP_AS_IS | Generic |
 | `commands/orchestrator.md` | ADAPT | {reason} |
 | `commands/issue-workflow.md` | ADAPT | Script paths, config keys |
 | `commands/dod.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
