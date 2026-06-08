@@ -103,6 +103,11 @@ There are no wrong answers. Partial answers are fine.
    c) No CI yet
    (skip if unsure)
 
+7. Agents' working temp directory:
+   Agents write issue-tracking files, logs, and locks here.
+   Default: `.ai` — or type a custom name (e.g. `.TemporaryItems`, `.work`)
+   Leave blank to accept the default.
+
 Anything else I should know? (framework conventions, monorepo structure, unusual tooling, etc.)
 ```
 
@@ -132,6 +137,7 @@ local_dev_cmd: <boot command or "none" or "infer">
 local_url: <URL or "none" or "infer">
 has_browser_ui: <yes / no / infer>
 ci: <answer or "infer">
+temp_root: <custom name, or ".ai" if left blank>
 notes: <free-text answer to "anything else" or empty>
 ```
 
@@ -257,7 +263,6 @@ Read `{TARGET_ROOT}/.claude/transplant-context.md` to extract the disposition ta
 | `bin/dev-start.sh` | `{M}/bin/dev-up.sh` | `{T}/bin/dev-start.sh` |
 | `bin/dev-seed.sh` | — (generated from scratch) | `{T}/bin/dev-seed.sh` |
 | `bin/dev-down.sh` | `{M}/bin/dev-down.sh` | `{T}/bin/dev-down.sh` |
-| `maestro.json` | `{M}/.template/maestro.json` | `{T}/.claude/maestro.json` |
 
 `{M}` = `MAESTRO_ROOT`, `{T}` = `TARGET_ROOT`
 
@@ -289,7 +294,6 @@ In upgrade mode, `disposition` values come from the context doc's **Section 10 �
 
 | Cluster | Components |
 |---|---|
-| `config` | `maestro.json` (always GENERATE) |
 | `orchestration` | `commands/orchestrator.md`, `commands/issue-workflow.md` |
 | `grooming` | `agents/grooming-agent.md`, `agents/challenger.md` |
 | `implementation` | `agents/backend-agent.md`, `agents/frontend-agent.md` |
@@ -302,7 +306,7 @@ In upgrade mode, `disposition` values come from the context doc's **Section 10 �
 
 ## Phase 2 — Spawn Writers
 
-Spawn all 8 `transplant-writer` agents **simultaneously**, each receiving its dispatch plan as prompt input.
+Spawn all 7 `transplant-writer` agents **simultaneously**, each receiving its dispatch plan as prompt input.
 
 Each prompt must be self-contained — writers are isolated agents with no access to this conversation:
 
@@ -370,11 +374,77 @@ cat > "$TARGET_ROOT/.claude/transplant-manifest.json" << EOF
     "local_url": "{interview.local_url}",
     "has_browser_ui": "{interview.has_browser_ui}",
     "ci": "{interview.ci}",
+    "temp_root": "{interview.temp_root}",
     "notes": "{interview.notes}"
   }
 }
 EOF
 ```
+
+---
+
+## Phase 3 — QA Pass (Claude Opus)
+
+After all writers complete and reference snapshots are written, spawn the `transplant-qa` agent with model **opus**:
+
+**Prompt:**
+```
+Audit the transplanted workflow for the project at {TARGET_ROOT}.
+
+context_path: {TARGET_ROOT}/.claude/transplant-context.md
+target_root: {TARGET_ROOT}
+project_type: {analyst.project_type}
+files_written: {JSON array of all files_written from aggregated writer results}
+```
+
+**On green verdict:** proceed to Phase 4.
+
+**On red verdict:** run a targeted re-work pass:
+
+1. Group findings by cluster (use the cluster groupings table from Phase 2).
+2. For each cluster with FAIL findings, build a targeted dispatch plan containing only the flagged components. Append a `qa_feedback` array to the plan:
+   ```json
+   {
+     "mode": "fresh",
+     "maestro_root": "{MAESTRO_ROOT}",
+     "target_root": "{TARGET_ROOT}",
+     "context_path": "{TARGET_ROOT}/.claude/transplant-context.md",
+     "cluster": "{cluster-name}",
+     "qa_feedback": [
+       {
+         "file": "/absolute/path",
+         "check": "A",
+         "description": "...",
+         "rework_instruction": "..."
+       }
+     ],
+     "components": [...]
+   }
+   ```
+3. Spawn targeted `transplant-writer` agents in parallel for each flagged cluster. Each writer's prompt includes: `"This is a QA re-work pass. Apply every item in qa_feedback to its file before re-writing."`
+4. Re-run the QA agent. Maximum **2 re-spin rounds total**.
+5. If still red after 2 rounds: print remaining findings as manual steps in the summary and proceed to Phase 4.
+
+---
+
+## Phase 4 — Cleanup Prompt
+
+Ask:
+
+> "Upgrade reference snapshots live at `.claude/transplant-refs/` alongside `transplant-manifest.json` and `transplant-context.md`. These are only needed if you plan to run `/transplant` again to upgrade this workflow later.
+>
+> Remove upgrade artifacts? (y/n)"
+
+**If yes:**
+```bash
+rm -rf "$TARGET_ROOT/.claude/transplant-refs"
+rm -f "$TARGET_ROOT/.claude/transplant-manifest.json"
+rm -f "$TARGET_ROOT/.claude/transplant-context.md"
+```
+
+**If no:** keep all files.
+
+---
 
 Print the final summary:
 
@@ -389,7 +459,6 @@ Files written ({total count}):
   Agents:   {list of .claude/agents/*.md written}
   Commands: {list of .claude/commands/*.md written}
   Scripts:  {list of bin/ and scripts/ written}
-  Config:   .claude/maestro.json
 
 Dropped: {list or "none"}
 
@@ -400,13 +469,17 @@ Dropped: {list or "none"}
 {if writer errors:}
 ⚠️  Writer errors:
   {cluster}: {error}
+
+{if upgrade artifacts removed:}
+  Upgrade artifacts removed — workflow is self-contained.
+{if upgrade artifacts kept:}
+  Upgrade artifacts retained at .claude/transplant-refs/
 ─────────────────────────────────────────
 Next steps:
-  1. Fill any FIXME values in .claude/maestro.json
-  2. Review generated agents — especially backend-agent.md and qa-engineer.md
-  3. Run: chmod +x {TARGET_ROOT}/bin/*.sh
-  4. Commit .claude/ and bin/ to the target repo
-  5. Test: cd {TARGET_ROOT} && bash bin/dev-start.sh
+  1. Review generated agents — especially orchestrator.md, backend-agent.md, and qa-engineer.md
+  2. Run: chmod +x {TARGET_ROOT}/bin/*.sh
+  3. Commit .claude/ and bin/ to the target repo
+  4. Test: cd {TARGET_ROOT} && bash bin/dev-start.sh
 ─────────────────────────────────────────
 ```
 
@@ -442,4 +515,4 @@ Target: {TARGET_ROOT}
 | Writer returns no JSON | Log the cluster as failed, continue collecting other results. List it in the error summary. |
 | Target `.claude/` already exists and user confirmed | Proceed — writers use Write which overwrites. |
 | Context doc missing a section | Proceed — writers will use FIXME markers for missing values. Flag in summary. |
-| `analyst.repo == "FIXME"` | Note in summary: "Fill in `.ai.repo` and `repo` in `.claude/maestro.json`." |
+| `analyst.repo == "FIXME"` | Note in summary: "Fill in `REPO=` in `.claude/commands/orchestrator.md` constants block." |

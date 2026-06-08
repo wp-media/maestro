@@ -30,6 +30,8 @@ Apply these rules **per field**:
 
 Fields that the analyst cannot resolve from either source after a genuine codebase read become `FIXME` entries and surface as manual steps in the transplant summary.
 
+**Special case — `temp_root`:** if value is `"infer"`, check `{target_root}/.gitignore` for AI temp directory patterns (lines matching `^\.ai`, `^\.TemporaryItems`, `^\.work`, `^\.agents`, etc.). Use the first match. If none found, write `.ai`. Never write `"infer"` or `"FIXME"` for this field.
+
 ---
 
 ## Step 1 — Project fingerprint
@@ -352,6 +354,7 @@ mkdir -p {target_root}/.claude
 | Seed command | `{exact command or N/A}` |
 | Local URL | {http://localhost:PORT} |
 | Admin / dashboard URL | {http://... or N/A} |
+| Temp root | {.ai or custom name from interview — never write "infer" here} |
 | Notes | {anything unusual about the dev environment} |
 
 ---

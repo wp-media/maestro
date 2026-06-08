@@ -48,8 +48,10 @@ Read `context_path` in full. Extract and hold in context:
 - Static analysis tool and **exact lint command**
 - Dev environment boot/stop/seed commands
 - Local URL, admin URL
+- Temp root (e.g. `.ai` or `.TemporaryItems`)
 - E2E setup (framework, base URL, test dir)
 - GitHub repo slug
+- Base branch
 - Frontend split: yes / no
 - Analyst notes (Section 9) — read these carefully, they often contain critical constraints
 
@@ -57,7 +59,35 @@ Read `context_path` in full. Extract and hold in context:
 
 ## Step 2 — Process each component
 
-Work through `dispatch.components` in order. For each:
+Work through `dispatch.components` in order.
+
+### Universal pre-write pass (applies before every disposition except DROP and REWRITE)
+
+Before writing any file, apply these transformations to the content in order:
+
+**1. Config read → prompt injection.** Find any block that reads a runtime config file at startup. The pattern looks like:
+```
+Before any step, read `.claude/maestro.json` and extract:
+```
+Replace the entire phrase "read `.claude/maestro.json` and extract:" with:
+```
+The following values are injected via the orchestrator prompt — do not read any config file:
+```
+Keep the variable list (REPO, TEMP_ROOT, etc.) intact below it.
+
+**2. Maestro de-brand:**
+- Remove any remaining `.claude/maestro.json` file path references (the entire surrounding statement if nothing else is on that line)
+- Replace "Maestro" as a product/brand name in prose, headers, and frontmatter descriptions with "this workflow"
+- Remove `maestro:` command/skill prefixes from any prose references
+
+**3. Path fixes:**
+- `.claude/skills/issue-workflow/scripts/` → `.claude/commands/issue-workflow/scripts/`
+- `bin/dev-up.sh` → `bin/dev-start.sh`
+- `bash bin/dev-up.sh` → `bash bin/dev-start.sh`
+
+---
+
+For each component:
 
 ### DROP
 Write nothing. Record the component name in `files_skipped`.
@@ -65,19 +95,16 @@ Write nothing. Record the component name in `files_skipped`.
 ---
 
 ### KEEP_AS_IS
-Read `source_path`. Write verbatim to `output_path` with **only these cosmetic fixes**:
-- Replace `.claude/skills/issue-workflow/scripts/` → `.claude/commands/issue-workflow/scripts/`
-- Replace `bin/dev-up.sh` → `bin/dev-start.sh`
-- Replace `bash bin/dev-up.sh` → `bash bin/dev-start.sh`
+Read `source_path`. Apply the universal pre-write pass. Write to `output_path`.
 
-Do NOT change logic, content, commands, or structure.
+Do NOT change logic, content, commands, or structure beyond the universal pre-write pass.
 
 ---
 
 ### ADAPT
-Read `source_path`. Make **targeted, surgical changes** based on the context doc. Preserve everything else unchanged.
+Read `source_path`. Apply the universal pre-write pass first. Then make **targeted, surgical changes** based on the context doc. Preserve everything else unchanged.
 
-Changes to make:
+Additional changes to make:
 
 **Replace tool references:**
 - PHPCS / phpcs / phpstan / `./vendor/bin/phpcs` → project's static analysis tool + command
@@ -124,58 +151,6 @@ What to rewrite:
 - Test structure and assertions style
 
 The rewritten agent must be internally consistent — don't mix PHP conventions with Python commands.
-
----
-
-### GENERATE (config cluster — `maestro.json` only)
-Do not copy the template. Generate `maestro.json` from scratch using the context doc data directly.
-
-Use this schema (omit blocks that don't apply — no empty arrays or null-filled editions):
-
-```json
-{
-  "name": "{slug from project name}",
-  "repo": "{owner/repo from context — FIXME if unavailable}",
-  "type": "{project type from context}",
-  "description": "FIXME — add project description",
-  "areas": [
-    {
-      "path": "{path}/",
-      "role": "{source|tests|assets|config|vendor|tooling|i18n|docs}",
-      "notes": "{brief note}"
-    }
-  ],
-  "tooling": {
-    // Only include tools that actually exist in the project
-    // Use keys: composer, phpcs, phpstan, node, jest, playwright, cypress, makefile, docker-compose
-    // Value is the config file path
-  },
-  "notes": [
-    "Prefer minimal diffs and avoid unrelated formatting changes.",
-    "Do not edit generated output in dist/ or assets/ unless explicitly requested."
-  ],
-  "ai": {
-    "slug": "{slug}",
-    "display_name": "{project name}",
-    "repo": "{owner/repo}",
-    "temp_root": ".ai",
-    "architecture_skill": null,
-    "frontend_skill": null,
-    "editions": null,
-    "html_log": false,
-    "e2e": {
-      "local_url": "{local url from context}",
-      "boot_cmd": "bash bin/dev-start.sh",
-      "seed_cmd": "bash bin/dev-seed.sh",
-      "test_cmd": null,
-      "settings_path": "{admin path from context or null}",
-      "ci_integration": false
-    }
-  }
-}
-```
-
-Mark any value you cannot determine as `"FIXME — description"`.
 
 ---
 
@@ -238,7 +213,7 @@ When your cluster is `scripts`, the `bin/dev-start.sh` and `bin/dev-down.sh` fil
 
 Read `{maestro_root}/bin/dev-up.sh` as a structural reference. Write a new `dev-start.sh` for the target project based on context Section 3 (Dev Environment):
 
-- **wp-env projects (ADAPT):** Keep the wp-env structure, update the slug resolution to use `.claude/maestro.json`, update the URL, replace `.maestro/bin/dev-seed.sh` reference with `bin/dev-seed.sh`
+- **wp-env projects (ADAPT):** Keep the wp-env structure, derive the slug from the project directory name (`basename "$TARGET_ROOT"`), update the URL to match the context doc, replace `.maestro/bin/dev-seed.sh` reference with `bin/dev-seed.sh`
 - **docker-compose projects (REWRITE):** `docker-compose up -d`, then seed if applicable, then print URL
 - **npm-based projects (REWRITE):** Background start of the dev server + health-check loop
 - **make-based projects (REWRITE):** `make dev` or equivalent
@@ -260,10 +235,31 @@ Read `{maestro_root}/bin/dev-down.sh` as reference. Adapt for the target's stop 
 
 ## Step 4 — Orchestrator cluster special handling
 
-When your cluster is `orchestration`, the `orchestrator.md` adaptation needs attention to WP-specific sections:
+When your cluster is `orchestration`, the orchestrator must have its runtime config-reading replaced with a hardcoded constants block.
+
+**Generate the constants block** from context doc Sections 1–6 and the interview `temp_root` value. Prepend it immediately after the frontmatter, before the first `##` section:
+
+```markdown
+## Project Config
+
+<!-- Values baked in at transplant time. Update here if the project changes. -->
+REPO={repo from context Section 6 — owner/repo}
+TEMP_ROOT={temp_root from context Section 3 Dev Environment}
+BASE_BRANCH={base_branch from context Section 6}
+TEST_CMD={exact test command from context Section 2}
+LINT_CMD={exact lint command from context Section 2, omit line if N/A}
+BOOT_CMD=bash bin/dev-start.sh
+SEED_CMD=bash bin/dev-seed.sh{omit line if no seeding}
+LOCAL_URL={local URL from context Section 3, omit line if N/A}
+ADMIN_URL={admin URL from context Section 3, omit line if N/A}
+```
+
+Use `FIXME — <what is needed>` only for `REPO` if genuinely unavailable. All other fields have a clear default or can be omitted.
+
+**Then remove** the entire "Read `.claude/maestro.json` at startup…" paragraph (the universal pre-write pass handles this, but verify it is gone).
 
 **Always adapt:**
-- Config var table: remove `ARCH_SKILL`, `FRONTEND_SKILL`, `EDITIONS`, `REST_NS`, `E2E_SETTINGS` if not applicable to the project type
+- Config var table in the body: remove `ARCH_SKILL`, `FRONTEND_SKILL`, `EDITIONS`, `REST_NS`, `E2E_SETTINGS` if not applicable to the project type
 - `domain detection` paragraph referencing PHP admin output → adapt or remove
 - `editions-aware scope (Step 4c)` → DROP this step entirely for non-edition projects
 - `compliance.md` references → remove if compliance is dropped
@@ -282,11 +278,26 @@ When your cluster is `orchestration`, the `orchestrator.md` adaptation needs att
 
 Before returning, verify each file you wrote:
 
-1. No WP-specific content remains in non-WP files (scan for: `wp-env`, `wp plugin`, `PHPCS`, `phpunit.xml`, `wp_options`, `/wp-admin/`)
-2. `{PLACEHOLDER}` variables are intact (they resolve at runtime — do not expand them)
-3. JSON return contracts are present (grep for `"verdict":`, `"overall":`, `"ticket_id":`, `"branch":` in the relevant files)
-4. No broken relative path references (`.claude/skills/` should be gone)
-5. `maestro.json` has no null `e2e.local_url` if the project has a local URL in context
+1. No Maestro references remain: scan for `maestro.json`, `maestro_root`, `\.claude/maestro`, `maestro:` prefix. Zero hits required.
+2. No WP-specific content in non-WP files: scan for `wp-env`, `wp plugin`, `PHPCS`, `phpunit.xml`, `wp_options`, `/wp-admin/`
+3. `{PLACEHOLDER}` variables are intact (they resolve at runtime — do not expand them)
+4. JSON return contracts are present (grep for `"verdict":`, `"overall":`, `"ticket_id":`, `"branch":` in the relevant files)
+5. No broken relative path references (`.claude/skills/` must be gone)
+6. `orchestrator.md` contains a `## Project Config` block with `REPO=`, `TEMP_ROOT=`, `BASE_BRANCH=`
+
+---
+
+## Step 6 — QA re-work (when `dispatch.qa_feedback` is present)
+
+When the dispatch plan contains a `qa_feedback` array, this is a re-work pass initiated by the QA agent. Process QA feedback **before** re-writing each component.
+
+For each item in `qa_feedback`:
+- `file` — which output file needs fixing
+- `check` — which QA check failed (A–F)
+- `description` — what was found
+- `rework_instruction` — exactly what to change
+
+Apply every `rework_instruction` to the relevant component. Then re-apply the standard disposition logic (ADAPT / REWRITE / KEEP_AS_IS) as normal — the QA fix and the standard pass must both be applied.
 
 ---
 
@@ -309,7 +320,7 @@ Before returning, verify each file you wrote:
       "resolution": "Preserved team version — manual merge required"
     }
   ],
-  "fixme_values": ["maestro.json: repo slug not determinable — fill in owner/repo", "..."],
+  "fixme_values": ["orchestrator.md: REPO not determinable — fill in owner/repo in the Project Config block", "..."],
   "notes": "string — key adaptations or merges made, anything the user should review"
 }
 ```
