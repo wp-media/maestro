@@ -45,7 +45,7 @@ Before running the checks, acknowledge these. Agents are good at producing plaus
 
 ---
 
-## The 5 checks
+## The 6 checks
 
 Run each check in order. Report **PASS**, **WARN**, or **FAIL** with specific evidence for each.
 
@@ -97,6 +97,7 @@ Run `git diff {BASE_BRANCH} --name-only` and look for changes to the public API 
 - New or changed configuration keys, option names, or capabilities
 - New or changed plugin metadata
 - New or changed exported public methods on ServiceProvider-bound services
+- New or changed WP-CLI commands
 
 Then check if docs were updated:
 ```bash
@@ -126,11 +127,15 @@ Then fetch the PR body:
 Check that all required sections from the template are present and non-empty:
 - Description (with `Fixes #N`)
 - Type of change (one checkbox ticked)
-- What was tested
-- How to test
-- Affected Features & Quality Assurance Scope
-- Technical description
-- Mandatory Checklist items
+- Detailed scenario → What was tested
+- Detailed scenario → How to test
+- Detailed scenario → Affected Features & Quality Assurance Scope
+- Technical description → Documentation
+- Technical description → New dependencies
+- Technical description → Risks
+- Mandatory Checklist → Code validation
+- Mandatory Checklist → Code style
+- Additional Checks
 
 - **PASS**: All required sections present and filled
 - **WARN**: One section is thin or partially filled
@@ -169,19 +174,15 @@ ls .github/workflows/
 ```
 Note the check names (e.g. `lint / PHP CodeSniffer`, `lint / PHPStan`, `task-check`).
 
-Poll GitHub Actions status until all checks complete or 5-minute timeout:
+Wait for all checks to complete (blocks until all checks are no longer pending):
 ```bash
-for i in $(seq 1 10); do
-  STATUS=$(gh pr checks "$PR_URL" 2>/dev/null)
-  echo "$STATUS" | grep -qE "(pending|in_progress)" || break
-  sleep 30
-done
-gh pr checks "$PR_URL"
+gh pr checks "$PR_URL" --watch
 ```
 
 For any check that shows `fail`, fetch its log URL and extract the relevant error excerpt:
 ```bash
-gh pr checks "$PR_URL" --json name,state,detailsUrl
+gh pr checks "$PR_URL" --json name,state,link \
+  --jq '.[] | select(.state == "FAILURE") | {name, link}'
 gh run view <run_id> --log-failed 2>/dev/null | tail -30
 ```
 
@@ -221,6 +222,7 @@ Exceptions that do not count as violations:
 - Auto-generated files (`*.min.js`, `*.min.css`, lock files)
 - Files in the test directory that directly correspond to a changed source file
 - Files the orchestrator explicitly added to scope via a `blocked_reason` note
+- Files modified solely by the auto-formatter (e.g. `composer phpcs:fix` / `phpcbf`). The auto-formatter has no "changed files only" mode and may reformat files outside the declared scope. Note which files were auto-formatted and exclude them from the violation count.
 
 If no `tasks.json` exists (e.g., the orchestrator was not used), skip this check with status `N/A`.
 
@@ -228,17 +230,12 @@ If no `tasks.json` exists (e.g., the orchestrator was not used), skip this check
 - **WARN**: One file outside scope was modified — name it and explain why
 - **FAIL**: Two or more files outside scope were modified without explanation
 
-A FAIL here does not block hand-off automatically, but the orchestrator must acknowledge it before proceeding.
+**Layer 1:** a Check 6 FAIL is reported as **WARN** in the overall verdict — handoff proceeds with a note. (L1 `overall` is only ever `PASS` or `WARN`.)
+**Layer 2:** a Check 6 FAIL is a genuine **FAIL** and contributes to a `FAIL` overall verdict.
 
 ---
 
 ## Output format
-
-**Format constraints (enforced for L2 output):**
-- Total output: ≤ 400 words.
-- Evidence fields: one sentence maximum — no paragraphs, no log dumps.
-- PASS checks: collapsed into the summary table only — no prose elaboration.
-- WARN / FAIL checks: one prose sentence in "Blockers" or "Warnings" — no more.
 
 ```
 | Check | Status | Evidence |
@@ -250,7 +247,7 @@ A FAIL here does not block hand-off automatically, but the orchestrator must ack
 | 5. CI                 | FAIL | run-stan failing: custom rule in src/Engine/Cache/Subscriber.php:142 |
 | 6. File scope         | PASS | All 4 changed files within declared scope |
 
-Overall: BLOCKED
+Overall: FAIL
 
 Blockers:
 - Check 5: static analysis failing on src/Engine/Cache/Subscriber.php:142 — see error excerpt
@@ -259,8 +256,18 @@ Warnings (non-blocking):
 - Check 2: src/Engine/Foo/Bar.php has no test — consider filing a ticket
 ```
 
-If all checks pass: print **READY TO MERGE** clearly.
-If blocked: list each blocker with a suggested fix.
+If all checks pass: print **PASS** clearly.
+If any check fails: print **FAIL** and list each blocker with a suggested fix.
+
+## L2 output format constraints
+
+Enforced for Layer 2 output only:
+- Total output: ≤ 400 words.
+- Evidence fields: one sentence maximum — no paragraphs, no log dumps.
+- PASS checks: collapsed into the summary table only — no prose elaboration.
+- WARN / FAIL checks: one prose sentence in "Blockers" or "Warnings" — no more.
+- Always include: the summary table, the `Overall` line, and the `Blockers` list (even if empty).
+- Omit: commands run, environment setup narration, PASS check prose explanations.
 
 ---
 

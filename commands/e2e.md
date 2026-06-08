@@ -81,7 +81,8 @@ or implementation agent's execution window.
    mcp__playwright__click({ selector: "#wp-submit" })
    # primary scenario
    mcp__playwright__navigate({ url: "{E2E_SETTINGS}" })
-   mcp__playwright__assert_text({ selector: "...", text: "..." })
+   mcp__playwright__snapshot({})
+   # Inspect snapshot output to confirm expected element/text is present
    ```
 
    Take at most 1–2 screenshots if helpful, but do not publish them at this tier.

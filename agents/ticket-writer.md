@@ -81,7 +81,8 @@ The project lives on GitHub. Always use `gh` for issue operations. The canonical
    - **EPIC**: create the EPIC with label `epics` first, then create sub-tickets referencing it.
    - **Single**: create directly.
 
-7. Emit a GitHub operation event before creating the issue:
+7. Emit the GitHub operation event, then immediately create the issue. Do not wait between the two — emit and create in sequence:
+
    ```json
    {
      "type": "github_operation",
@@ -94,9 +95,8 @@ The project lives on GitHub. Always use `gh` for issue operations. The canonical
    }
    ```
 
-   Emit to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`. Emit and continue.
+   Emit to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`, then:
 
-7a. Create the issue with the AI-generated notice at the top of the body:
    ```bash
    gh issue create --repo {REPO} \
      --title "Short imperative title under 70 chars" \
@@ -120,7 +120,6 @@ The project lives on GitHub. Always use `gh` for issue operations. The canonical
      --label "Made by AI" \
      --label "<additional labels>"
    ```
-
 
 8. Return the ticket object to the orchestrator (see schema below).
 

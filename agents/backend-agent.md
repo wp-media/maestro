@@ -254,7 +254,7 @@ cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/backend-result.json" <<'EOF'
 EOF
 ```
 
-This file is read by the orchestrator for routing decisions.
+This file is a session-recovery fallback. The primary routing input is the JSON object returned directly to the orchestrator — never read this file for primary routing decisions.
 
 ### Emit start and complete events
 
@@ -269,8 +269,9 @@ EOF
 **Before returning this JSON object (after Step 3b is done and commit succeeds):**
 
 ```bash
+TESTS_OK=true  # set to false if any test failed
 cat >> "$TEMP_ROOT/issues/${ISSUE_ID}/orchestrator-events.jsonl" <<EOF
-{"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"backend-agent","type":"implementation_complete","issue_id":"${ISSUE_ID}","data":{"domain":"backend","tests_passing":true/false,"dod_l1_overall":"PASS|WARN","files_changed":N,"commit_sha":"..."}}
+{"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"backend-agent","type":"implementation_complete","issue_id":"${ISSUE_ID}","data":{"domain":"backend","tests_passing":${TESTS_OK},"dod_l1_overall":"PASS|WARN","files_changed":N,"commit_sha":"..."}}
 EOF
 ```
 

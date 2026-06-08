@@ -222,7 +222,7 @@ Phase label — insert before the first event of each pipeline phase:
   <div class="event" data-type="gate" data-status="pass">
     <div class="event-icon" style="color:#22c55e">⬡</div>
     <div class="event-type" style="color:#22c55e">DOD L2</div>
-    <div class="event-summary">PASS — all 5 checks clean, Co-Authored-By trailer present on N commits</div>
+    <div class="event-summary">PASS — all 6 checks clean, Co-Authored-By trailer present on N commits</div>
     <div class="event-step">step N</div>
     <div class="event-chevron">›</div>
   </div>
