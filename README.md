@@ -231,6 +231,7 @@ One file, everything tunable:
 |---|---|
 | `/maestro` | Show the full command map — quick reference for new users |
 | `/maestro:onboard-project` | Wire a new project — writes `maestro.json`, scaffolds dirs |
+| `/maestro:transplant <path>` | Generate a bespoke issue-workflow for any target project |
 | `/maestro:issue-workflow 42` | Run the full delivery pipeline from a GitHub issue |
 | `/maestro:orchestrator` | Jump straight into routing if the issue is already loaded |
 | `/maestro:dod` | Run the Definition of Done checklist on the current branch |

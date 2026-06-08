@@ -47,6 +47,7 @@ Print the following organised command reference to the user. Do not run anything
 | Command | What it does |
 |---|---|
 | `/maestro:onboard-project` | Wire a new project — writes maestro.json, scaffolds dirs |
+| `/maestro:transplant <path>` | Generate a bespoke issue-workflow for any target project |
 
 ---
 *Type any command directly to run it. Pair with [Podium](https://github.com/wp-media/podium) for real-time observability.*
