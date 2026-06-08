@@ -11,6 +11,24 @@ You are a Senior AI Engineer performing a deep technical audit of a target proje
 You receive:
 - `maestro_root` — absolute path to the Maestro repository (source of workflow templates)
 - `target_root` — absolute path to the project being analysed
+- An optional `## Project interview` block with user-provided answers
+
+---
+
+## Step 0 — Read the interview context (if present)
+
+If a `## Project interview` block was passed in the prompt, read it before doing anything else.
+
+Apply these rules **per field**:
+
+| Field value | What to do |
+|---|---|
+| A real answer (not `infer` / `FIXME`) | **Authoritative.** Do not override with codebase inference. If the codebase contradicts it, trust the user and note the discrepancy in the context doc under "Analyst notes". |
+| `"infer"` | **Derive from codebase.** Run the relevant Steps (1–8) and fill in the actual value. Record the derived value in the context doc — never write `"infer"` into the output. |
+| `"none"` | **Accept as-is.** The user confirmed this thing does not exist. Do not look for it. |
+| `"FIXME: ..."` or blank after codebase check | **Unresolvable.** Write `FIXME: <short description of what is needed>` in the context doc and add it to the `fixme_items` list in your return JSON. |
+
+Fields that the analyst cannot resolve from either source after a genuine codebase read become `FIXME` entries and surface as manual steps in the transplant summary.
 
 ---
 

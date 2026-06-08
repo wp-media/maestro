@@ -66,7 +66,9 @@ Present this intake form:
 
 ```
 Before analysing the project, I need a few answers to make the transplant as accurate as possible.
-Answer what you know — leave anything uncertain blank and the analyst will infer it from the codebase.
+
+Skip anything you don't know — the analyst will read the codebase and fill it in.
+There are no wrong answers. Partial answers are fine.
 
 1. Project type (pick one):
    a) WordPress plugin or theme
@@ -78,30 +80,45 @@ Answer what you know — leave anything uncertain blank and the analyst will inf
 
 2. Primary language(s):
    e.g. PHP, TypeScript, Python, Go, Ruby — list all that apply
+   (skip if unsure)
 
 3. Test runner(s):
    e.g. PHPUnit, Jest, Vitest, Pytest, RSpec, Mocha, none yet
+   (skip if unsure)
 
 4. Local dev environment:
    a) Yes — Docker / docker compose
    b) Yes — custom shell script (what command?)
    c) Yes — other (describe)
    d) No local dev environment
-
-   If yes: what URL does it run on? (e.g. http://localhost:3000)
+   (skip if unsure)
+   If yes: what URL does it run on? e.g. http://localhost:3000
 
 5. Does the project have a browser-testable UI?
-   (Admin panel, web app pages, settings page, etc. — yes / no)
+   Admin panel, web app pages, settings page, etc. — yes / no / unsure
 
 6. CI setup:
    a) GitHub Actions
    b) Other CI (name it)
    c) No CI yet
+   (skip if unsure)
 
 Anything else I should know? (framework conventions, monorepo structure, unusual tooling, etc.)
 ```
 
-Wait for the user's answers. If they skip a question, note it as "infer from codebase" for that field.
+Wait for the user's answers.
+
+**Handling skipped or uncertain answers:**
+
+| User response | What to put in the context block | What the analyst does |
+|---|---|---|
+| A clear answer | The answer verbatim | Treat as authoritative — do not override from codebase |
+| Skipped / blank | `"infer"` | Read the codebase and derive the value; record the inferred value in the context doc |
+| "I don't know" / "unsure" | `"infer"` | Same as skipped |
+| "none" / "not set up yet" | `"none"` | Accept as-is — do not look for it in the codebase |
+| Contradicts the codebase | Keep user answer | Trust the user; note the discrepancy in the context doc |
+
+When the analyst cannot determine a field from either the user answer or the codebase (e.g. `"infer"` and no evidence in the codebase), it writes `"FIXME: <what is needed>"` for that field and surfaces it as a manual step in the final summary.
 
 Once answers are received, build the **interview context block**:
 
@@ -136,7 +153,13 @@ target_root: {TARGET_ROOT}
 
 {INTERVIEW_CONTEXT_BLOCK}
 
-The interview block above is user-provided ground truth — treat it as authoritative over anything you infer from the codebase. Use it to drive disposition decisions: non-PHP projects should have PHP-specific checks rewritten or dropped; projects with no browser UI should have e2e-qa-tester dropped; test runner answers directly determine what replaces PHPUnit in DOD Check 2 and implementation agents.
+Interview field rules:
+- Field value is a real answer → authoritative. Do not override from codebase even if they conflict. Note any discrepancy in the context doc.
+- Field value is `"infer"` → unknown. Read the codebase and derive the value. Record the inferred value (not `"infer"`) in the context doc.
+- Field value is `"none"` → user confirmed the thing does not exist. Do not look for it.
+- Field value is `"FIXME: ..."` → neither the user nor the codebase supplied it. Leave it as FIXME and surface it as a manual step in your return JSON.
+
+Use interview answers to drive disposition decisions: non-PHP projects should have PHP-specific checks rewritten or dropped; projects with no browser UI should have e2e-qa-tester dropped; test runner answers directly determine what replaces PHPUnit in DOD Check 2 and implementation agents.
 
 Produce transplant-context.md at {TARGET_ROOT}/.claude/transplant-context.md and return the JSON summary.
 ```
