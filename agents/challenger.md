@@ -12,7 +12,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -69,8 +69,8 @@ For each angle below, ask: **what would cause this plan to fail?**
 
 ## Step 4 — Verdict
 
-- **APPROVED** — No `MUST_HAVE` or `SHOULD_HAVE` gaps. The plan is solid enough to proceed.
-- **NEEDS_REVISION** — One or more `MUST_HAVE` or `SHOULD_HAVE` gaps. Grooming must revise before implementation.
+- **APPROVED** — No `MUST_HAVE` gaps. `SHOULD_HAVE` findings may be present but do not block approval; surface them as recommendations.
+- **NEEDS_REVISION** — One or more `MUST_HAVE` gaps. Grooming must revise before implementation.
 - **BLOCKED** — A fundamental decision or prerequisite is missing that the grooming-agent cannot resolve alone (requires human input, architectural decision, or external dependency).
 
 ## Step 5 — Post to GitHub

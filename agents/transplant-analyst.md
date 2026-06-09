@@ -224,23 +224,54 @@ When `mode: upgrade` is passed, run Steps 1–8 as normal (re-analyse the projec
 cat {manifest_path}
 ```
 
-Extract `maestro_commit` and `project_type`.
+Extract:
+- `maestro_commit` — the git commit SHA of the Maestro repo at last transplant time
+- `project_type`
+- `components` — the array of `{ maestro_source, output_path (relative), sha256 }` entries
+
+If `maestro_commit` is `"unknown"` or the field is missing, the baseline cannot be reconstructed. In this case, set every component's upgrade disposition to `SKIP` and add a single analyst note: "maestro_commit unavailable — upgrade diff skipped, all components preserved." Proceed to Step 9c with all `SKIP` dispositions.
 
 ### Step 9b — Diff every transplanted component
 
-For each component in the standard disposition table (Section 8), compute four states:
+Build the standard component path mapping table (same as the transplant command's component reference table: Maestro source path → target output path relative to target root).
 
+For each component in the mapping table, compute two states:
+
+**Maestro changed?**
+
+Reconstruct the Maestro baseline from git:
 ```bash
-# Did Maestro change since last transplant?
-diff "{refs_path}/maestro/{component}" "{maestro_root}/{component}" > /dev/null 2>&1
-MAESTRO_CHANGED=$?  # 0 = identical, 1 = changed
-
-# Did the team modify the output since last transplant?
-diff "{refs_path}/output/{component}" "{target_root}/.claude/{component}" > /dev/null 2>&1
-TEAM_CHANGED=$?  # 0 = identical, 1 = changed
+git -C "{maestro_root}" show "{maestro_commit}:{maestro_source}" > /tmp/transplant-baseline.md 2>/dev/null
 ```
 
-Compute the upgrade disposition:
+If the git command fails (commit not in history), treat `MAESTRO_CHANGED=0` for this component (cannot determine — assume no change, skip or preserve).
+
+Then compare baseline to current:
+```bash
+diff /tmp/transplant-baseline.md "{maestro_root}/{maestro_source}" > /dev/null 2>&1
+MAESTRO_CHANGED=$?  # 0 = identical, 1 = changed
+```
+
+For components that were `DROP` at the last transplant (not present in the manifest `components` array): check if they now exist in Maestro and were previously absent or dropped. If Maestro has a new component that was not in the last manifest, treat it as `APPLY` (newly available).
+
+**Team changed?**
+
+Find the component in the manifest `components` array by matching `maestro_source`. Extract its stored `sha256`.
+
+```bash
+# Current hash of the team's output file
+CURRENT_HASH=$( (sha256sum "{target_root}/{output_relative}" 2>/dev/null || shasum -a 256 "{target_root}/{output_relative}") | awk '{print $1}' )
+
+# Stored hash from manifest
+STORED_HASH="<value from manifest components array>"
+
+if [ "$CURRENT_HASH" = "$STORED_HASH" ]; then TEAM_CHANGED=0; else TEAM_CHANGED=1; fi
+```
+
+If the component is not in the manifest `components` array (it was DROPped last time), set `TEAM_CHANGED=0`.
+If the output file does not exist at all, set `TEAM_CHANGED=0`.
+
+**Compute upgrade disposition:**
 
 | Maestro changed | Team changed | Upgrade disposition |
 |---|---|---|
@@ -250,8 +281,8 @@ Compute the upgrade disposition:
 | Yes | Yes | `MERGE` — semantic 3-way merge required |
 
 For `MERGE` components, also note:
-- A one-line summary of what changed in Maestro (read the diff and describe it)
-- A one-line summary of what the team changed (read the diff and describe it)
+- A one-line summary of what changed in Maestro (read the diff between baseline and current source, describe it)
+- A one-line summary of what the team changed (read the diff between baseline-generated output and current team file — reconstruct what the writer would have produced from the baseline, or just diff stored-hash-matched content vs current)
 - Whether the changes are in the same or different sections (same-section = higher conflict risk)
 
 ### Step 9c — Build the upgrade plan table

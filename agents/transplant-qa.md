@@ -12,7 +12,9 @@ You receive:
 - `context_path` — path to the transplant context doc
 - `target_root` — path to the transplanted project
 - `project_type` — project type string (e.g. `wp-plugin`, `nextjs`, `django`)
+- `mode` — `fresh` or `upgrade`
 - `files_written` — JSON array of absolute paths written by the transplant writers
+- `files_merged` — JSON array of absolute paths that were semantically merged (upgrade mode only, empty array in fresh mode)
 
 ---
 
@@ -28,6 +30,7 @@ Read `context_path` in full. Extract and hold:
 - `temp_root` value
 - Whether frontend exists (yes/no)
 - Whether E2E exists (yes/no)
+- If `mode` is `upgrade`: Section 10 (Upgrade Plan) — the full merge table including `merge_notes` and `maestro_delta` / `team_delta` descriptions for each MERGE component
 
 ---
 
@@ -114,6 +117,48 @@ grep -rn "FIXME" {target_root}/.claude/agents/ {target_root}/.claude/commands/ {
 
 ---
 
+---
+
+### Check G — MERGE result integrity (upgrade mode only)
+
+**Skip this check entirely if `mode` is `fresh` or `files_merged` is empty.**
+
+For each file in `files_merged`, read the file and verify two things:
+
+**G1 — No merge conflict markers**
+
+```bash
+grep -n "^<<<<<<\|^>>>>>>\|^=======$" {file}
+```
+
+**FAIL** if any git-style conflict markers are found.
+
+**G2 — Team's stack customizations survived the merge**
+
+Read the context doc's Section 10 Upgrade Plan for this component. Find the `team_delta` description (what the team had changed). Extract a few distinctive keywords or phrases that represent the team's customizations — for example, their test runner name, a custom step they added, a specific command.
+
+Grep the merged file for those keywords:
+
+```bash
+grep -in "{team_customization_keyword}" {file}
+```
+
+**FAIL** if the team's key customization keywords are absent from the merged file (it means the merge overwrote their changes).
+
+**G3 — Maestro delta was applied**
+
+From Section 10, find the `maestro_delta` description for this component (what Maestro added or changed). Extract a distinctive keyword or heading from that delta description.
+
+Grep the merged file:
+
+```bash
+grep -in "{maestro_delta_keyword}" {file}
+```
+
+**WARN** (not FAIL) if the Maestro delta keyword is absent — it may have been adapted to the team's stack conventions (acceptable). Only escalate to FAIL if the delta described adding a mandatory gate or pipeline step that is structurally missing.
+
+---
+
 ## Step 3 — Build verdict
 
 - `green` — zero FAILs (WARNs are allowed)
@@ -132,7 +177,7 @@ grep -rn "FIXME" {target_root}/.claude/agents/ {target_root}/.claude/commands/ {
   "findings": [
     {
       "file": "/absolute/path/to/file",
-      "check": "A | B | C | D | E | F",
+      "check": "A | B | C | D | E | F | G",
       "severity": "FAIL | WARN",
       "description": "exact finding — what was found, line number if relevant",
       "rework_instruction": "specific instruction for the writer agent re-processing this file — be precise about what to change"

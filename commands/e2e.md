@@ -27,14 +27,12 @@ or restart it with `{E2E_BOOT}`.
 ## Tier 1 — Basic
 
 **Purpose:** behavioral verification and smoke tests. Fast enough to fit inside a planning
-or implementation agent's execution window.
+agent's execution window.
 
 **Invokers:**
 - `grooming-agent` — verify behavioral assumptions about the current system *before*
   writing the spec. Use to confirm: does the current feature behave as described in the
   issue? What does the current API or AJAX endpoint return for the scenario being changed?
-- `backend-agent` / `frontend-agent` (post-implementation) — confirm the primary happy
-  path works with the new code before handing off to lead-reviewer.
 
 ### Anti-rationalization table
 
@@ -138,8 +136,6 @@ and screenshots to `.e2e-screenshots/`. Screenshots are published to a public Gi
 | Invoker | Tier | Purpose |
 |---|---|---|
 | `grooming-agent` | Basic | Verify a behavioral assumption before writing the spec |
-| `backend-agent` (post-implement) | Basic | Smoke the primary happy path before hand-off |
-| `frontend-agent` (post-implement) | Basic | Smoke the primary happy path before hand-off |
 | `qa-engineer` | Extended | Full acceptance criteria + regression + screenshots |
 
 ---
@@ -154,5 +150,5 @@ and screenshots to `.e2e-screenshots/`. Screenshots are published to a public Gi
   curl -s -o /dev/null -w "%{http_code}" {E2E_SETTINGS}
   ```
 - For cache-header tests, send a request to a front-end URL and inspect the project's cache response headers.
-- The basic tier never writes Playwright spec files. If a flow is complex enough to need a deterministic spec, that signals it should go through the extended tier (qa-engineer + e2e-qa-tester).
+- The basic tier never writes Playwright spec files and is invoked by grooming-agent only. Implementation agents (backend-agent, frontend-agent) do not invoke the e2e skill — full E2E validation belongs to the qa-engineer + e2e-qa-tester tier.
 - If `{E2E_CI}` is true, the project maintains a permanent E2E suite — `e2e-qa-tester` will commit spec files rather than delete them.

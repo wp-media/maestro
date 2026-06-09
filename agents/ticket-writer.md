@@ -17,7 +17,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -94,8 +94,6 @@ The project lives on GitHub. Always use `gh` for issue operations. The canonical
      }
    }
    ```
-
-   Emit to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`, then:
 
    ```bash
    gh issue create --repo {REPO} \

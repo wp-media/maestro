@@ -13,7 +13,7 @@ export const meta = {
 //   prNumber           number  — PR number
 //   branch             string  — feature branch name
 //   baseBranch         string  — e.g. 'origin/develop'
-//   tempRoot           string  — e.g. '.maestro'
+//   tempRoot           string  — e.g. '.ai'
 //   specPath           string  — absolute path to spec.md
 //   acceptanceCriteria string  — numbered list of acceptance criteria
 //   domains            string  — 'backend' | 'frontend' | 'both'
@@ -86,8 +86,7 @@ const dodPrompt = [
   'Read .claude/commands/dod.md for the complete check instructions, then run all Layer 2 checks.',
   'This is a fresh, independent read — do not assume Layer 1 caught everything.',
   '',
-  `Write the JSON result to: ${tempRoot}/issues/${issueN}/contracts/dod-l2-result.json`,
-  'Return the same structured JSON in your response.',
+  'Return the structured JSON directly in your response — no file write needed.',
 ].join('\n')
 
 const reviewPrompt = [

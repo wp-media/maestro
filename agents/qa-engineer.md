@@ -14,7 +14,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -38,14 +38,14 @@ Before testing anything, the local WordPress environment at `{E2E_URL}` must be 
 **Always run these commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
 
 ```bash
-# 1. Resolve PR number from issue number (orchestrator passes ISSUE_NUMBER throughout)
-ISSUE_NUMBER=<N>
-PR_NUMBER=$(gh issue view $ISSUE_NUMBER --repo {REPO} --json pullRequests \
-  --jq '.pullRequests[0].number // empty')
-if [ -z "$PR_NUMBER" ]; then
-  echo "ERROR: No PR linked to issue #$ISSUE_NUMBER — cannot proceed"
-  exit 1
-fi
+# 1. Use the PR number the orchestrator passed directly
+# PR_NUMBER and PR_URL are provided as inputs.
+# If PR_NUMBER was not supplied, fall back to resolving from the issue number:
+# PR_NUMBER=$(gh issue view $ISSUE_NUMBER --repo {REPO} --json pullRequests \
+#   --jq '.pullRequests[0].number // empty')
+# if [ -z "$PR_NUMBER" ]; then
+#   echo "ERROR: No PR linked to issue — cannot proceed"; exit 1
+# fi
 
 # 2. Check out the PR branch
 gh pr checkout $PR_NUMBER
@@ -209,27 +209,27 @@ Produce the test report in the format below. Be specific — "tested locally" is
 
 ---
 
-### Step 6 — Post and Emit report as a PR comment and a GitHub operation
+### Step 6 — Post the report as a PR comment
 
 After generating the report, post it as a PR comment so it is immediately visible to all reviewers.
 **Post the comment regardless of the overall result** (PASS, FAIL, or PARTIAL).
 
-#### Step 6d — Deduplication check (run first)
+#### Step 6a — Deduplication check (run first)
 
-Before posting, check whether a QA report already exists on this PR:
+Before posting, check whether a QA report already exists on this PR using the HTML marker:
 
 ```bash
-EXISTING=$(gh pr view $PR_NUMBER --repo {REPO} --json comments \
-  --jq '[.comments[] | select(.body | contains("**QA:"))] | last | .url // empty')
+EXISTING_ID=$(gh api repos/{REPO}/issues/$PR_NUMBER/comments \
+  --jq '[.[] | select(.body | contains("<!-- ai-pipeline:qa-report -->"))] | last | .id // empty')
 ```
 
-- **No existing comment** → post a new comment with the full report using `gh pr comment`.
-- **Existing comment found** → edit it in-place (one living comment rather than a thread):
+- **No existing comment** → post a new comment. Prepend `<!-- ai-pipeline:qa-report -->` as the very first line of the body so future re-runs can find it.
+- **Existing comment found** → edit it in-place:
   ```bash
-  COMMENT_ID="${EXISTING##*/}"
-  gh api repos/{REPO}/issues/comments/$COMMENT_ID \
+  gh api repos/{REPO}/issues/comments/$EXISTING_ID \
     --method PATCH \
     -f body="$(cat <<'REPORT'
+<!-- ai-pipeline:qa-report -->
 [full updated report content]
 REPORT
 )"
@@ -240,31 +240,17 @@ This prevents multiple duplicate full QA reports on every pipeline re-run.
 
 ---
 
-Emit an event to handle:
-```json
-{
-  "type": "github_operation",
-  "operation": "post_comment_to_pr",
-  "issue_id": "<N>",
-  "pr_number": <PR_NUMBER>,
-  "data": {
-    "body": "[full QA report content as markdown]"
-  }
-}
-```
-
 **For any PR that touches frontend files (JS, CSS, HTML, Twig templates): screenshots are
 required, not optional.** If Strategy B ran, `e2e-qa-tester` will have returned screenshot
 URLs — always include them in the `### Screenshots` section. If no screenshots exist for a
 frontend PR, the report is incomplete; state the reason explicitly (e.g. "boot failed —
 exit 1, see Environment Boot table").
 
-Emit the event to `{TEMP_ROOT}/issues/<N>/orchestrator-events.jsonl`. 
-
 Post the comment using:
 
 ```bash
 gh pr comment <PR_number> --body "$(cat <<'REPORT'
+<!-- ai-pipeline:qa-report -->
 [full report content]
 REPORT
 )"
@@ -352,25 +338,3 @@ The orchestrator will ask the user to classify any unexpected finding before rou
 - ⚠️ **Ask first:** if no ticket spec or acceptance criteria are available; if the local server is unreachable
 - 🚫 **Never do:** modify any plugin code or files, skip acceptance criteria without noting them, report PASS without evidence, conflate "no test failures" with "acceptance criteria met"
 
----
-
-## Result file write
-
-Before returning, you MUST write the JSON result to disk:
-
-> Expand `{TEMP_ROOT}` to the value read from `repo-map.json` before executing.
-
-```bash
-mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/contracts"
-cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/qa-result.json" <<'EOF'
-{
-  "overall": "...",
-  "strategies_used": [...],
-  ...
-}
-EOF
-```
-
-The orchestrator will then read this file to make routing decisions.
-
-The file MUST exist before the agent returns. If writing fails, log the error and still return the JSON object to the orchestrator.

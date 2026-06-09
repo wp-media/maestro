@@ -209,7 +209,7 @@ done
 
 **Layer 1 only** (in Layer 2, file scope is not tracked — this check is skipped with status `N/A`).
 
-The orchestrator writes `file_scope` for each implementation task in `{TEMP_ROOT}/issues/<N>/tasks.json`. Read your task entry and extract the declared scope.
+The orchestrator passes `file_scope` inline in your dispatch plan. Use the value provided — do not read any file.
 
 List every file changed on the branch:
 ```bash
@@ -224,7 +224,7 @@ Exceptions that do not count as violations:
 - Files the orchestrator explicitly added to scope via a `blocked_reason` note
 - Files modified solely by the auto-formatter (e.g. `composer phpcs:fix` / `phpcbf`). The auto-formatter has no "changed files only" mode and may reformat files outside the declared scope. Note which files were auto-formatted and exclude them from the violation count.
 
-If no `tasks.json` exists (e.g., the orchestrator was not used), skip this check with status `N/A`.
+If no `file_scope` was provided in the dispatch plan (e.g., the skill was invoked standalone), skip this check with status `N/A`.
 
 - **PASS**: All modified files are within declared scope (or no scope was declared)
 - **WARN**: One file outside scope was modified — name it and explain why
@@ -303,20 +303,4 @@ Always return this JSON object in addition to the human-readable output above:
 **Layer 2:** `overall` can be `PASS`, `WARN`, or `FAIL`. Populate `layer1_delta` with
 any issues that were not flagged in layer 1.
 
-**Result file (L2 only):** When running Layer 2 (orchestrator gate), write the JSON result to:
-```
-{TEMP_ROOT}/issues/<N>/contracts/dod-l2-result.json
-```
-
-```bash
-mkdir -p "{TEMP_ROOT}/issues/${ISSUE_ID}/contracts"
-cat > "{TEMP_ROOT}/issues/${ISSUE_ID}/contracts/dod-l2-result.json" <<'EOF'
-{
-  "overall": "PASS|WARN|FAIL",
-  "checks": [...],
-  ...
-}
-EOF
-```
-
-This file is monitored by the orchestrator. The file MUST be written before the skill returns.
+Return the JSON object directly to the orchestrator. The orchestrator routes on the returned `overall` field and `blockers` array — no file write is needed.

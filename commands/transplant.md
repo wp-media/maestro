@@ -177,8 +177,9 @@ Analyse the project at {TARGET_ROOT} for a Maestro workflow upgrade.
 mode: upgrade
 maestro_root: {MAESTRO_ROOT}
 target_root: {TARGET_ROOT}
-refs_path: {TARGET_ROOT}/.claude/transplant-refs
 manifest_path: {TARGET_ROOT}/.claude/transplant-manifest.json
+
+The manifest (version 2) contains a `components` array with `{ maestro_source, output_path, sha256 }` per written file — use this for team-change detection instead of a refs directory. Use `git -C {MAESTRO_ROOT} show {maestro_commit}:{maestro_source}` to reconstruct Maestro baselines.
 
 Produce an updated transplant-context.md and an upgrade plan. Return the JSON summary.
 ```
@@ -205,9 +206,34 @@ Context doc: {analyst.context_path}
 ─────────────────────────────────────────
 ```
 
-Then ask the user:
+**Spawn the `transplant-analyst-reviewer` agent with model opus** (fresh mode only — skip in upgrade mode):
+
+```
+Review the transplant context doc at {TARGET_ROOT}/.claude/transplant-context.md.
+
+context_path: {TARGET_ROOT}/.claude/transplant-context.md
+maestro_root: {MAESTRO_ROOT}
+```
+
+The reviewer applies unambiguous auto-fixes directly to the context doc (wrong DROP/KEEP dispositions, missing TEMP_ROOT default, etc.) and returns a verdict JSON.
+
+**If reviewer returns `auto_fixed` entries:** note each correction.
+
+**If reviewer returns `findings` with `severity: FAIL`:** these need user attention.
+
+Then ask the user (combining the analyst summary + reviewer outcome):
 
 **Fresh mode:**
+
+If reviewer returned `NEEDS_REVISION` or any findings:
+> "Reviewer flagged {N} item(s):
+> {for each finding: `• [FAIL|WARN] {component}: {description}`}
+>
+> {if auto_fixed non-empty: `Auto-corrected {M} disposition(s) in the context doc: {list}.`}
+>
+> Review the context doc at `{analyst.context_path}` and confirm to proceed — or describe what needs correcting."
+
+If reviewer returned `APPROVED`:
 > "Review the context doc at `{analyst.context_path}` and confirm to generate the workflow — or describe what needs correcting."
 
 **Upgrade mode:**
@@ -280,13 +306,27 @@ Each dispatch plan follows this structure (replace placeholders with resolved ab
       "name": "component-name",
       "disposition": "DISPOSITION-FROM-CONTEXT-DOC",
       "source_path": "/absolute/source/path (current Maestro)",
-      "output_path": "/absolute/output/path",
-      "ref_maestro_path": "/absolute/path/to/transplant-refs/maestro/{component} (upgrade mode only, null in fresh)",
-      "ref_output_path": "/absolute/path/to/transplant-refs/output/{component} (upgrade mode only, null in fresh)"
+      "output_path": "/absolute/output/path"
     }
   ]
 }
 ```
+
+For **MERGE** components in upgrade mode, add three extra fields so the writer can reconstruct the Maestro baseline from git without a refs directory:
+
+```json
+{
+  "name": "backend-agent",
+  "disposition": "MERGE",
+  "source_path": "/absolute/maestro/agents/backend-agent.md",
+  "output_path": "/absolute/target/.claude/agents/backend-agent.md",
+  "maestro_root": "{MAESTRO_ROOT}",
+  "maestro_commit": "{MAESTRO_COMMIT_AT_TRANSPLANT}",
+  "maestro_source": "agents/backend-agent.md"
+}
+```
+
+`maestro_commit` is the `maestro_commit` value read from the existing manifest (Step 0). `maestro_source` is the Maestro-relative path for this component.
 
 In upgrade mode, `disposition` values come from the context doc's **Section 10 — Upgrade Plan** (SKIP / PRESERVE / APPLY / MERGE) rather than Section 8. Writers handle each disposition differently — see `transplant-writer.md`.
 
@@ -322,50 +362,39 @@ Read the context doc at {TARGET_ROOT}/.claude/transplant-context.md, then proces
 
 ## Phase 2 — Collect Results + Finalize
 
-After all writers complete, collect their return JSON. Aggregate `files_written`, `files_skipped`, and `fixme_values`.
+After all writers complete, collect their return JSON. Aggregate `files_written`, `file_hashes`, `files_merged`, `files_skipped`, and `fixme_values`.
 
-**Write reference snapshots** (run after writers complete, before manifest):
+**Run consistency pass** — spawn the `transplant-consistency` agent:
 
-```bash
-# Maestro sources at this point in time — used for future upgrade diffs
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/agents"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/scripts"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/refs"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/maestro/bin"
+```
+Run a cross-cluster consistency check on the transplanted workflow.
 
-cp "$MAESTRO_ROOT/agents/"*.md "$TARGET_ROOT/.claude/transplant-refs/maestro/agents/" 2>/dev/null || true
-for cmd in orchestrator issue-workflow dod e2e docs compliance knowledge-graph; do
-  cp "$MAESTRO_ROOT/commands/$cmd.md" "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/" 2>/dev/null || true
-done
-cp "$MAESTRO_ROOT/commands/issue-workflow/scripts/"*.sh "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/scripts/" 2>/dev/null || true
-cp "$MAESTRO_ROOT/commands/issue-workflow/refs/"*.md "$TARGET_ROOT/.claude/transplant-refs/maestro/commands/issue-workflow/refs/" 2>/dev/null || true
-cp "$MAESTRO_ROOT/bin/"*.sh "$TARGET_ROOT/.claude/transplant-refs/maestro/bin/" 2>/dev/null || true
-
-# Output files as written — used to detect team modifications on next upgrade
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/agents"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/scripts"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/refs"
-mkdir -p "$TARGET_ROOT/.claude/transplant-refs/output/bin"
-
-cp "$TARGET_ROOT/.claude/agents/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/agents/" 2>/dev/null || true
-cp "$TARGET_ROOT/.claude/commands/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/commands/" 2>/dev/null || true
-cp "$TARGET_ROOT/.claude/commands/issue-workflow/scripts/"*.sh "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/scripts/" 2>/dev/null || true
-cp "$TARGET_ROOT/.claude/commands/issue-workflow/refs/"*.md "$TARGET_ROOT/.claude/transplant-refs/output/commands/issue-workflow/refs/" 2>/dev/null || true
-cp "$TARGET_ROOT/bin/"*.sh "$TARGET_ROOT/.claude/transplant-refs/output/bin/" 2>/dev/null || true
+context_path: {TARGET_ROOT}/.claude/transplant-context.md
+target_root: {TARGET_ROOT}
+files_written: {JSON array of all files_written from aggregated writer results}
 ```
 
-**Write transplant manifest:**
+The consistency agent applies fixes directly to the written files. Collect its `fixes_applied` and `warnings` for the final summary. Do not block on warnings — proceed regardless of consistency findings.
+
+**Write transplant manifest** (after consistency pass):
+
+The manifest uses per-file SHA256 hashes (from the `file_hashes` arrays collected from writer results) instead of a refs directory. This lets the upgrade analyst detect Maestro drift via `git show` and team modifications via hash comparison — with no file copies needed.
+
+Build the `components` array by iterating the aggregated `file_hashes`:
 
 ```bash
 MAESTRO_COMMIT="$(git -C "$MAESTRO_ROOT" rev-parse HEAD 2>/dev/null || echo 'unknown')"
-cat > "$TARGET_ROOT/.claude/transplant-manifest.json" << EOF
+```
+
+Write `{TARGET_ROOT}/.claude/transplant-manifest.json` with this structure:
+
+```json
 {
-  "version": "1",
-  "transplanted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "maestro_commit": "$MAESTRO_COMMIT",
+  "version": "2",
+  "transplanted_at": "{ISO 8601 UTC timestamp}",
+  "maestro_commit": "{MAESTRO_COMMIT}",
   "project_type": "{analyst.project_type}",
   "context_path": ".claude/transplant-context.md",
-  "refs_path": ".claude/transplant-refs",
   "interview": {
     "project_type": "{interview.project_type}",
     "languages": "{interview.languages}",
@@ -376,16 +405,25 @@ cat > "$TARGET_ROOT/.claude/transplant-manifest.json" << EOF
     "ci": "{interview.ci}",
     "temp_root": "{interview.temp_root}",
     "notes": "{interview.notes}"
-  }
+  },
+  "components": [
+    {
+      "maestro_source": "agents/backend-agent.md",
+      "output_path": ".claude/agents/backend-agent.md",
+      "disposition": "ADAPT",
+      "sha256": "{sha256 from file_hashes}"
+    }
+  ]
 }
-EOF
 ```
+
+One entry per file in the aggregated `file_hashes`. DROPped/SKIPped/PREServed components are absent (they have no output file or no new sha256).
 
 ---
 
 ## Phase 3 — QA Pass (Claude Opus)
 
-After all writers complete and reference snapshots are written, spawn the `transplant-qa` agent with model **opus**:
+After the consistency pass and manifest are written, spawn the `transplant-qa` agent with model **opus**:
 
 **Prompt:**
 ```
@@ -394,7 +432,9 @@ Audit the transplanted workflow for the project at {TARGET_ROOT}.
 context_path: {TARGET_ROOT}/.claude/transplant-context.md
 target_root: {TARGET_ROOT}
 project_type: {analyst.project_type}
+mode: {fresh | upgrade}
 files_written: {JSON array of all files_written from aggregated writer results}
+files_merged: {JSON array of all files_merged from aggregated writer results, empty array if fresh mode}
 ```
 
 **On green verdict:** proceed to Phase 4.
@@ -431,18 +471,17 @@ files_written: {JSON array of all files_written from aggregated writer results}
 
 Ask:
 
-> "Upgrade reference snapshots live at `.claude/transplant-refs/` alongside `transplant-manifest.json` and `transplant-context.md`. These are only needed if you plan to run `/transplant` again to upgrade this workflow later.
+> "`transplant-manifest.json` and `transplant-context.md` are only needed if you plan to run `/transplant` again to upgrade this workflow later. (No refs directory is created — the manifest is a single JSON file.)
 >
-> Remove upgrade artifacts? (y/n)"
+> Keep upgrade artifacts? (y/n — default: y)"
 
-**If yes:**
+**If no:**
 ```bash
-rm -rf "$TARGET_ROOT/.claude/transplant-refs"
 rm -f "$TARGET_ROOT/.claude/transplant-manifest.json"
 rm -f "$TARGET_ROOT/.claude/transplant-context.md"
 ```
 
-**If no:** keep all files.
+**If yes (default):** keep both files.
 
 ---
 
@@ -466,6 +505,13 @@ Dropped: {list or "none"}
 ⚠️  Manual steps required:
   {each fixme_value}
 
+{if consistency fixes non-empty:}
+  Consistency fixes: {N fixes across M files}
+
+{if consistency warnings non-empty:}
+⚠️  Consistency warnings (review manually):
+  {each warning}
+
 {if writer errors:}
 ⚠️  Writer errors:
   {cluster}: {error}
@@ -473,7 +519,7 @@ Dropped: {list or "none"}
 {if upgrade artifacts removed:}
   Upgrade artifacts removed — workflow is self-contained.
 {if upgrade artifacts kept:}
-  Upgrade artifacts retained at .claude/transplant-refs/
+  Upgrade artifacts retained: .claude/transplant-manifest.json
 ─────────────────────────────────────────
 Next steps:
   1. Review generated agents — especially orchestrator.md, backend-agent.md, and qa-engineer.md
@@ -513,6 +559,10 @@ Target: {TARGET_ROOT}
 |---|---|
 | Analyst returns no JSON | Re-spawn with a note to return JSON. If it fails twice, ask user to run the analyst manually and provide the context doc. |
 | Writer returns no JSON | Log the cluster as failed, continue collecting other results. List it in the error summary. |
+| Writer returns no `file_hashes` | Compute hashes inline: `(sha256sum "$f" 2>/dev/null \|\| shasum -a 256 "$f") \| awk '{print $1}'` for each path in `files_written`. Use `maestro_source` from the dispatch plan for each file. |
+| Reviewer agent fails or returns no JSON | Log and skip reviewer step — proceed to user review prompt without reviewer findings. |
+| Consistency agent fails or returns no JSON | Log the failure in the summary as a warning. Do not block Phase 3. |
+| MERGE writer cannot find `maestro_commit` in git history | Writer preserves the team's file unchanged and records a merge conflict. Surfaces in upgrade summary. |
 | Target `.claude/` already exists and user confirmed | Proceed — writers use Write which overwrites. |
 | Context doc missing a section | Proceed — writers will use FIXME markers for missing values. Flag in summary. |
 | `analyst.repo == "FIXME"` | Note in summary: "Fill in `REPO=` in `.claude/commands/orchestrator.md` constants block." |

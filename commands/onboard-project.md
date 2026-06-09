@@ -6,7 +6,7 @@ description: Wire a new project — writes maestro.json and scaffolds the temp d
 # Onboard Project
 
 Wires a WordPress plugin project into the Maestro ecosystem in one pass: writes
-`.claude/maestro.json`, scaffolds the `.maestro/` working directory, and prints
+`.claude/maestro.json`, scaffolds the `.ai/` working directory, and prints
 the next steps. After this skill runs, the project is ready for every Maestro
 agent and workflow. Podium (the optional dashboard) can be installed separately.
 
@@ -55,7 +55,7 @@ ls *.php 2>/dev/null
 | **Plugin slug** | repo name after `/` in the remote, or the directory name | — |
 | **Display name** | `Plugin Name:` header in the main `.php` file, else title-cased slug | — |
 | **GitHub repo** | `owner/repo` extracted exactly from the remote URL | — |
-| **Temp root** | — | `.maestro` |
+| **Temp root** | — | `.ai` |
 | **Base branch** | — | `origin/develop` |
 
 Examples of slug → display name: `wp-rocket` → "WP Rocket", `imagify` →
@@ -67,7 +67,7 @@ Present what you inferred and ask the user to confirm or correct:
 > - slug: `wp-rocket`
 > - display_name: `WP Rocket`
 > - repo: `wp-media/wp-rocket`
-> - temp_root: `.maestro`
+> - temp_root: `.ai`
 > - base_branch: `origin/develop`
 >
 > Confirm, or tell me what to change.
@@ -87,7 +87,7 @@ confirmed values. Use this exact structure:
     "slug": "wp-rocket",
     "display_name": "WP Rocket",
     "repo": "wp-media/wp-rocket",
-    "temp_root": ".maestro",
+    "temp_root": ".ai",
     "base_branch": "origin/develop",
     "architecture_skill": "wp-rocket-architecture",
     "frontend_skill": null,
@@ -119,15 +119,15 @@ Write the JSON to `.claude/maestro.json`.
 
 ---
 
-## Step 4 — Create the `.maestro/` working directory
+## Step 4 — Create the `.ai/` working directory
 
-Use the confirmed `temp_root` (default `.maestro`).
+Use the confirmed `temp_root` (default `.ai`).
 
 ```bash
-mkdir -p .maestro/issues
+mkdir -p .ai/issues
 ```
 
-- `.maestro/issues/` — orchestrator run artifacts (one folder per issue).
+- `.ai/issues/` — orchestrator run artifacts (one folder per issue).
 
 If the user chose a non-default `temp_root`, substitute it in the path.
 
@@ -154,17 +154,17 @@ as a suggested next step, but do not install it automatically.
 Keep generated working files out of version control.
 
 ```bash
-grep -n "\.maestro" .gitignore 2>/dev/null
+grep -n ".ai/" .gitignore 2>/dev/null
 ```
 
-If `.maestro/` is **not** already ignored, append it:
+If `.ai/` is **not** already ignored, append it:
 
 ```bash
-printf '\n# Maestro working files\n.maestro/\n' >> .gitignore
+printf '\n# Maestro working files\n.ai/\n' >> .gitignore
 ```
 
 If `.gitignore` doesn't exist, create it with the same content. Skip this step
-entirely if `.maestro` already appears in `.gitignore`.
+entirely if `.ai/` already appears in `.gitignore`.
 
 ---
 
@@ -175,7 +175,7 @@ Print exactly this (substituting the real display name):
 ```
 ✓ Maestro configured for {display_name}
   Config: .claude/maestro.json
-  Temp:   .maestro/
+  Temp:   .ai/
 
 Next steps:
   /orchestrator issue-N  → run the full delivery pipeline

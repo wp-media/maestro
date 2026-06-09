@@ -16,8 +16,6 @@ export const meta = {
 //   model            string  — 'sonnet' | 'opus' | 'haiku'
 //   backendDispatch  string  — full dispatch plan for backend-agent (null if frontend-only)
 //   frontendDispatch string  — full dispatch plan for frontend-agent (null if backend-only)
-//   backendTask      object  — task entry from tasks.json for backend (null if frontend-only)
-//   frontendTask     object  — task entry from tasks.json for frontend (null if backend-only)
 //   worktrees        object  — { backend: path, frontend: path } | null (null in sequential mode)
 //   sessionLearnings string  — content of AGENTS.md section 13
 //   currentModel     string  — display name of the running model, e.g. "Claude Sonnet 4.6"
@@ -32,15 +30,6 @@ const IMPL_SCHEMA = {
     files_changed: { type: 'array', items: { type: 'string' } },
     tests_passing: { type: 'boolean' },
     test_output: { type: 'string' },
-    e2e_smoke: {
-      type: 'object',
-      required: ['status'],
-      properties: {
-        status: { type: 'string', enum: ['PASS', 'FAIL', 'SKIP'] },
-        scenarios_tested: { type: 'array', items: { type: 'string' } },
-        details: { type: 'string' },
-      },
-    },
     docs: {
       type: 'object',
       required: ['status'],
@@ -71,7 +60,7 @@ const IMPL_SCHEMA = {
   },
 }
 
-function buildPrompt(role, dispatch, task, worktreePath, issueN, branch, specPath, sessionLearnings, currentModel) {
+function buildPrompt(role, dispatch, worktreePath, issueN, branch, specPath, sessionLearnings, currentModel) {
   const lines = [
     `You are the ${role} for issue #${issueN}.`,
     '',
@@ -81,9 +70,6 @@ function buildPrompt(role, dispatch, task, worktreePath, issueN, branch, specPat
   if (worktreePath) lines.push(`Working directory (git worktree): ${worktreePath}`)
   lines.push(
     '',
-    'Your task entry:',
-    JSON.stringify(task, null, 2),
-    '',
     'Dispatch plan:',
     dispatch,
     '',
@@ -92,7 +78,7 @@ function buildPrompt(role, dispatch, task, worktreePath, issueN, branch, specPat
     '',
     `Current model: ${currentModel}`,
     '',
-    'Run the docs skill, e2e skill (basic tier), and dod skill (layer 1) inline before committing.',
+    'Run the docs skill and dod skill (layer 1) inline before committing.',
     'Commit atomically to the branch above.',
     'Return the implementation contract JSON.',
   )
@@ -103,7 +89,6 @@ const {
   issueN, branch, specPath,
   domains, executionMode, model,
   backendDispatch, frontendDispatch,
-  backendTask, frontendTask,
   worktrees,
   sessionLearnings, currentModel,
 } = args
@@ -119,11 +104,11 @@ if (runParallel) {
   log('Spawning backend and frontend agents in parallel...')
   const results = await parallel([
     () => agent(
-      buildPrompt('backend-agent', backendDispatch, backendTask, worktrees && worktrees.backend, issueN, branch, specPath, sessionLearnings, currentModel),
+      buildPrompt('backend-agent', backendDispatch, worktrees && worktrees.backend, issueN, branch, specPath, sessionLearnings, currentModel),
       { label: 'backend', phase: 'Implementation', schema: IMPL_SCHEMA, model, agentType: 'maestro:backend-agent' }
     ),
     () => agent(
-      buildPrompt('frontend-agent', frontendDispatch, frontendTask, worktrees && worktrees.frontend, issueN, branch, specPath, sessionLearnings, currentModel),
+      buildPrompt('frontend-agent', frontendDispatch, worktrees && worktrees.frontend, issueN, branch, specPath, sessionLearnings, currentModel),
       { label: 'frontend', phase: 'Implementation', schema: IMPL_SCHEMA, model, agentType: 'maestro:frontend-agent' }
     ),
   ])
@@ -133,14 +118,14 @@ if (runParallel) {
   if (needsBackend) {
     log('Running backend agent...')
     backendResult = await agent(
-      buildPrompt('backend-agent', backendDispatch, backendTask, null, issueN, branch, specPath, sessionLearnings, currentModel),
+      buildPrompt('backend-agent', backendDispatch, null, issueN, branch, specPath, sessionLearnings, currentModel),
       { label: 'backend', phase: 'Implementation', schema: IMPL_SCHEMA, model, agentType: 'maestro:backend-agent' }
     )
   }
   if (needsFrontend) {
     log('Running frontend agent...')
     frontendResult = await agent(
-      buildPrompt('frontend-agent', frontendDispatch, frontendTask, null, issueN, branch, specPath, sessionLearnings, currentModel),
+      buildPrompt('frontend-agent', frontendDispatch, null, issueN, branch, specPath, sessionLearnings, currentModel),
       { label: 'frontend', phase: 'Implementation', schema: IMPL_SCHEMA, model, agentType: 'maestro:frontend-agent' }
     )
   }

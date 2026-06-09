@@ -32,10 +32,21 @@ You receive a **dispatch plan** as your input — a JSON block describing your c
       "disposition": "DROP",
       "source_path": "/absolute/path/to/maestro/agents/frontend-agent.md",
       "output_path": null
+    },
+    {
+      "name": "backend-agent",
+      "disposition": "MERGE",
+      "source_path": "/absolute/path/to/maestro/agents/backend-agent.md",
+      "output_path": "/absolute/path/to/target/.claude/agents/backend-agent.md",
+      "maestro_root": "/absolute/path/to/maestro",
+      "maestro_commit": "abc123def456",
+      "maestro_source": "agents/backend-agent.md"
     }
   ]
 }
 ```
+
+The `maestro_commit` + `maestro_source` fields are present only on `MERGE` components (upgrade mode). They let the writer reconstruct the Maestro baseline from git history without a `transplant-refs/` directory.
 
 ---
 
@@ -171,15 +182,25 @@ Maestro changed; team did not customize the output. Re-run the standard fresh-mo
 Both Maestro and the team changed this component. This is the most important case — execute it carefully.
 
 **Inputs:**
-- `ref_maestro_path` — Maestro source as it was at the last transplant (the baseline)
+- `maestro_root` + `maestro_commit` + `maestro_source` — reconstruct the Maestro baseline (what was transplanted last time) via git
 - `source_path` — Maestro source now (the new version)
 - `output_path` — team's current file (their adapted/customized version)
 
 **Process:**
 
-1. Read all three files.
+1. Reconstruct the baseline (old Maestro source at transplant time):
 
-2. **Identify the Maestro delta**: What changed between `ref_maestro_path` and `source_path`?
+```bash
+git -C "{maestro_root}" show "{maestro_commit}:{maestro_source}" 2>/dev/null
+```
+
+If the git command fails (commit not found or git unavailable), write the team's file unchanged to `output_path` (preserve status quo) and record a merge conflict in the return JSON explaining that the baseline could not be retrieved.
+
+Read `source_path` (current Maestro) and `output_path` (team's current file).
+
+You now have all three versions needed for a semantic 3-way merge.
+
+2. **Identify the Maestro delta**: What changed between the baseline (git output) and `source_path`?
    - Read both files carefully.
    - Identify every changed section, added step, new rule, removed content, updated JSON contract, etc.
    - Summarize the delta as a list of semantic changes: "Added Step 4d (anti-scope-creep gate)", "Updated model routing table to add e2e-qa-tester row", "Changed QA loop limit from 2 to 3", etc.
@@ -274,7 +295,20 @@ Use `FIXME — <what is needed>` only for `REPO` if genuinely unavailable. All o
 
 ---
 
-## Step 5 — Quality check
+## Step 5 — Compute file hashes
+
+After writing all files, compute a SHA256 hash for each file in `files_written`. These hashes are stored in the transplant manifest and used at upgrade time to detect team modifications without a `transplant-refs/` directory.
+
+```bash
+# Use sha256sum (Linux) or shasum (macOS) — try both
+(sha256sum "$output_path" 2>/dev/null || shasum -a 256 "$output_path") | awk '{print $1}'
+```
+
+Record each result as an entry in `file_hashes` (see return JSON below).
+
+---
+
+## Step 6 — Quality check
 
 Before returning, verify each file you wrote:
 
@@ -287,7 +321,7 @@ Before returning, verify each file you wrote:
 
 ---
 
-## Step 6 — QA re-work (when `dispatch.qa_feedback` is present)
+## Step 7 — QA re-work (when `dispatch.qa_feedback` is present)
 
 When the dispatch plan contains a `qa_feedback` array, this is a re-work pass initiated by the QA agent. Process QA feedback **before** re-writing each component.
 
@@ -308,6 +342,14 @@ Apply every `rework_instruction` to the relevant component. Then re-apply the st
   "cluster": "string",
   "mode": "fresh | upgrade",
   "files_written": ["/absolute/path/to/output/file", "..."],
+  "file_hashes": [
+    {
+      "output_path": "/absolute/path/to/output/file",
+      "output_relative": ".claude/agents/backend-agent.md",
+      "maestro_source": "agents/backend-agent.md",
+      "sha256": "deadbeef1234..."
+    }
+  ],
   "files_merged": ["/absolute/path/to/merged/file", "..."],
   "files_preserved": ["component-name (team-owned, untouched)", "..."],
   "files_skipped": ["component-name (DROP or SKIP)", "..."],
@@ -324,3 +366,5 @@ Apply every `rework_instruction` to the relevant component. Then re-apply the st
   "notes": "string — key adaptations or merges made, anything the user should review"
 }
 ```
+
+`file_hashes` must include one entry per file in `files_written`. For DROPped/SKIPped/PREServed files, omit them (they were not written). For MERGE results, include the merged output path.

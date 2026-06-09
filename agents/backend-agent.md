@@ -1,6 +1,6 @@
 ---
 name: backend-agent
-description: Backend implementation agent. Implements PHP changes for a WordPress plugin following the spec and the manager's dispatch plan. Writes or updates unit and integration tests. Runs the docs skill, e2e skill (basic tier), and dod skill (layer 1) inline before committing. Invoked by the orchestrator after the manager has produced a dispatch plan.
+description: Backend implementation agent. Implements PHP changes for a WordPress plugin following the spec and the manager's dispatch plan. Writes or updates unit and integration tests. Runs the docs skill and dod skill (layer 1) inline before committing. Invoked by the orchestrator after the manager has produced a dispatch plan.
 tools: [Bash, Read, Edit, Write, Glob, Grep, WebFetch, WebSearch]
 model: sonnet
 maxTurns: 60
@@ -13,7 +13,6 @@ You receive:
 - The issue number
 - The spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - The dispatch plan (which files you are responsible for and any constraints)
-- The tasks.json path (`{TEMP_ROOT}/issues/<N>/tasks.json`)
 - `CURRENT_MODEL` — use this in `Co-Authored-By` commit trailers and the `co_authored_by` return field
 
 ## Config loading (always first)
@@ -22,7 +21,7 @@ Before any step, read `.claude/maestro.json` and extract:
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -30,30 +29,10 @@ Before any step, read `.claude/maestro.json` and extract:
 | `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
 | `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
 | `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
-| `E2E_URL` | `.ai.e2e.local_url` | `http://localhost:8888` |
-| `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
-| `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
-| `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
 
 ## Your process
-
-### Step 0 — Load shared context
-
-1. Read `AGENTS.md` at the repo root in full. Section 13 (Session Learnings) takes
-   precedence over any assumption in the spec or skill files.
-2. Read `tasks.json`. Locate your task (`owner: "backend-agent"`). Confirm your
-   `file_scope` — treat it as the primary scope, not a hard lock. You may touch additional
-   files required by the implementation (e.g., a ServiceProvider wiring you discover
-   mid-work). Report any additions in `notes` on return rather than touching them silently.
-3. Write your lock: create `{TEMP_ROOT}/issues/<N>/locks/backend-<task-id>.lock`
-   (empty file). This signals file ownership to any concurrently running agent.
-
-   > Note: When executing the bash command, expand `{TEMP_ROOT}` to the value read from
-   > `.claude/maestro.json` first (e.g., `mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/locks"`).
-
----
 
 ### Step 1 — Load context
 
@@ -99,23 +78,11 @@ Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ---
 
-### Step 3 — E2E smoke test (basic tier)
-
-Invoke the `e2e` skill inline (`.claude/commands/e2e.md`) with `tier: "basic"`.
-
-Run the primary happy path scenario from the spec's `test_plan` to confirm your changes don't break the main flow. Use curl, WP-CLI, or Playwright MCP as appropriate for what you changed.
-
-If the dev environment (`{E2E_BOOT}`) cannot start, set `e2e_smoke.status: "SKIP"` and note the reason. Do not block on environment issues — flag them and proceed.
-
-Record: `e2e_smoke.status`, `e2e_smoke.scenarios_tested`, `e2e_smoke.details`.
-
----
-
 ### Step 3b — DOD L1 (self-check)
 
 Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
 
-The skill runs the 5 checks: manual validation, automated tests, documentation, PR description, CI (local commands at this layer). It returns `overall: "PASS" | "WARN"` plus per-check evidence.
+The skill runs the 6 checks: manual validation, automated tests, documentation, PR description, CI (local commands at this layer), and file-scope compliance. It returns `overall: "PASS" | "WARN"` plus per-check evidence.
 
 **Self-correct any FAIL before committing.** Common fixes:
 - `automated-tests` FAIL → write the missing test, fix the failing assertion
@@ -131,14 +98,9 @@ Record: `dod_layer1.overall`, `dod_layer1.checks`.
 
 ---
 
-### Step 3c — Write API contract
+### Step 3c — Return API surface in JSON
 
-Before committing, write `{TEMP_ROOT}/issues/<N>/contracts/backend-api.json`
-with the actual API surface as implemented (not just as specced). This is a **separate file**
-from the full result JSON you write in Step 5 — do not conflate them.
-
-> Note: When executing the bash command, expand `{TEMP_ROOT}` to the value read from
-> `repo-map.json` first.
+Before committing, include the actual API surface in your return JSON as the `backend_api` field. The orchestrator reads this and passes the relevant fields to frontend-agent when domains overlap.
 
 ```json
 {
@@ -149,17 +111,11 @@ from the full result JSON you write in Step 5 — do not conflate them.
   "rest_endpoints": [
     { "method": "GET|POST", "route": "{REST_NS}..." }
   ],
-  "ajax_actions": [],
-  "notes": "any drift from spec"
+  "ajax_actions": []
 }
 ```
 
-> If `{REST_NS}` is null, leave `rest_endpoints` as an empty array.
-
-The orchestrator reads this file after you complete and passes the relevant fields
-(`hooks`, `option_keys`, `rest_endpoints`) to the frontend-agent in sequential mode.
-Populate every field even if empty (`[]`).
-If nothing changed in a category, leave the array empty — do not omit the key.
+Populate every field even if empty (`[]`). If nothing changed in a category, leave the array empty — do not omit the key.
 
 ---
 
@@ -184,14 +140,7 @@ Do not push. The `release-agent` handles push and PR creation after both impleme
 
 ### Step 5 — Finalize and return
 
-Before returning:
-
-1. Update your task entry in `tasks.json`: set `status: "completed"` and `completed_at` to
-   the current ISO timestamp.
-2. Remove your lock file: `{TEMP_ROOT}/issues/<N>/locks/backend-<task-id>.lock`
-
-Then return the following JSON object to the orchestrator. The orchestrator reads this from
-`result_path` in `tasks.json` — write it there, then also return it inline.
+Return the following JSON object to the orchestrator.
 
 ```json
 {
@@ -200,11 +149,6 @@ Then return the following JSON object to the orchestrator. The orchestrator read
   "files_changed": ["list of PHP + docs files modified"],
   "tests_passing": true,
   "test_output": "one-line summary, e.g. '42 tests, 0 failures'",
-  "e2e_smoke": {
-    "status": "PASS|FAIL|SKIP",
-    "scenarios_tested": ["Primary happy path: described from spec"],
-    "details": "curl {E2E_URL}/ returned expected response"
-  },
   "docs": {
     "status": "DONE|SKIP",
     "files_updated": ["docs/api/<file>.md"],
@@ -217,7 +161,8 @@ Then return the following JSON object to the orchestrator. The orchestrator read
       { "name": "automated-tests", "status": "PASS|WARN", "evidence": "N tests passed" },
       { "name": "documentation", "status": "PASS|WARN", "evidence": "docs/... updated, or SKIP if no public API change" },
       { "name": "pr-description", "status": "PASS|WARN", "evidence": "draft filled" },
-      { "name": "ci", "status": "PASS|WARN", "evidence": "phpcs-changed: 0 violations · run-stan: 0 errors · test-unit: 42 passed" }
+      { "name": "ci", "status": "PASS|WARN", "evidence": "phpcs-changed: 0 violations · run-stan: 0 errors · test-unit: 42 passed" },
+      { "name": "file-scope", "status": "PASS|WARN|N/A", "evidence": "all changed files within declared scope" }
     ]
   },
   "co_authored_by": "CURRENT_MODEL <noreply@anthropic.com>",
@@ -226,53 +171,15 @@ Then return the following JSON object to the orchestrator. The orchestrator read
     "hesitations": ["what was unclear or uncertain — spec gaps, ambiguous edge cases, behaviour not covered by tests"],
     "decision_rationale": "why the chosen approach was taken over the alternatives"
   },
+  "backend_api": {
+    "hooks": [{ "type": "filter|action", "name": "...", "signature": "..." }],
+    "option_keys": ["key_name"],
+    "rest_endpoints": [{ "method": "GET|POST", "route": "..." }],
+    "ajax_actions": []
+  },
   "notes": "any deviations from spec with reason, or empty string"
 }
 ```
 
 `dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 3b).
 
----
-
-## Result file and event emission
-
-Before returning the JSON object, perform these final steps:
-
-> In all bash commands below, expand `{TEMP_ROOT}` to the value read from `repo-map.json`
-> (e.g., use `$TEMP_ROOT` as a shell variable set to that value).
-
-### Write result file
-
-```bash
-mkdir -p "$TEMP_ROOT/issues/${ISSUE_ID}/contracts"
-cat > "$TEMP_ROOT/issues/${ISSUE_ID}/contracts/backend-result.json" <<'EOF'
-{
-  "ticket_id": "...",
-  "branch": "...",
-  ...
-}
-EOF
-```
-
-This file is a session-recovery fallback. The primary routing input is the JSON object returned directly to the orchestrator — never read this file for primary routing decisions.
-
-### Emit start and complete events
-
-**At the beginning of Step 1 (after you receive inputs):**
-
-```bash
-cat >> "$TEMP_ROOT/issues/${ISSUE_ID}/orchestrator-events.jsonl" <<EOF
-{"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"backend-agent","type":"agent_start","issue_id":"${ISSUE_ID}","data":{"step":5,"domain":"backend"}}
-EOF
-```
-
-**Before returning this JSON object (after Step 3b is done and commit succeeds):**
-
-```bash
-TESTS_OK=true  # set to false if any test failed
-cat >> "$TEMP_ROOT/issues/${ISSUE_ID}/orchestrator-events.jsonl" <<EOF
-{"timestamp":"$(date -u +'%Y-%m-%dT%H:%M:%SZ')","source":"backend-agent","type":"implementation_complete","issue_id":"${ISSUE_ID}","data":{"domain":"backend","tests_passing":${TESTS_OK},"dod_l1_overall":"PASS|WARN","files_changed":N,"commit_sha":"..."}}
-EOF
-```
-
-Do not commit these events or result files — they are coordination infrastructure, not code.

@@ -9,7 +9,7 @@ Read `.claude/maestro.json` at startup and extract these values. Pass them expli
 
 | Variable | JSON path | Example |
 |---|---|---|
-| `TEMP_ROOT` | `.ai.temp_root` | `.maestro` |
+| `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
 | `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
@@ -175,86 +175,11 @@ find ~/.claude/plugins -name "podium-health.md" 2>/dev/null | head -1
 
 **When `html_log: true` (legacy):**
 
-Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
+Path: `.ai/issues/<N>/workflow-log.html`
 
 - **Create** the log at startup with just the header and an empty event list.
 - **Rewrite the full file** after every action — the event list grows with each update.
 - See `.claude/commands/orchestrator/html-log-format.md` for the full HTML structure and event patterns. Load it on demand (not at session start) to keep context lean.
-
-**Synthesis rule:** Route based on the JSON object returned directly from each agent call — `result_path` contract files are session-recovery fallbacks only, never the primary routing input. This prevents stale data from a prior run's contract file from influencing routing in the current run.
-
----
-
-## Runtime Coordination Layer
-
-Each pipeline run creates an isolated working directory for coordination artifacts:
-
-**Run root:** `{TEMP_ROOT}/issues/<N>/`
-
-```
-issues/<N>/
-├── issue.md                 # issue snapshot (written by issue-sync.sh)
-├── spec.md                  # implementation spec (written by grooming-agent)
-├── pull.md                  # PR draft (written by init-pr-draft.sh / release-agent)
-├── workflow-log.html        # live HTML run log (written by orchestrator)
-├── tasks.json               # shared task ledger — read/written by all agents
-├── orchestrator-events.jsonl  # event stream — written by all agents
-├── contracts/
-│   ├── backend-api.json     # written by backend-agent (Step 3c): hooks, option_keys, rest_endpoints
-│   ├── backend-result.json  # written by backend-agent (Step 5): full implementation result
-│   └── frontend-result.json # written by frontend-agent on completion
-└── locks/
-    └── <agent>-<task-id>.lock  # file ownership — removed when agent finishes
-```
-
-### `tasks.json` structure
-
-```json
-{
-  "run_id": "issue-<N>-<unix-timestamp>",
-  "issue_id": "<N>",
-  "branch": "<branch-name>",
-  "base_branch": "origin/develop",
-  "worktrees": {},
-  "tasks": [
-    {
-      "id": "impl-backend",
-      "type": "implementation",
-      "owner": "backend-agent",
-      "status": "pending | in-progress | completed | blocked",
-      "depends_on": [],
-      "file_scope": ["inc/Engine/...", "tests/Unit/..."],
-      "worktree": null,
-      "result_path": "{TEMP_ROOT}/issues/<N>/contracts/backend-result.json",
-      "started_at": null,
-      "completed_at": null,
-      "blocked_reason": null
-    },
-    {
-      "id": "impl-frontend",
-      "type": "implementation",
-      "owner": "frontend-agent",
-      "status": "pending | in-progress | completed | blocked",
-      "depends_on": [],
-      "file_scope": ["assets/src/...", "views/..."],
-      "worktree": null,
-      "result_path": "{TEMP_ROOT}/issues/<N>/contracts/frontend-result.json",
-      "started_at": null,
-      "completed_at": null,
-      "blocked_reason": null
-    }
-  ]
-}
-```
-
-### Backend API contract
-
-Two separate files, two separate purposes:
-
-- **`contracts/backend-api.json`** — API surface only (`hooks`, `option_keys`, `rest_endpoints`, `ajax_actions`). Written by backend-agent in Step 3c, before committing. The orchestrator reads this to share the actual API surface with frontend-agent.
-- **`contracts/backend-result.json`** — Full implementation result (`ticket_id`, `branch`, `files_changed`, `dod_layer1`, etc.). Written by backend-agent in Step 5. The orchestrator reads this for routing decisions. `result_path` in `tasks.json` points here.
-
-The frontend agent may read `contracts/backend-api.json` as a fallback — orchestrator-managed shared state only. If absent, frontend proceeds from spec and notes the skip. When scopes overlap (or `--sequential` was passed), the orchestrator reads `backend-api.json` after backend completes and passes its contents explicitly in the frontend dispatch plan. The frontend agent never reads the file itself in that path.
 
 ---
 
@@ -306,11 +231,6 @@ fields — prose is for human readability only.
   "files_changed": ["string"],
   "tests_passing": true,
   "test_output": "string",
-  "e2e_smoke": {
-    "status": "PASS|FAIL|SKIP",
-    "scenarios_tested": ["string"],
-    "details": "string"
-  },
   "docs": {
     "status": "DONE|SKIP",
     "files_updated": ["string"],
@@ -325,6 +245,12 @@ fields — prose is for human readability only.
     "alternatives_considered": ["other approaches weighed before choosing this one"],
     "hesitations": ["what was unclear or uncertain during implementation"],
     "decision_rationale": "why the chosen approach was taken over the alternatives"
+  },
+  "backend_api": {
+    "hooks": [{ "type": "filter|action", "name": "string", "signature": "string" }],
+    "option_keys": ["string"],
+    "rest_endpoints": [{ "method": "GET|POST", "route": "string" }],
+    "ajax_actions": []
   },
   "notes": "string"
 }
@@ -346,7 +272,9 @@ fields — prose is for human readability only.
 {
   "overall": "PASS|WARN|FAIL",
   "checks": [{ "name": "string", "status": "PASS|WARN|FAIL", "evidence": "string" }],
-  "blockers": ["string"],
+  "blockers": [
+    { "check": "string", "description": "string", "error_excerpt": "string", "suggested_fix": "string" }
+  ],
   "warnings": ["string"],
   "layer1_delta": ["string"]
 }
@@ -401,7 +329,7 @@ fields — prose is for human readability only.
 
 ### Step 1 — Issue read *(always)*
 
-Read the issue file at `{TEMP_ROOT}/issues/<N>/issue.md` (produced by
+Read the issue file at `.ai/issues/<N>/issue.md` (produced by
 `issue-workflow` or `issue-sync.sh`). Extract title and acceptance criteria:
 
 1. Look for `Acceptance Criteria`, `Definition of Done`, or `DoD` section
@@ -411,7 +339,7 @@ Read the issue file at `{TEMP_ROOT}/issues/<N>/issue.md` (produced by
 If the entry was raw input rather than an issue number, invoke `ticket-writer` in `create`
 mode first to formalize the issue, then read the resulting file.
 
-Create the initial HTML log (empty event list). Log a ROUTING DECISION event:
+Create the initial HTML log at `.ai/issues/<N>/workflow-log.html` (empty event list). Log a ROUTING DECISION event:
 "Pipeline started — reading issue #N. Calibration: <mode>."
 
 ---
@@ -421,7 +349,7 @@ Create the initial HTML log (empty event list). Log a ROUTING DECISION event:
 Invoke `grooming-agent`:
 > Inputs: issue `#N`, issue file path, base branch
 
-Spec written to `{TEMP_ROOT}/issues/<N>/spec.md`. Agent also returns
+Spec written to `.ai/issues/<N>/spec.md`. Agent also returns
 JSON. Log an AGENT event with the grooming JSON summary.
 
 ---
@@ -561,29 +489,23 @@ Log AGENT event.
 
 ---
 
-### Step 4b — Task graph initialization
+### Step 4b — Issue directory setup
 
-Create the run directory and write the initial `tasks.json`:
+Create the run directory for this issue:
 
 ```bash
-mkdir -p {TEMP_ROOT}/issues/<N>/contracts
-mkdir -p {TEMP_ROOT}/issues/<N>/locks
+mkdir -p .ai/issues/<N>
 ```
 
-Populate `file_scope` for each task from `grooming.development_steps[*].files`:
+Track `file_scope` for each domain in context (not in a file):
 - **backend scope**: PHP source files and test files per the project's `areas` in repo-map.json
 - **frontend scope**: JS/CSS/template files per the project's `areas` in repo-map.json
 
-If a file appears in both (e.g., a ServiceProvider registering both PHP services and JS
-localizations), assign it to the domain owning the majority of changes; note the shared
-file in `blocked_reason` for the other task so it doesn't touch it.
+If a file appears in both domains, assign it to the domain owning the majority of changes; note the shared file in context so the other agent doesn't touch it.
 
-**Parallel eligibility:** scopes are disjoint when no single file path appears in both
-`impl-backend.file_scope` and `impl-frontend.file_scope`. If `--sequential` flag was provided,
-treat parallel eligibility as `NO` (skip git worktree creation, force sequential execution).
+**Parallel eligibility:** scopes are disjoint when no single file path appears in both backend and frontend scopes. If `--sequential` flag was provided, treat parallel eligibility as `NO`.
 
-Log a ROUTING DECISION event: "Task graph initialized — N backend files, M frontend files,
-execution: parallel | sequential (reason: --sequential flag | overlapping files | single domain)".
+Log a ROUTING DECISION event: "Issue directory created — N backend files, M frontend files, execution: parallel | sequential (reason: --sequential flag | overlapping files | single domain)".
 
 ---
 
@@ -619,11 +541,8 @@ If any point fails: **do not start implementation**. Log a ROUTING DECISION even
 
 ### Step 5 — Implementation
 
-Each agent runs the `docs` skill, `e2e` skill (basic tier), and `dod` skill (layer 1)
-inline before committing, then commits atomically.
-
-Before spawning, mark each in-scope task `in-progress` in `tasks.json` and record
-`started_at`.
+Each agent runs the `docs` skill and `dod` skill (layer 1) inline before committing,
+then commits atomically.
 
 **Execution mode decision:**
 - If `execution_mode == "parallel"` AND scopes are disjoint → use **parallel path (05a/b-PAR)**
@@ -631,14 +550,13 @@ Before spawning, mark each in-scope task `in-progress` in `tasks.json` and recor
 
 ---
 
-**Compose dispatch plans** — before calling the Workflow, write the dispatch plan for each in-scope agent. These must be complete and self-contained: agents cannot see the orchestrator context. Each dispatch plan must include the spec summary, grooming output (approach, development_steps, file_scope), and any relevant session learnings. In sequential mode, include the backend API surface from `contracts/backend-api.json` in the frontend dispatch plan if backend has already committed.
+**Compose dispatch plans** — before calling the Workflow, write the dispatch plan for each in-scope agent. These must be complete and self-contained: agents cannot see the orchestrator context. Each dispatch plan must include the spec summary, grooming output (approach, development_steps, file_scope), and any relevant session learnings. In sequential mode, include the backend API surface returned inline from the backend agent's return JSON (`backend_api` field) in the frontend dispatch plan.
 
 **In parallel mode:** Create git worktrees for isolation before calling the Workflow:
 ```bash
-git worktree add {TEMP_ROOT}/issues/<N>/worktrees/backend <branch>
-git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
+git worktree add .ai/issues/<N>/worktrees/backend <branch>
+git worktree add .ai/issues/<N>/worktrees/frontend <branch>
 ```
-Update each task's `worktree` field in `tasks.json`.
 
 **Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/implementation.js` with the Read tool, then call the Workflow tool with:
 - `script`: the file contents
@@ -653,22 +571,17 @@ Update each task's `worktree` field in `tasks.json`.
     "model": "<resolved implementation model>",
     "backendDispatch": "<dispatch plan string — null if frontend-only>",
     "frontendDispatch": "<dispatch plan string — null if backend-only>",
-    "backendTask": { "...task entry from tasks.json..." },
-    "frontendTask": { "...task entry from tasks.json — null if backend-only..." },
     "worktrees": { "backend": "<path>", "frontend": "<path>" },
     "sessionLearnings": "<section 13 content>",
     "currentModel": "<current model name>"
   }
   ```
 
-The Workflow shows a live progress panel with per-agent token and tool counts. It returns `{ backend, frontend }` — structured objects matching the implementation JSON contract. The underlying agents still write `contracts/backend-api.json` and `contracts/backend-result.json` / `frontend-result.json` as before.
+The Workflow shows a live progress panel with per-agent token and tool counts. It returns `{ backend, frontend }` — structured objects matching the implementation JSON contract.
 
-**Synthesis:** Read `tests_passing`, `dod_layer1.overall`, `e2e_smoke.status`, and
-`files_changed` directly from the Workflow return value (`result.backend`, `result.frontend`).
-Log AGENT events with `docs` status, `e2e_smoke` status, DOD L1 summary, and commit SHA.
+**Synthesis:** Read `tests_passing`, `dod_layer1.overall`, and `files_changed` directly from the Workflow return value (`result.backend`, `result.frontend`).
 
-Log AGENT events after each with `docs` status, `e2e_smoke` status, DOD L1 summary, and
-commit SHA.
+Log AGENT events after each with `docs` status, DOD L1 summary, and commit SHA.
 
 ---
 
@@ -862,12 +775,10 @@ Final summary template:
 | L | 30 min |
 | XL | 45 min |
 
-If any agent's task remains `in-progress` past its timeout:
-1. Mark it `blocked` in `tasks.json` with `blocked_reason: "timeout"`.
-2. Remove any worktree created for it: `git worktree remove <path>`.
-3. Log an ESCALATION event — do not silently retry with the same scope.
-4. Offer the human two options: (a) re-spawn with a narrower `file_scope` (split the task
-   entry in `tasks.json`), or (b) hand off to manual implementation.
+If any agent runs past its timeout:
+1. Remove any worktree created for it: `git worktree remove .ai/issues/<N>/worktrees/<agent>`.
+2. Log an ESCALATION event — do not silently retry with the same scope.
+3. Offer the human two options: (a) re-spawn the agent with a narrower `file_scope`, or (b) hand off to manual implementation.
 
 Reassign rather than retry when the same agent has failed 3 times with the same error —
 that pattern signals a spec ambiguity, not a transient failure.
@@ -914,7 +825,7 @@ All agents also receive `CURRENT_MODEL` and `session_learnings` (section 13 of `
 | `backend-agent` | Issue object + spec path + dispatch plan |
 | `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (when scopes overlap) |
 | `release-agent` | Issue #, branch name, base branch, acceptance criteria, spec path |
-| `lead-reviewer` | PR URL + spec path (`{TEMP_ROOT}/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
+| `lead-reviewer` | PR URL + spec path (`.ai/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
 | `qa-engineer` | PR number + acceptance criteria + base branch |
 | `ticket-writer` (nth_followup) | Single NTH feedback item (not full context) |
 
