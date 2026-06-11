@@ -23,6 +23,15 @@ export const meta = {
 //   skipQa             boolean — true for purely internal refactors
 //   sessionLearnings   string  — content of AGENTS.md section 13
 //   currentModel       string  — display name of the running model, e.g. "Claude Sonnet 4.6"
+//   // env config — passed from orchestrator project config (required for Strategy B)
+//   repo               string  — e.g. 'wp-media/my-plugin'
+//   slug               string  — e.g. 'my-plugin'
+//   displayName        string  — e.g. 'My Plugin'
+//   archSkill          string  — e.g. 'my-plugin-architecture'
+//   e2eUrl             string  — e.g. 'http://localhost:8888'
+//   e2eBoot            string  — e.g. 'bash bin/dev-start.sh'
+//   e2eSettings        string  — e.g. '/wp-admin/options-general.php?page=my-plugin'
+//   e2eCi              string  — 'true' | 'false'
 // }
 
 const DOD_SCHEMA = {
@@ -72,6 +81,8 @@ const {
   acceptanceCriteria, domains, uiVisible,
   executionMode, skipLeadReview, skipQa,
   sessionLearnings, currentModel,
+  repo, slug, displayName, archSkill,
+  e2eUrl, e2eBoot, e2eSettings, e2eCi,
 } = args
 
 const dodPrompt = [
@@ -109,6 +120,18 @@ const uiNote = uiVisible
   ? 'Strategy B (browser/visual) is the PRIMARY strategy — UI changes are present.'
   : ''
 
+const envConfig = [
+  repo         ? `REPO=${repo}` : null,
+  slug         ? `SLUG=${slug}` : null,
+  displayName  ? `DISPLAY_NAME=${displayName}` : null,
+  archSkill    ? `ARCH_SKILL=${archSkill}` : null,
+  e2eUrl       ? `E2E_URL=${e2eUrl}` : null,
+  e2eBoot      ? `E2E_BOOT=${e2eBoot}` : null,
+  e2eSettings  ? `E2E_SETTINGS=${e2eSettings}` : null,
+  e2eCi        ? `E2E_CI=${e2eCi}` : null,
+  `TEMP_ROOT=${tempRoot}`,
+].filter(Boolean).join('\n')
+
 const qaPrompt = [
   `You are the qa-engineer for issue #${issueN}.`,
   '',
@@ -118,6 +141,9 @@ const qaPrompt = [
   `Domains: ${domains}`,
   `UI visible: ${uiVisible}`,
   uiNote,
+  '',
+  'Environment config:',
+  envConfig,
   '',
   'Acceptance criteria:',
   acceptanceCriteria,

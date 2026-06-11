@@ -635,7 +635,15 @@ CI is monitored by DOD L2 Check 5 in both modes.
     "skipLeadReview": false,
     "skipQa": false,
     "sessionLearnings": "<section 13 content>",
-    "currentModel": "<current model name>"
+    "currentModel": "<current model name>",
+    "repo": "<REPO from project config>",
+    "slug": "<SLUG from project config>",
+    "displayName": "<DISPLAY_NAME from project config>",
+    "archSkill": "<ARCH_SKILL from project config>",
+    "e2eUrl": "<LOCAL_URL from project config>",
+    "e2eBoot": "<BOOT_CMD from project config>",
+    "e2eSettings": "<E2E_SETTINGS from project config — e.g. /wp-admin/options-general.php?page=slug>",
+    "e2eCi": "<E2E_CI from project config>"
   }
   ```
 
