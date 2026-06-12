@@ -92,7 +92,11 @@ confirmed values. Use this exact structure:
     "architecture_skill": "wp-rocket-architecture",
     "frontend_skill": null,
     "editions": null,
+    "rest_namespace": null,
+    "html_log": false,
     "e2e": {
+      "local_url": null,
+      "boot_cmd": null,
       "settings_path": null,
       "ci_integration": false,
       "license_option_key": null
@@ -107,8 +111,11 @@ Rules for filling it in:
   values from Step 2.
 - `architecture_skill` → `"{slug}-architecture"` (e.g. `wp-rocket-architecture`).
   This skill may not exist yet — that's expected; flag it in the summary.
-- `frontend_skill`, `editions`, `e2e.settings_path` → leave `null`. Later runs
-  or the full deep-analysis onboarding can fill these in.
+- `frontend_skill`, `editions`, `rest_namespace`, `e2e.local_url`, `e2e.boot_cmd`,
+  `e2e.settings_path` → leave `null`. Later runs or the full deep-analysis onboarding
+  can fill these in. (Agents skip E2E probing while `e2e.local_url` / `e2e.boot_cmd`
+  are null.)
+- `html_log` → `false` (the orchestrator's legacy HTML run log — Podium replaces it).
 - `e2e.ci_integration` → `false`.
 
 ```bash

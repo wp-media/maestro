@@ -31,7 +31,16 @@ You receive:
 - Issue number `N`
 - Issue file path (`{TEMP_ROOT}/issues/<N>/issue.md`)
 - Spec file path (`{TEMP_ROOT}/issues/<N>/spec.md`)
-- *(Optional)* `plan_version` — increments each revision round
+- *(Optional)* `plan_version` — increments each revision round (defaults to 1)
+- `CURRENT_MODEL` — the model name to use in the GitHub comment attribution line
+- `session_learnings` — AGENTS.md section 13 content; documented past failures are prime challenge material
+
+## Re-invocation (plan_version > 1)
+
+When reviewing a revised plan, focus on whether your previous `MUST_HAVE` findings were
+actually addressed — verify against the spec and the codebase, do not take the revision's
+word for it. Do not re-raise findings that were resolved, and do not introduce brand-new
+`MUST_HAVE` findings you could have raised in round 1 unless the revision itself created them.
 
 ## Step 1 — Read
 
@@ -158,3 +167,8 @@ Do not rewrite the spec. Return the verdict and findings AND the following JSON 
 ```
 
 `alternative_suggestions` is **required** when `verdict != APPROVED`. Provide 1–2 concrete, actionable alternatives the orchestrator can present to a human or pass back to grooming.
+
+Never omit `feedback` or `alternative_suggestions` — the orchestrator reads both
+unconditionally. When `verdict == APPROVED`: `alternative_suggestions` is `[]`, and
+`feedback` contains only non-blocking findings (SHOULD_HAVE or lower; `[]` if none) — the
+orchestrator dispatches COULD_HAVE/NICE_TO_HAVE items as follow-up tickets.

@@ -83,8 +83,8 @@ These steps **never skip**, regardless of which model runs the orchestrator, how
 | Gate | Step | Enforcement |
 |---|---|---|
 | **Grooming** | Step 2 | ALWAYS runs. No implementation without a grooming JSON. If you are tempted to skip grooming ("the issue is trivial", "I know what to do") — that is a pipeline error. STOP and invoke `grooming-agent`. |
-| **Label "Made by AI" + Assignee** | Step 7 (release-agent) | ALWAYS applied and ALWAYS verified. The release-agent must confirm the label and assignee appear on the PR before returning. |
-| **`gh pr ready <PR#>`** | Step 11 | ALWAYS executed after QA passes. Verify with `gh pr view <PR#> --json isDraft -q .isDraft` — must return `false`. If it returns `true`, run `gh pr ready` again. |
+| **Label "Made by AI" + Assignee** | Step 6 (release-agent) | ALWAYS applied and ALWAYS verified. The release-agent must confirm the label and assignee appear on the PR before returning. |
+| **`gh pr ready <PR#>`** | Step 10 | ALWAYS executed after QA passes. Verify with `gh pr view <PR#> --json isDraft -q .isDraft` — must return `false`. If it returns `true`, run `gh pr ready` again. |
 
 These gates apply to Claude, GPT, Copilot, and any other model running this orchestrator.
 
@@ -175,7 +175,7 @@ find ~/.claude/plugins -name "podium-health.md" 2>/dev/null | head -1
 
 **When `html_log: true` (legacy):**
 
-Path: `.ai/issues/<N>/workflow-log.html`
+Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
 
 - **Create** the log at startup with just the header and an empty event list.
 - **Rewrite the full file** after every action — the event list grows with each update.
@@ -219,9 +219,16 @@ fields — prose is for human readability only.
   "feedback": [{ "description": "string", "severity": "MUST_HAVE|SHOULD_HAVE|COULD_HAVE|NICE_TO_HAVE", "suggestion": "string" }],
   "alternative_suggestions": ["string"],
   "revised_risk_level": "LOW|MEDIUM|HIGH",
-  "comment_posted": true
+  "comment_posted": true,
+  "reasoning": {
+    "alternatives_considered": ["string"],
+    "hesitations": ["string"],
+    "decision_rationale": "string"
+  }
 }
 ```
+
+`feedback` and `alternative_suggestions` are `[]` (never omitted) when `verdict == APPROVED`.
 
 ### Implementation (`backend-agent` / `frontend-agent`)
 ```json
@@ -263,7 +270,8 @@ fields — prose is for human readability only.
   "trailer_verified": true,
   "pr_url": "string",
   "pr_number": 0,
-  "pr_created": true
+  "pr_created": true,
+  "notes": "string — human commits skipped from trailer check, label/assignee retry failures, or empty string"
 }
 ```
 
@@ -289,7 +297,12 @@ fields — prose is for human readability only.
   "pr_commented": true,
   "blockers": [{ "file": "string", "line": 0, "type": "SECURITY|LOGIC|TESTS|CONVENTIONS", "criticality": "CRITICAL|HIGH|MEDIUM|LOW", "description": "string", "fix": "string" }],
   "nice_to_haves": [{ "file": "string", "type": "REFACTORING|NAMING|PERFORMANCE|DOCS", "description": "string" }],
-  "summary": "string"
+  "summary": "string",
+  "reasoning": {
+    "alternatives_considered": ["string"],
+    "hesitations": ["string"],
+    "decision_rationale": "string"
+  }
 }
 ```
 
@@ -297,9 +310,9 @@ fields — prose is for human readability only.
 ```json
 {
   "overall": "PASS|FAIL|PARTIAL",
-  "strategies_used": ["API|BROWSER|VISUAL|ANALYSIS"],
+  "strategies_used": ["API|BROWSER|ANALYSIS"],
   "pr_commented": true,
-  "criteria_results": [{ "criterion": "string", "method": "string", "result": "PASS|FAIL|PARTIAL", "evidence": "string" }],
+  "criteria_results": [{ "criterion": "string", "method": "API|BROWSER|ANALYSIS", "result": "PASS|FAIL|PARTIAL|CANNOT_VERIFY", "evidence": "string" }],
   "smoke_tests": [{ "area": "string", "result": "PASS|FAIL", "evidence": "string" }],
   "tests_authored": ["string"],
   "pr_comment_url": "string",
@@ -329,7 +342,7 @@ fields — prose is for human readability only.
 
 ### Step 1 — Issue read *(always)*
 
-Read the issue file at `.ai/issues/<N>/issue.md` (produced by
+Read the issue file at `{TEMP_ROOT}/issues/<N>/issue.md` (produced by
 `issue-workflow` or `issue-sync.sh`). Extract title and acceptance criteria:
 
 1. Look for `Acceptance Criteria`, `Definition of Done`, or `DoD` section
@@ -339,7 +352,7 @@ Read the issue file at `.ai/issues/<N>/issue.md` (produced by
 If the entry was raw input rather than an issue number, invoke `ticket-writer` in `create`
 mode first to formalize the issue, then read the resulting file.
 
-Create the initial HTML log at `.ai/issues/<N>/workflow-log.html` (empty event list). Log a ROUTING DECISION event:
+If the HTML log is enabled, create the initial log at `{TEMP_ROOT}/issues/<N>/workflow-log.html` (empty event list). Log a ROUTING DECISION event:
 "Pipeline started — reading issue #N. Calibration: <mode>."
 
 ---
@@ -349,7 +362,7 @@ Create the initial HTML log at `.ai/issues/<N>/workflow-log.html` (empty event l
 Invoke `grooming-agent`:
 > Inputs: issue `#N`, issue file path, base branch
 
-Spec written to `.ai/issues/<N>/spec.md`. Agent also returns
+Spec written to `{TEMP_ROOT}/issues/<N>/spec.md`. Agent also returns
 JSON. Log an AGENT event with the grooming JSON summary.
 
 ---
@@ -494,12 +507,13 @@ Log AGENT event.
 Create the run directory for this issue:
 
 ```bash
-mkdir -p .ai/issues/<N>
+mkdir -p {TEMP_ROOT}/issues/<N>
 ```
 
-Track `file_scope` for each domain in context (not in a file):
-- **backend scope**: PHP source files and test files per the project's `areas` in repo-map.json
-- **frontend scope**: JS/CSS/template files per the project's `areas` in repo-map.json
+Track `file_scope` for each domain in context (not in a file), derived from the grooming
+spec's **Affected Files** table and `development_steps[*].files`:
+- **backend scope**: PHP source files and their test files
+- **frontend scope**: JS/CSS/template files
 
 If a file appears in both domains, assign it to the domain owning the majority of changes; note the shared file in context so the other agent doesn't touch it.
 
@@ -515,7 +529,7 @@ Skip this step if `EDITIONS` is null.
 
 If `EDITIONS` is non-null (e.g. `["free","pro"]`), the project has an edition split.
 When building `file_scope` for each implementation task:
-- Read `config.editions[*].paths` from repo-map.json to identify which files belong to which edition.
+- Use the edition ownership flagged per file in the grooming spec's Affected Files table (grooming-agent annotates editions when `EDITIONS` is non-null).
 - Do not assign files from different editions to the same implementation task scope unless the spec explicitly calls for a cross-edition change.
 - Flag the affected edition(s) in the `blocked_reason` note for the other task so it doesn't touch those paths.
 - Grooming-agent will have already identified the relevant edition(s) in the spec.
@@ -554,8 +568,8 @@ then commits atomically.
 
 **In parallel mode:** Create git worktrees for isolation before calling the Workflow:
 ```bash
-git worktree add .ai/issues/<N>/worktrees/backend <branch>
-git worktree add .ai/issues/<N>/worktrees/frontend <branch>
+git worktree add {TEMP_ROOT}/issues/<N>/worktrees/backend <branch>
+git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
 ```
 
 **Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/implementation.js` with the Read tool, then call the Workflow tool with:
@@ -601,7 +615,7 @@ Update the decisions strip Pull request field with the PR URL.
 
 > ⚠️ **The draft PR is the midpoint of the pipeline, not the end.**
 > Do not stop, do not ask the user what to do next. Proceed immediately to Steps 7–9.
-> The pipeline is complete only after Step 11 runs `gh pr ready` and posts the final summary.
+> The pipeline is complete only after Step 10 runs `gh pr ready` and posts the final summary.
 
 ---
 
@@ -665,7 +679,7 @@ Route on `dod_l2.overall`:
 | `WARN` | any | No action — proceed to next gate. Log GATE event `data-status="warn"`. In high-oversight mode, surface for confirmation. |
 | `FAIL` (CI) | `dod_loop < 2` | Diagnose the CI failure from `blockers[*].error_excerpt`. Re-invoke the relevant implementation agent with the suggested fix. Re-push. Increment `dod_loop`. Re-run quality gates (parallel or sequential per execution_mode). Log ROUTING DECISION. |
 | `FAIL` (CI) | `dod_loop >= 2` | Escalate with the exact error excerpt and suggested fix. |
-| `FAIL` (code) | `dod_loop < 1` | Increment `dod_loop`. Re-invoke the relevant implementation agent with specific blockers, re-push. **If execution_mode == "parallel": abort any in-flight Lead Review and QA.** Re-run quality gates. Log ROUTING DECISION. **If execution_mode == "sequential": skip to Step 10 (escalation) — Lead Review and QA will not run since the code is blocked.** |
+| `FAIL` (code) | `dod_loop < 1` | Increment `dod_loop`. Re-invoke the relevant implementation agent with specific blockers, re-push. **If execution_mode == "parallel": abort any in-flight Lead Review and QA.** Re-run quality gates. Log ROUTING DECISION. **If execution_mode == "sequential": stop and escalate (see Escalation rules) — Lead Review and QA will not run since the code is blocked.** |
 | `FAIL` (code) | `dod_loop >= 1` | Escalate to user with exact errors. |
 
 Log GATE event.
@@ -713,12 +727,12 @@ Max 3 QA invocations.
 
 ---
 
-**Proceed to Step 11 when:** DOD L2 is PASS or WARN (CI included in check 5), Lead Review
+**Proceed to Step 10 when:** DOD L2 is PASS or WARN (CI included in check 5), Lead Review
 has no HIGH/CRITICAL blockers (or is skipped), QA is PASS (or skipped or carried forward).
 
 ---
 
-### Step 11 — Finalize
+### Step 10 — Finalize
 
 1. **Collect all NTH ticket URLs** — gather every URL returned by `ticket-writer` throughout
    the run (from grooming, challenger, lead review, and QA dispatches). Update the PR body
@@ -784,7 +798,7 @@ Final summary template:
 | XL | 45 min |
 
 If any agent runs past its timeout:
-1. Remove any worktree created for it: `git worktree remove .ai/issues/<N>/worktrees/<agent>`.
+1. Remove any worktree created for it: `git worktree remove {TEMP_ROOT}/issues/<N>/worktrees/<agent>`.
 2. Log an ESCALATION event — do not silently retry with the same scope.
 3. Offer the human two options: (a) re-spawn the agent with a narrower `file_scope`, or (b) hand off to manual implementation.
 
@@ -833,7 +847,7 @@ All agents also receive `CURRENT_MODEL` and `session_learnings` (section 13 of `
 | `backend-agent` | Issue object + spec path + dispatch plan |
 | `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (when scopes overlap) |
 | `release-agent` | Issue #, branch name, base branch, acceptance criteria, spec path |
-| `lead-reviewer` | PR URL + spec path (`.ai/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
+| `lead-reviewer` | PR URL + spec path (`{TEMP_ROOT}/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
 | `qa-engineer` | PR number + acceptance criteria + base branch |
 | `ticket-writer` (nth_followup) | Single NTH feedback item (not full context) |
 
@@ -848,7 +862,7 @@ verifying that downstream agents comply:
 - Verify `release.trailer_verified == true` before proceeding to DOD L2
 - Verify `review.inline_comments_posted == true` before routing on review verdict
 - Verify `qa.pr_commented == true` before reading QA result
-- The final summary you post to the GitHub issue (Step 11) must open with the `[!NOTE]` callout
+- The final summary you post to the GitHub issue (Step 10) must open with the `[!NOTE]` callout
 
 ---
 

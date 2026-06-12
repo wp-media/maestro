@@ -139,6 +139,14 @@ Receive a single NTH feedback item from the orchestrator:
 
 For NTH items:
 - **Do not ask clarifying questions.** The orchestrator has already classified these.
+- **Dedup check first** — multiple agents (challenger, lead-reviewer, qa-engineer) can surface
+  the same NTH item in one run. Before creating, search for an existing open follow-up:
+  ```bash
+  gh issue list --repo {REPO} --state open --label "Made by AI" --search "<2-3 keywords from the description>" --json number,title,url
+  ```
+  If an open issue covers the same concern (same source PR and substantially the same
+  description), do **not** create a duplicate — return that issue's number/URL with
+  `ticket_created: false`.
 - Create a follow-up ticket immediately with label `enhancement` (or `tech-debt` for refactoring items). Always add the `Made by AI` label too.
 - Title format: short imperative statement derived from the `description` field.
 - Body: include the `source_agent`, `source_pr_or_ticket`, and `suggestion` as context.
@@ -198,6 +206,18 @@ Emit to the event queue and create the issue. Do NOT wait for a response — emi
 }
 ```
 
+`ticket_created` is `false` when an existing duplicate was found and returned instead of
+creating a new issue (the `ticket_id`/`ticket_url` then point to the existing issue).
+
+**Deriving `type`** — apply the first rule that matches:
+
+| Rule | `type` |
+|---|---|
+| Scope spans multiple issues (EPIC created with `epics` label) | `epic` |
+| Describes broken/incorrect current behavior (regression, error, "should X but does Y") | `bug` |
+| Internal-only work: refactoring, tech-debt, tooling, CI, dependency bumps, test coverage | `chore` |
+| Anything else — new or changed user-facing capability | `user_story` |
+
 ---
 
 ## Rules
@@ -205,7 +225,7 @@ Emit to the event queue and create the issue. Do NOT wait for a response — emi
 - Title: **imperative mood**, under 70 chars (e.g. "Add retry logic to API client")
 - Repo is always `{REPO}` (read from `.claude/maestro.json`) unless explicitly overridden
 - Each issue must be **standalone**: one concern, one definition of done
-- Never create an issue without first searching for duplicates (skip this check in `nth_followup` mode)
+- Never create an issue without first searching for duplicates (in `nth_followup` mode use the cheap targeted search described in that section — no clarifying questions)
 - **All created issues must include the AI-generated notice** at the top of the body:
   `> 🤖 AI-generated — created by an automated pipeline. Review before acting on this.`
 - Apply the `Made by AI` label on every issue created by this agent

@@ -19,7 +19,7 @@ Read `.claude/maestro.json`. Extract:
 ## Two-layer operation
 
 **Layer 1 (implementation agent self-correction):**
-Invoked inside `backend-agent` or `frontend-agent` as step 3 of their internal sequence.
+Invoked inside `backend-agent` or `frontend-agent` as their pre-commit self-check step.
 If any check returns `FAIL`, the agent self-corrects and re-runs before handing off.
 `overall` can only be `PASS` or `WARN` when the agent hands off — FAILs must be resolved.
 
@@ -39,7 +39,6 @@ Before running the checks, acknowledge these. Agents are good at producing plaus
 | "The change is too small to need a test" | Acceptance criteria still apply. A one-line fix to a Subscriber still needs a test on that Subscriber. |
 | "Tests pass, DOD L1 is fine" | Passing tests are evidence, not proof. L1 self-reports; L2 is the independent read. |
 | "No public API change, skipping docs" | Check for hook additions, `option_keys`, REST routes. Those count as public API. |
-| "I'll skip e2e because the environment might not boot" | Boot it. If it fails, `SKIP` is a valid status — but you must attempt it first. |
 | "The PR description section is present" | Present is not the same as filled. Thin is a WARN — name it explicitly. |
 | "I'll add tests in a follow-up ticket" | "Later" is the load-bearing word. There is no later. See Check 2. |
 
@@ -64,7 +63,8 @@ designed to independently test a PR and share feedback.
 
 - **PASS**: Section describes specific manual steps taken and their outcome
 - **WARN**: Section is present but thin (e.g. only one scenario for a complex change)
-- **FAIL**: Section is empty, says "N/A" without justification, or no PR draft exists at all (Layer 1 only — in Layer 2 this is FAIL since the PR is open)
+- **FAIL**: Section is empty or says "N/A" without justification (Layer 2 — the PR is open, so a missing body is FAIL)
+- **N/A**: Layer 1 only — the PR draft does not exist yet (`release-agent` creates `pull.md` after implementation). Not a failure.
 
 ---
 
@@ -140,6 +140,7 @@ Check that all required sections from the template are present and non-empty:
 - **PASS**: All required sections present and filled
 - **WARN**: One section is thin or partially filled
 - **FAIL**: PR not created yet (Layer 2 only), or 2+ sections missing / left with placeholder text
+- **N/A**: Layer 1 only — no PR draft exists yet (`release-agent` creates it after implementation). Not a failure.
 
 ---
 
@@ -191,15 +192,17 @@ Include each failure as a separate blocker in the return JSON with:
 - `error_excerpt`: the relevant log lines
 - `suggested_fix`: one sentence on what likely caused it
 
-Also verify the `Co-Authored-By: Claude` trailer is present on every commit on the branch:
+Also verify the `Co-Authored-By` trailer is present on every pipeline-authored commit on
+the branch (same pattern the `release-agent` enforces — the model name varies, the email
+does not; commits authored by a human collaborator are exempt):
 ```bash
 git log {BASE_BRANCH}..HEAD --format="%H %s" | while read sha msg; do
-  git show $sha --format="%b" -s | grep -q "Co-Authored-By: Claude" \
+  git show $sha --format="%b" -s | grep -q "Co-Authored-By: .* <noreply@anthropic.com>" \
     || echo "MISSING Co-Authored-By on $sha"
 done
 ```
 
-- **PASS**: All checks green AND trailer present on every commit
+- **PASS**: All checks green AND trailer present on every pipeline-authored commit
 - **WARN**: A non-blocking check (e.g. coverage threshold) is failing
 - **FAIL**: Any required check is failing, or any commit is missing the trailer
 
@@ -279,10 +282,10 @@ Always return this JSON object in addition to the human-readable output above:
 {
   "overall": "PASS|WARN|FAIL",
   "checks": [
-    { "name": "manual-validation", "status": "PASS|WARN|FAIL", "evidence": "string" },
-    { "name": "automated-tests", "status": "PASS|WARN|FAIL", "evidence": "string" },
+    { "name": "manual-validation", "status": "PASS|WARN|FAIL|N/A", "evidence": "string" },
+    { "name": "automated-tests", "status": "PASS|WARN|FAIL|N/A", "evidence": "string" },
     { "name": "documentation", "status": "PASS|WARN|FAIL", "evidence": "string" },
-    { "name": "pr-description", "status": "PASS|WARN|FAIL", "evidence": "string" },
+    { "name": "pr-description", "status": "PASS|WARN|FAIL|N/A", "evidence": "string" },
     { "name": "ci", "status": "PASS|WARN|FAIL", "evidence": "string" },
     { "name": "file-scope", "status": "PASS|WARN|FAIL|N/A", "evidence": "string" }
   ],

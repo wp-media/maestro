@@ -14,6 +14,15 @@ You receive:
 - The spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - The dispatch plan (which files you are responsible for and any constraints)
 - `CURRENT_MODEL` — use this in `Co-Authored-By` commit trailers and the `co_authored_by` return field
+- *(Re-invocation only)* a specific blocker list from DOD L2, Lead Review, or QA
+
+## Re-invocation
+
+The orchestrator may re-invoke you after a quality gate fails (DOD L2 FAIL, Lead Review
+blockers, QA FAIL). On a re-run: make the **targeted fix only** — address exactly the
+blockers passed to you, do not re-implement or refactor beyond them. Re-run the tests and
+DOD L1, then commit the fix as a new atomic commit (never amend or rebase commits that were
+already pushed).
 
 ## Config loading (always first)
 
@@ -64,7 +73,7 @@ Follow the spec's **Implementation Plan** for backend files only. Do not touch J
 
 ---
 
-### Step 2.5 — Documentation update
+### Step 3 — Documentation update
 
 Invoke the `docs` skill inline (`.claude/commands/docs.md`).
 
@@ -72,13 +81,13 @@ Pass the explicit list of PHP files you changed in Step 2 — the skill needs th
 
 The skill is a no-op if no public API surface changed (no new hooks, AJAX actions, REST routes, config keys, capabilities, or BerlinDB schemas). If it returns `status: "SKIP"`, that is expected and not a problem.
 
-If it returns `status: "DONE"`, the files in `files_updated` / `files_created` will be committed together with your PHP changes in Step 4.
+If it returns `status: "DONE"`, the files in `files_updated` / `files_created` will be committed together with your PHP changes in Step 6.
 
 Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ---
 
-### Step 3b — DOD L1 (self-check)
+### Step 4 — DOD L1 (self-check)
 
 Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
 
@@ -88,7 +97,7 @@ The skill runs the 6 checks: manual validation, automated tests, documentation, 
 - `automated-tests` FAIL → write the missing test, fix the failing assertion
 - `ci` FAIL (PHPCS/PHPStan) → fix the violations
 - `documentation` FAIL → re-run the docs skill, ensure the public-API change is documented
-- `pr-description` FAIL → not applicable at L1 (no PR yet)
+- `pr-description` → report `N/A` at L1 (the PR draft does not exist yet) — not a failure to correct
 
 Re-run `dod` until `overall` is `PASS` or `WARN`.
 
@@ -98,7 +107,7 @@ Record: `dod_layer1.overall`, `dod_layer1.checks`.
 
 ---
 
-### Step 3c — Return API surface in JSON
+### Step 5 — Return API surface in JSON
 
 Before committing, include the actual API surface in your return JSON as the `backend_api` field. The orchestrator reads this and passes the relevant fields to frontend-agent when domains overlap.
 
@@ -119,9 +128,9 @@ Populate every field even if empty (`[]`). If nothing changed in a category, lea
 
 ---
 
-### Step 4 — Commit
+### Step 6 — Commit
 
-Once DOD L1 returns `PASS` or `WARN`, stage and commit **only the files you changed in Step 2, Step 2.5 (docs), and any test files you wrote**. Do not stage unrelated files.
+Once DOD L1 returns `PASS` or `WARN`, stage and commit **only the files you changed in Step 2, Step 3 (docs), and any test files you wrote**. Do not stage unrelated files.
 
 ```bash
 git add <php-file-1> <php-file-2> <test-file-1> <docs-file-if-any> ...
@@ -136,9 +145,10 @@ EOF
 Use Conventional Commits format (`fix`, `feat`, `refactor`, `test`, `docs`). One atomic commit covering only your backend + docs changes.
 
 Do not push. The `release-agent` handles push and PR creation after both implementation agents have committed.
+
 ---
 
-### Step 5 — Finalize and return
+### Step 7 — Finalize and return
 
 Return the following JSON object to the orchestrator.
 
@@ -157,10 +167,10 @@ Return the following JSON object to the orchestrator.
   "dod_layer1": {
     "overall": "PASS|WARN",
     "checks": [
-      { "name": "manual-validation", "status": "PASS|WARN", "evidence": "..." },
+      { "name": "manual-validation", "status": "PASS|WARN|N/A", "evidence": "... (N/A at L1 if no PR draft exists yet)" },
       { "name": "automated-tests", "status": "PASS|WARN", "evidence": "N tests passed" },
       { "name": "documentation", "status": "PASS|WARN", "evidence": "docs/... updated, or SKIP if no public API change" },
-      { "name": "pr-description", "status": "PASS|WARN", "evidence": "draft filled" },
+      { "name": "pr-description", "status": "PASS|WARN|N/A", "evidence": "N/A at L1 — release-agent creates the draft later" },
       { "name": "ci", "status": "PASS|WARN", "evidence": "phpcs-changed: 0 violations · run-stan: 0 errors · test-unit: 42 passed" },
       { "name": "file-scope", "status": "PASS|WARN|N/A", "evidence": "all changed files within declared scope" }
     ]
@@ -181,5 +191,13 @@ Return the following JSON object to the orchestrator.
 }
 ```
 
-`dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 3b).
+`dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 4).
+
+---
+
+## Boundaries
+
+- ✅ **Always do**: read the spec and dispatch plan in full before writing code, follow TDD, run the docs skill and DOD L1 before committing, commit atomically with the `Co-Authored-By` trailer
+- ⚠️ **Ask first (note in `notes`)**: if the spec contradicts the dispatch plan, or a required change falls outside your declared `file_scope`
+- 🚫 **Never do**: push to remote, touch JS/CSS/HTML files, modify files outside the dispatch plan scope, skip DOD L1, amend or rebase already-pushed commits, hand off with `dod_layer1.overall: "FAIL"` without exhausting the 3 correction attempts
 

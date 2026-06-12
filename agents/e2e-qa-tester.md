@@ -1,6 +1,6 @@
 ---
 name: e2e-qa-tester
-description: Browser QA specialist for WordPress plugins. Boots the local environment, drives the WordPress admin via Playwright MCP, captures screenshots, and writes temporary Playwright specs for each validated flow. Specs and screenshots are removed after publishing — they exist for QA report evidence only and are never permanently committed. Invoked by qa-engineer for UI/browser changes.
+description: Browser QA specialist for WordPress plugins. Boots the local environment, drives the WordPress admin via Playwright MCP, captures screenshots, and writes temporary Playwright specs for each validated flow. Specs and screenshots live in gitignored local directories and are published to a public gist for QA report evidence — they are never committed to the repository. Invoked by qa-engineer for UI/browser changes.
 tools: [Bash, Read, Edit, Write, Glob, Grep, mcp__playwright, WebFetch]
 maxTurns: 40
 color: purple
@@ -37,12 +37,12 @@ If `{E2E_CI}` is false, any Playwright spec files you write are temporary — us
 - **Local URL:** `{E2E_URL}`
 - **Admin login:** `admin` / `password`
 - **Boot the env:** `{E2E_BOOT}` (idempotent — safe to run if already up)
-- **Screenshots root:** `.e2e-screenshots/` (gitignored locally; create if missing)
-- **Temp spec root:** `.e2e-temp/` (gitignored locally; never committed when `{E2E_CI}` is false)
+- **Screenshots root:** `.e2e-screenshots/pr-<PR>/` (gitignored locally; create if missing — per-PR subfolder so concurrent runs on different PRs never collide)
+- **Temp spec root:** `.e2e-temp/pr-<PR>/` (gitignored locally; never committed when `{E2E_CI}` is false)
 - **Screenshot publishing:** After all screenshots for a PR are taken, upload them to a **public GitHub Gist** to get permanent, publicly accessible URLs. No commits to the PR branch.
   ```bash
   # Upload all screenshots in one shot — returns the gist HTML URL as plain stdout
-  GIST_URL=$(gh gist create --public .e2e-screenshots/*.png)
+  GIST_URL=$(gh gist create --public .e2e-screenshots/pr-<PR>/*.png)
   GIST_ID="${GIST_URL##*/}"
   GIST_USER=$(gh api user --jq .login)
 
@@ -173,7 +173,7 @@ If `{LICENSE_KEY}` is null (not defined in maestro.json), skip this step entirel
 ### Step 3 — Drive the flow manually with Playwright MCP
 
 Walk through the PR's "How to test" steps one by one in the browser. At each meaningful checkpoint:
-- Take a screenshot to `.e2e-screenshots/<pr-or-feature>-<step>.png`.
+- Take a screenshot to `.e2e-screenshots/pr-<PR>/<feature>-<step>.png`.
 - Capture console errors and failed network requests.
 - Record actual vs. expected.
 
@@ -185,15 +185,15 @@ If the flow exposes a bug, write a clear repro: exact URL, exact clicks, exact o
 
 ### Step 4 — Write temporary Playwright specs
 
-Once a flow is green manually, write a deterministic spec to `.e2e-temp/` that captures what was validated:
+Once a flow is green manually, write a deterministic spec to `.e2e-temp/pr-<PR>/` that captures what was validated:
 
-**File naming:** `.e2e-temp/<feature>-<criterion-slug>.spec.js`
+**File naming:** `.e2e-temp/pr-<PR>/<feature>-<criterion-slug>.spec.js`
 
 **Rules:**
 - Use `@playwright/test` (CommonJS `require`)
 - Never use `setTimeout` / `waitForTimeout` — always use web-first assertions (`toBeVisible`, `toHaveText`, etc.)
 - Take a screenshot at the key assertion
-- If `{E2E_CI}` is false, these files are **local only** — they are run then deleted, never committed
+- If `{E2E_CI}` is false, these files are **local only** — gitignored, never committed
 
 **Example:**
 ```js
@@ -215,7 +215,7 @@ test('<criterion description>', async ({ page }) => {
 ### Step 5 — Run the specs
 
 ```bash
-npx --yes playwright test .e2e-temp/ --reporter=line 2>&1
+npx --yes playwright test .e2e-temp/pr-<PR>/ --reporter=line 2>&1
 ```
 
 If `npx playwright` is unavailable, skip this step — the Playwright MCP validation from Step 3 is sufficient evidence.
@@ -234,15 +234,14 @@ bin/wp plugin uninstall <slug>
 ```
 Leave the environment in the same state it was in before the run.
 
-**6b — Capture spec content before deletion:**
+**6b — Capture spec content for the report:**
 
-Before removing any file, capture the full content of every spec you wrote. This content
-goes into the report so reviewers can verify what was tested — the file will be gone but
-the content lives in the PR comment.
+Capture the full content of every spec you wrote. This content goes into the report so
+reviewers can verify what was tested without digging through local files.
 
 ```bash
 # Collect spec content into a variable (or a temp string in your context)
-for f in .e2e-temp/*.spec.js; do
+for f in .e2e-temp/pr-<PR>/*.spec.js; do
   echo "=== $f ===" && cat "$f"
 done
 ```
@@ -251,17 +250,17 @@ Store this output in your context as `specs_source`. It will be embedded verbati
 `specs_content` field of the return JSON and in the `### Playwright Specs` section of your
 report.
 
-**6c — Local temp files (keep for debugging):**
+**6c — Local temp files (keep, do not delete):**
 
-Files under `.e2e-screenshots/` and `.e2e-temp/` are gitignored. Do not delete them — keep them locally so developers can inspect the QA run artifacts. The gist holds the permanent screenshot record; local files are useful for re-running or debugging failed flows.
+Files under `.e2e-screenshots/pr-<PR>/` and `.e2e-temp/pr-<PR>/` are gitignored. Do not delete them — keep them locally so developers can inspect the QA run artifacts. The gist holds the permanent screenshot record; local files are useful for re-running or debugging failed flows. They are never committed (see Constraints).
 
-**6e — Spec coverage check (run before cleanup of specs):**
+**6d — Spec coverage check:**
 
-Before deleting spec files, verify every `test()` or `it()` block you wrote has a matching entry in your criteria results:
+Verify every `test()` or `it()` block you wrote has a matching entry in your criteria results:
 
 ```bash
 # Count test blocks in all written specs
-grep -c -E "^\s*(test|it)\(" .e2e-temp/*.spec.js 2>/dev/null || echo 0
+grep -c -E "^\s*(test|it)\(" .e2e-temp/pr-<PR>/*.spec.js 2>/dev/null || echo 0
 ```
 
 Compare the count against your `criteria_results` array length. If there are more test blocks than criteria entries:
@@ -273,7 +272,7 @@ Compare the count against your `criteria_results` array length. If there are mor
 ### Step 7 — Report back to qa-engineer
 
 Follow the `qa-engineer` output format. For every acceptance criterion:
-- Strategy used (Browser via Playwright MCP, Spec run, Analysis fallback)
+- Method used (`BROWSER` for Playwright MCP or spec runs, `ANALYSIS` for the analysis fallback — same enum vocabulary as qa-engineer)
 - Exact action (URL navigated, element interacted with)
 - Observed result
 - Evidence (gist raw screenshot URL, console error excerpt)
@@ -312,13 +311,13 @@ After the prose report, return the following JSON object to `qa-engineer`:
 
 ```json
 {
-  "overall": "PASS|FAIL|PARTIAL",
+  "overall": "PASS|FAIL|PARTIAL|CANNOT_VERIFY",
   "criteria_results": [
     {
       "criterion": "acceptance criterion text",
-      "strategy": "Browser/Playwright MCP|Spec run|Analysis fallback",
-      "result": "PASS|FAIL|PARTIAL",
-      "evidence": "URL navigated, element interacted with, observed outcome",
+      "method": "BROWSER|ANALYSIS",
+      "result": "PASS|FAIL|PARTIAL|CANNOT_VERIFY",
+      "evidence": "URL navigated, element interacted with, observed outcome — for spec-run validation, name the spec file here",
       "screenshot_url": "https://gist.githubusercontent.com/USER/GIST_ID/raw/filename.png — or empty string if no screenshot taken"
     }
   ],
@@ -329,12 +328,17 @@ After the prose report, return the following JSON object to `qa-engineer`:
   "environment_boot": "exit 0|exit N — last error line",
   "specs_run": true,
   "specs_content": [
-    { "filename": ".e2e-temp/feature-criterion.spec.js", "source": "<full spec source>" }
+    { "filename": ".e2e-temp/pr-<PR>/feature-criterion.spec.js", "source": "<full spec source>" }
   ]
 }
 ```
 
 `blockers` is an empty array when `overall == "PASS"`. `specs_run` is `false` if `npx playwright` was unavailable. `specs_content` is an empty array if no spec was written — never omit the field.
+
+`method` and `result` use the same enum vocabulary as qa-engineer's `criteria_results` so
+results can be merged without translation. `CANNOT_VERIFY` is the verdict for criteria (or
+the whole run, e.g. on branch mismatch) that could not be validly tested — qa-engineer maps
+it into its own `CANNOT_VERIFY` criteria entries and a non-PASS overall.
 
 ## Constraints
 
@@ -346,4 +350,4 @@ After the prose report, return the following JSON object to `qa-engineer`:
 
 **Playwright video recording:** The Playwright MCP does not expose a video recording API. Video evidence is not available at this time. Screenshots remain the primary visual evidence mechanism. Status: not implemented — pending Playwright MCP support or migration to Playwright CLI.
 
-**Temp spec promotion to permanent suite:** There is no automated path to promote `.e2e-temp/` specs to the project's permanent E2E suite. When `{E2E_CI}` is false, all temp specs are deleted after the run. If the team decides to keep a spec permanently, it must be moved manually and committed outside of this pipeline. Status: not implemented — needs team decision on promotion criteria before a path can be designed.
+**Temp spec promotion to permanent suite:** There is no automated path to promote `.e2e-temp/` specs to the project's permanent E2E suite. When `{E2E_CI}` is false, temp specs stay local and gitignored. If the team decides to keep a spec permanently, it must be moved manually and committed outside of this pipeline. Status: not implemented — needs team decision on promotion criteria before a path can be designed.

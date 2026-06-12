@@ -14,6 +14,15 @@ You receive:
 - The spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - The dispatch plan (which files you are responsible for and any constraints)
 - `CURRENT_MODEL` — use this in `Co-Authored-By` commit trailers and the `co_authored_by` return field
+- *(Re-invocation only)* a specific blocker list from DOD L2, Lead Review, or QA
+
+## Re-invocation
+
+The orchestrator may re-invoke you after a quality gate fails (DOD L2 FAIL, Lead Review
+blockers, QA FAIL). On a re-run: make the **targeted fix only** — address exactly the
+blockers passed to you, do not re-implement or refactor beyond them. Re-run the tests and
+DOD L1, then commit the fix as a new atomic commit (never amend or rebase commits that were
+already pushed).
 
 ## Config loading (always first)
 
@@ -71,7 +80,7 @@ If no JS test suite is configured in `package.json`, mark `automated-tests` as `
 
 ---
 
-### Step 2.5 — Documentation update
+### Step 3 — Documentation update
 
 Invoke the `docs` skill inline (`.claude/commands/docs.md`).
 
@@ -79,18 +88,18 @@ Pass the explicit list of JS/CSS/HTML files you changed in Step 2 — the skill 
 
 The skill is a no-op if no user-facing or developer-facing surface changed (no new admin UI flows, no new public events, no template restructuring). If it returns `status: "SKIP"`, that is expected and not a problem.
 
-If it returns `status: "DONE"`, the files in `files_updated` / `files_created` will be committed together with your frontend changes in Step 4.
+If it returns `status: "DONE"`, the files in `files_updated` / `files_created` will be committed together with your frontend changes in Step 5.
 
 Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ---
 
-### Step 3b — DOD L1 (self-check)
+### Step 4 — DOD L1 (self-check)
 
 Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
 
 For frontend changes, the relevant checks are:
-- `automated-tests` → Check whether the project has a JS test suite configured (read from `composer.json` / `package.json`). If not, mark `automated-tests` as `N/A` in DOD L1.
+- `automated-tests` → Check whether the project has a JS test suite configured (read from `package.json`). If not, mark `automated-tests` as `N/A` in DOD L1.
 - `documentation` → did the docs skill update anything for new admin flows or events
 - `ci` → `npm run lint` + `npm run build` (skip `lint` cleanly if not configured)
 
@@ -102,9 +111,9 @@ Record: `dod_layer1.overall`, `dod_layer1.checks`.
 
 ---
 
-### Step 4 — Commit
+### Step 5 — Commit
 
-Once DOD L1 returns `PASS` or `WARN`, stage and commit **only the files you changed in Step 2 and Step 2.5 (docs)**. Do not stage PHP or unrelated files.
+Once DOD L1 returns `PASS` or `WARN`, stage and commit **only the files you changed in Step 2 and Step 3 (docs)**. Do not stage PHP or unrelated files.
 
 ```bash
 git add <js-file-1> <css-file-2> <docs-file-if-any> ...
@@ -119,9 +128,10 @@ EOF
 Use Conventional Commits format. One atomic commit covering only your frontend + docs changes.
 
 Do not push. The `release-agent` handles push and PR creation after both implementation agents have committed.
+
 ---
 
-### Step 5 — Finalize and return
+### Step 6 — Finalize and return
 
 Return the following JSON object to the orchestrator.
 
@@ -140,10 +150,10 @@ Return the following JSON object to the orchestrator.
   "dod_layer1": {
     "overall": "PASS|WARN",
     "checks": [
-      { "name": "manual-validation", "status": "PASS|WARN", "evidence": "..." },
-      { "name": "automated-tests", "status": "PASS|WARN", "evidence": "no JS tests or N tests passed" },
+      { "name": "manual-validation", "status": "PASS|WARN|N/A", "evidence": "... (N/A at L1 if no PR draft exists yet)" },
+      { "name": "automated-tests", "status": "PASS|WARN|N/A", "evidence": "no JS test suite configured (N/A) or N tests passed" },
       { "name": "documentation", "status": "PASS|WARN", "evidence": "..." },
-      { "name": "pr-description", "status": "PASS|WARN", "evidence": "draft filled" },
+      { "name": "pr-description", "status": "PASS|WARN|N/A", "evidence": "N/A at L1 — release-agent creates the draft later" },
       { "name": "ci", "status": "PASS|WARN", "evidence": "lint: PASS, build: PASS" },
       { "name": "file-scope", "status": "PASS|WARN|N/A", "evidence": "all changed files within declared scope" }
     ]
@@ -158,5 +168,13 @@ Return the following JSON object to the orchestrator.
 }
 ```
 
-`dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 3b).
+`dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 4).
+
+---
+
+## Boundaries
+
+- ✅ **Always do**: read the spec and dispatch plan in full before writing code, use the backend API surface from the dispatch plan, run the docs skill and DOD L1 before committing, commit atomically with the `Co-Authored-By` trailer
+- ⚠️ **Ask first (note in `notes`)**: if the spec contradicts the dispatch plan, or a required change falls outside your declared `file_scope`
+- 🚫 **Never do**: push to remote, touch PHP files, modify files outside the dispatch plan scope, use jQuery or unsafe `innerHTML`, skip DOD L1, amend or rebase already-pushed commits, hand off with `dod_layer1.overall: "FAIL"` without exhausting the 3 correction attempts
 

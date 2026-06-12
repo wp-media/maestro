@@ -132,12 +132,12 @@ Delegate to the `e2e-qa-tester` agent. Provide:
 
 The `e2e-qa-tester` agent will:
 1. Walk through the UI flows using Playwright MCP
-2. Write temporary Playwright specs (`.e2e-temp/`) for each acceptance criterion
+2. Write temporary Playwright specs (`.e2e-temp/pr-<PR>/`) for each acceptance criterion
 3. Run those specs against the local environment
-4. Capture screenshots, publish them via a public GitHub Gist (`gh gist create --public`), then delete temp files locally
+4. Capture screenshots and publish them via a public GitHub Gist (`gh gist create --public`); local copies stay in gitignored temp directories
 5. Return per-criterion results and permanent gist raw URLs for each screenshot
 
-If `{E2E_CI}` is false, all test files written by `e2e-qa-tester` are temporary — used for QA validation only and removed after the run.
+If `{E2E_CI}` is false, all test files written by `e2e-qa-tester` are temporary — used for QA evidence only, kept locally in gitignored directories, and never committed.
 
 Only fall back to Strategy C if `{E2E_BOOT}` itself fails (non-zero exit) or `{E2E_URL}` is still unreachable after the boot script finishes. Document the exact failure.
 
@@ -295,27 +295,41 @@ Keep the PR comment short. Reviewers can see the diff and CI output themselves �
 
 No strategy selection table, no smoke test table, no recommendations prose — those go in the JSON return object only.
 
+## Re-invocation
+
+The orchestrator may re-invoke you up to 3 times after fix loops. On a re-run: focus the
+deep verification on the criteria that failed last time, do a lighter re-check of the
+criteria that passed (confirm the fix did not regress them), and update your existing PR
+comment via the Step 6a dedup flow (record its URL in `existing_comment_url`).
+
 ## Structured output for the orchestrator
 
 After producing the report, return the following JSON object to the orchestrator. The orchestrator routes on `overall` and `blockers` — fill every field accurately.
 
+**Strategy → enum mapping:** Strategy A → `API`, Strategy B → `BROWSER`, Strategy C →
+`ANALYSIS`. Use these exact uppercase values in `strategies_used` and `method` — never prose
+like "Browser" or "Analysis fallback". A criterion that could not be validly tested (e.g.
+branch mismatch or inactive license reported by `e2e-qa-tester`) gets `result:
+"CANNOT_VERIFY"` — and the overall verdict can then not be `PASS`; report `PARTIAL` with the
+reason in `blockers`.
+
 ```json
 {
   "overall": "PASS|FAIL|PARTIAL",
-  "strategies_used": ["API|BROWSER|VISUAL|ANALYSIS"],
+  "strategies_used": ["API|BROWSER|ANALYSIS"],
   "pr_commented": true,
   "criteria_results": [
     {
       "criterion": "acceptance criterion text",
-      "method": "strategy used",
-      "result": "PASS|FAIL|PARTIAL",
+      "method": "API|BROWSER|ANALYSIS",
+      "result": "PASS|FAIL|PARTIAL|CANNOT_VERIFY",
       "evidence": "what was observed"
     }
   ],
   "smoke_tests": [
     { "area": "Settings page", "result": "PASS|FAIL", "evidence": "loaded without errors" }
   ],
-  "tests_authored": ["list of new test files written and committed, or empty array"],
+  "tests_authored": ["normally an empty array — this agent never commits code; only populated if e2e-qa-tester committed permanent specs under E2E_CI=true"],
   "pr_comment_url": "URL of the posted QA report comment",
   "existing_comment_url": "URL of the previous QA report comment if a re-run, or empty string on first run",
   "blockers": ["criterion: what failed — what to fix"],

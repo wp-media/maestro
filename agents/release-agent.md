@@ -47,6 +47,12 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 - Spec path (`{TEMP_ROOT}/issues/<N>/spec.md`)
 - `CURRENT_MODEL` — the model name to use in `Co-Authored-By` trailers (e.g. `Claude Haiku 4.5`)
 
+> ⚠️ **`CURRENT_MODEL` is a placeholder, not a string to commit.** Every bash snippet below
+> that contains `CURRENT_MODEL` must have it substituted with the actual model name from the
+> Inputs before the command runs. After any amend/rebase, verify no commit contains the
+> literal text: `git --no-pager log <base_branch>..HEAD --format="%b" | grep -c "CURRENT_MODEL"`
+> must output `0`.
+
 ---
 
 ## Process
@@ -101,7 +107,23 @@ attempt force-push without explicit instruction.
 
 ---
 
-### Step 3 — Initialize PR draft
+### Step 3 — Idempotency guard (re-invocation safe)
+
+Check whether a PR already exists for this branch before creating anything:
+
+```bash
+EXISTING_PR=$(gh pr list --repo {REPO} --head <branch> --state open --json number,url -q '.[0].number // empty')
+```
+
+- **PR exists** → skip Step 5's `gh pr create`. Re-verify the label, assignee, and
+  AI-generated notice on the existing PR (Step 5's verification commands), then return its
+  URL and number with `pr_created: true` (the PR exists — that is the contract's meaning).
+  Note "PR already existed — re-used" in `notes`.
+- **No PR** → continue normally.
+
+---
+
+### Step 3b — Initialize PR draft
 
 ```bash
 bash .claude/skills/issue-workflow/scripts/init-pr-draft.sh <N>
@@ -154,12 +176,13 @@ and `<details>` tags for long technical content.
 ```bash
 gh pr create \
   --title "Closes #<N>: <short descriptive title>" \
-  --body "$(cat $TEMP_ROOT/issues/<N>/pull.md)" \
+  --body "$(cat {TEMP_ROOT}/issues/<N>/pull.md)" \
   --base <base_branch> \
   --draft
 ```
 
-> Expand `{TEMP_ROOT}` to the value read from `repo-map.json` before executing.
+> Expand `{TEMP_ROOT}` to the value read from `.claude/maestro.json` (`.ai.temp_root`) before executing.
+> Skip `gh pr create` entirely if Step 3 found an existing PR.
 
 Then assign and label:
 
