@@ -219,7 +219,6 @@ fields — prose is for human readability only.
   "feedback": [{ "description": "string", "severity": "MUST_HAVE|SHOULD_HAVE|COULD_HAVE|NICE_TO_HAVE", "suggestion": "string" }],
   "alternative_suggestions": ["string"],
   "revised_risk_level": "LOW|MEDIUM|HIGH",
-  "comment_posted": true,
   "reasoning": {
     "alternatives_considered": ["string"],
     "hesitations": ["string"],
@@ -700,6 +699,34 @@ Route on highest `criticality` in `blockers`:
 
 **NTH dispatch:** `nice_to_haves` items → `ticket-writer` in parallel (non-blocking). Max 3
 total lead-reviewer invocations.
+
+**Resolve addressed review threads (required after every fix push):**
+After re-pushing the fix commit, resolve all open review threads so the PR shows a clean status before lead-reviewer re-runs. Get the fix SHA, fetch every unresolved thread via GraphQL, post a "Fixed in <sha>" reply on each, then mark it resolved:
+
+```bash
+FIX_SHA=$(git rev-parse --short HEAD)
+PR_N=<PR number>
+OWNER=$(echo {REPO} | cut -d/ -f1)
+REPO_NAME=$(echo {REPO} | cut -d/ -f2)
+
+gh api graphql -f query="
+query {
+  repository(owner: \"$OWNER\", name: \"$REPO_NAME\") {
+    pullRequest(number: $PR_N) {
+      reviewThreads(first: 50) {
+        nodes { id isResolved comments(first: 1) { nodes { databaseId } } }
+      }
+    }
+  }
+}" --jq '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | [.id, (.comments.nodes[0].databaseId | tostring)] | @tsv' \
+| while IFS=$'\t' read THREAD_ID COMMENT_DB_ID; do
+  gh api repos/{REPO}/pulls/$PR_N/comments \
+    --method POST -f body="Fixed in $FIX_SHA." -F "in_reply_to=$COMMENT_DB_ID" --silent
+  gh api graphql -f query="mutation { resolveReviewThread(input: { threadId: \"$THREAD_ID\" }) { thread { isResolved } } }" --silent
+done
+```
+
+Only run this block when `lead-reviewer` previously returned `inline_comments_posted: true` and there are unresolved threads. Skip silently if the GraphQL query returns zero unresolved threads.
 
 Log AGENT event with verdict, loop count, and any NTH dispatch.
 

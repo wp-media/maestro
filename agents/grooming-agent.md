@@ -259,6 +259,7 @@ If you cannot split the work into independent slices (strong coupling, single at
 - Never escape backticks with `\\` — they render as literal `\`` in GitHub comments.
 - Always use a single-quoted heredoc (`<<'EOF'`) when passing multi-line bodies to `gh`.
 - Write code blocks as plain Markdown fences (` ```lang `) — no escaping needed inside a single-quoted heredoc.
+- Never use `#N` (e.g. `#1`, `#2`) for numbered list items — GitHub interprets these as issue/PR links. Use `1.`, `2.` instead.
 
 Post the grooming plan as a comment on issue #N. **Dedup first:** look for a previous
 grooming comment via the HTML marker:
