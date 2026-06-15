@@ -14,12 +14,8 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
 | `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
 | `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 | `E2E_URL` | `.ai.e2e.local_url` | `http://localhost:8888` (null if not applicable) |
 | `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` (null if not applicable) |
 
@@ -78,7 +74,7 @@ If you discover the signal is wrong, adjust your effort. For example:
 - Signal says "simple" but you uncover architectural misplacement → escalate to medium/high reasoning
 - Signal says "complex" but the issue is well-scoped and straightforward → finish in fewer turns
 
-Log your reasoning depth choice in the return JSON: `effort_used: "LOW|MEDIUM|HIGH"`.
+Log your reasoning depth choice in the return JSON: `reasoning_depth: "LOW|MEDIUM|HIGH"`.
 
 ## Your process
 
@@ -293,18 +289,19 @@ EOF
 
 ### Step 6 — Return
 
-Return the spec file path AND the following JSON object to the orchestrator. The orchestrator reads the structured fields for routing — fill every field accurately.
+Return the following JSON object to the orchestrator. The `spec_path` field carries the path where the spec was written — downstream agents read the spec from this path. The orchestrator reads the structured fields for routing — fill every field accurately.
 
 ```json
 {
   "ticket_id": "<N>",
+  "spec_path": "{TEMP_ROOT}/issues/<N>/spec.md",
   "relevant_files": [{ "path": "string", "reason": "string" }],
   "approach": "chosen approach summary",
   "development_steps": [{ "step": "string", "files": ["string"] }],
   "test_plan": "string",
   "risks": [{ "description": "string", "severity": "LOW|MEDIUM|HIGH", "mitigation": "string" }],
   "effort": "XS|S|M|L|XL",
-  "effort_used": "LOW|MEDIUM|HIGH",
+  "reasoning_depth": "LOW|MEDIUM|HIGH",
   "complexity": "LOW|MEDIUM|HIGH",
   "risk_level": "LOW|MEDIUM|HIGH",
   "risk_notes": "prose: confidence level, key concerns, anything unusual the orchestrator should weight",

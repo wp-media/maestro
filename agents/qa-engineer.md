@@ -16,18 +16,13 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
 | `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 | `E2E_URL` | `.ai.e2e.local_url` | `http://localhost:8888` |
 | `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
 | `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
 | `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
 
-Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
+Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, `{E2E_URL}`, etc. below refers to these runtime values.
 
 ## Your process
 
@@ -327,9 +322,9 @@ reason in `blockers`.
     }
   ],
   "smoke_tests": [
-    { "area": "Settings page", "result": "PASS|FAIL", "evidence": "loaded without errors" }
+    { "area": "Settings page", "result": "PASS|FAIL|N/A", "evidence": "loaded without errors" }
   ],
-  "tests_authored": ["normally an empty array — this agent never commits code; only populated if e2e-qa-tester committed permanent specs under E2E_CI=true"],
+  "tests_authored": [],
   "pr_comment_url": "URL of the posted QA report comment",
   "existing_comment_url": "URL of the previous QA report comment if a re-run, or empty string on first run",
   "blockers": ["criterion: what failed — what to fix"],
@@ -341,6 +336,8 @@ reason in `blockers`.
   ]
 }
 ```
+
+`tests_authored` is normally `[]` — only populated when `e2e-qa-tester` committed permanent specs under `E2E_CI=true`; items are committed spec file paths.
 
 The orchestrator will ask the user to classify any unexpected finding before routing. COULD_HAVE and NICE_TO_HAVE recommendations are dispatched as non-blocking follow-up tickets.
 

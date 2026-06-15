@@ -32,12 +32,9 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
 | `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
 | `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
 | `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
 
@@ -125,9 +122,7 @@ EOF
 )"
 ```
 
-Use Conventional Commits format. One atomic commit covering only your frontend + docs changes.
-
-Do not push. The `release-agent` handles push and PR creation after both implementation agents have committed.
+One atomic commit, Conventional Commits format (`fix`, `feat`, `refactor`, `test`, `docs`), `Co-Authored-By` trailer required. Do not push.
 
 ---
 
@@ -148,14 +143,14 @@ Return the following JSON object to the orchestrator.
     "files_created": []
   },
   "dod_layer1": {
-    "overall": "PASS|WARN",
+    "overall": "PASS|WARN|FAIL",
     "checks": [
-      { "name": "manual-validation", "status": "PASS|WARN|N/A", "evidence": "... (N/A at L1 if no PR draft exists yet)" },
-      { "name": "automated-tests", "status": "PASS|WARN|N/A", "evidence": "no JS test suite configured (N/A) or N tests passed" },
-      { "name": "documentation", "status": "PASS|WARN", "evidence": "..." },
-      { "name": "pr-description", "status": "PASS|WARN|N/A", "evidence": "N/A at L1 — release-agent creates the draft later" },
-      { "name": "ci", "status": "PASS|WARN", "evidence": "lint: PASS, build: PASS" },
-      { "name": "file-scope", "status": "PASS|WARN|N/A", "evidence": "all changed files within declared scope" }
+      { "name": "manual-validation", "status": "PASS|WARN|N/A|FAIL", "evidence": "... (N/A at L1 if no PR draft exists yet)" },
+      { "name": "automated-tests", "status": "PASS|WARN|N/A|FAIL", "evidence": "no JS test suite configured (N/A) or N tests passed" },
+      { "name": "documentation", "status": "PASS|WARN|N/A|FAIL", "evidence": "..." },
+      { "name": "pr-description", "status": "PASS|WARN|N/A|FAIL", "evidence": "N/A at L1 — release-agent creates the draft later" },
+      { "name": "ci", "status": "PASS|WARN|N/A|FAIL", "evidence": "lint: PASS, build: PASS" },
+      { "name": "file-scope", "status": "PASS|WARN|N/A|FAIL", "evidence": "all changed files within declared scope" }
     ]
   },
   "co_authored_by": "CURRENT_MODEL <noreply@anthropic.com>",
@@ -168,13 +163,10 @@ Return the following JSON object to the orchestrator.
 }
 ```
 
-`dod_layer1.overall` must be `PASS` or `WARN` — never `FAIL`. Self-correct all failures before committing (Step 4).
-
 ---
 
 ## Boundaries
 
-- ✅ **Always do**: read the spec and dispatch plan in full before writing code, use the backend API surface from the dispatch plan, run the docs skill and DOD L1 before committing, commit atomically with the `Co-Authored-By` trailer
 - ⚠️ **Ask first (note in `notes`)**: if the spec contradicts the dispatch plan, or a required change falls outside your declared `file_scope`
-- 🚫 **Never do**: push to remote, touch PHP files, modify files outside the dispatch plan scope, use jQuery or unsafe `innerHTML`, skip DOD L1, amend or rebase already-pushed commits, hand off with `dod_layer1.overall: "FAIL"` without exhausting the 3 correction attempts
+- 🚫 **Never do**: touch PHP files; use jQuery or unsafe `innerHTML`; push to remote; amend or rebase already-pushed commits
 

@@ -26,18 +26,9 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
-| `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
-| `E2E_URL` | `.ai.e2e.local_url` | `http://localhost:8888` |
-| `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
-| `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
-| `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
+| `CURRENT_MODEL` | *(passed as input)* | `Claude Haiku 4.5` |
 
-Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
+Every `{TEMP_ROOT}`, `{REPO}`, etc. below refers to these runtime values.
 
 ## Inputs
 - Issue number `N`
@@ -216,8 +207,8 @@ Return the following JSON object to the orchestrator:
 {
   "branch_pushed": true,
   "trailer_verified": true,
-  "pr_url": "https://github.com/{REPO}/pull/<N>",
-  "pr_number": <N>,
+  "pr_url": "https://github.com/{REPO}/pull/<PR_NUMBER>",
+  "pr_number": 1234,
   "pr_created": true,
   "notes": "any non-Claude human commits skipped from trailer check, or empty string"
 }

@@ -192,13 +192,14 @@ fields — prose is for human readability only.
 ```json
 {
   "ticket_id": "string",
+  "spec_path": "{TEMP_ROOT}/issues/<N>/spec.md",
   "relevant_files": [{ "path": "string", "reason": "string" }],
   "approach": "string",
   "development_steps": [{ "step": "string", "files": ["string"] }],
   "test_plan": "string",
   "risks": [{ "description": "string", "severity": "LOW|MEDIUM|HIGH", "mitigation": "string" }],
   "effort": "XS|S|M|L|XL",
-  "effort_used": "LOW|MEDIUM|HIGH",
+  "reasoning_depth": "LOW|MEDIUM|HIGH",
   "complexity": "LOW|MEDIUM|HIGH",
   "risk_level": "LOW|MEDIUM|HIGH",
   "risk_notes": "string",
@@ -243,8 +244,8 @@ fields — prose is for human readability only.
     "files_created": ["string"]
   },
   "dod_layer1": {
-    "overall": "PASS|WARN",
-    "checks": [{ "name": "string", "status": "PASS|WARN", "evidence": "string" }]
+    "overall": "PASS|WARN|FAIL",
+    "checks": [{ "name": "string", "status": "PASS|WARN|N/A|FAIL", "evidence": "string" }]
   },
   "co_authored_by": "Claude Sonnet 4.6 <noreply@anthropic.com>",
   "reasoning": {
@@ -252,6 +253,7 @@ fields — prose is for human readability only.
     "hesitations": ["what was unclear or uncertain during implementation"],
     "decision_rationale": "why the chosen approach was taken over the alternatives"
   },
+  // backend-agent only — frontend-agent omits this field
   "backend_api": {
     "hooks": [{ "type": "filter|action", "name": "string", "signature": "string" }],
     "option_keys": ["string"],
@@ -268,7 +270,7 @@ fields — prose is for human readability only.
   "branch_pushed": true,
   "trailer_verified": true,
   "pr_url": "string",
-  "pr_number": 0,
+  "pr_number": 1234,
   "pr_created": true,
   "notes": "string — human commits skipped from trailer check, label/assignee retry failures, or empty string"
 }
@@ -313,7 +315,7 @@ fields — prose is for human readability only.
   "pr_commented": true,
   "criteria_results": [{ "criterion": "string", "method": "API|BROWSER|ANALYSIS", "result": "PASS|FAIL|PARTIAL|CANNOT_VERIFY", "evidence": "string" }],
   "smoke_tests": [{ "area": "string", "result": "PASS|FAIL", "evidence": "string" }],
-  "tests_authored": ["string"],
+  "tests_authored": [],
   "pr_comment_url": "string",
   "existing_comment_url": "string — URL of prior QA comment if re-run, empty string on first run",
   "blockers": ["string"],
@@ -327,7 +329,7 @@ fields — prose is for human readability only.
   "ticket_id": "string",
   "ticket_url": "string",
   "title": "string",
-  "type": "user_story|bug|chore|epic",
+  "type": "user_story",
   "description": "string",
   "labels": ["string"],
   "sub_tickets": ["string"],
@@ -484,7 +486,7 @@ Route on `verdict`:
 - **NEEDS_REVISION** AND `grooming_loop < 2` → re-invoke `grooming-agent` with the specific `MUST_HAVE` findings. Increment `plan_version`. Log ROUTING DECISION + AGENT events. Re-invoke `challenger`.
 - **NEEDS_REVISION** AND `grooming_loop >= 2` → escalate to user. Log ESCALATION event.
 - **BLOCKED** AND `grooming_loop < 1` → re-invoke `grooming-agent` once with blocker context. Log ROUTING DECISION + AGENT events. Re-invoke `challenger`.
-- **BLOCKED** AND `grooming_loop >= 1` → escalate to user with blockers and `alternative_suggestions`. Log ESCALATION event.
+- **BLOCKED** AND `grooming_loop >= 1` → escalate to user with blockers and `challenger.alternative_suggestions`. Log ESCALATION event.
 
 **NTH dispatch:** Any COULD_HAVE or NICE_TO_HAVE feedback → dispatch `ticket-writer` in
 parallel (non-blocking). Main pipeline continues immediately. Log PARALLEL event.
@@ -563,7 +565,7 @@ then commits atomically.
 
 ---
 
-**Compose dispatch plans** — before calling the Workflow, write the dispatch plan for each in-scope agent. These must be complete and self-contained: agents cannot see the orchestrator context. Each dispatch plan must include the spec summary, grooming output (approach, development_steps, file_scope), and any relevant session learnings. In sequential mode, include the backend API surface returned inline from the backend agent's return JSON (`backend_api` field) in the frontend dispatch plan.
+**Compose dispatch plans** — before calling the Workflow, write the dispatch plan for each in-scope agent. These must be complete and self-contained: agents cannot see the orchestrator context. Each dispatch plan must include the spec summary, grooming output (approach, development_steps, file_scope), and any relevant session learnings. In sequential mode, include the backend API surface returned inline from the backend agent's return JSON (`backend_api` field) in the frontend dispatch plan. Inject only the config variables the implementation agent actually uses — see each agent's Config table for its reduced set. Do not forward the full config dump.
 
 **In parallel mode:** Create git worktrees for isolation before calling the Workflow:
 ```bash
@@ -744,7 +746,7 @@ Route on `overall`:
 | `PASS` | any | Proceed to finalize. |
 | `PARTIAL` | any | Surface to user for decision. Log ESCALATION event. |
 | `FAIL` | `qa_loop < 1` | Re-invoke relevant implementation agent with `qa.blockers` list. Re-push. Log ROUTING DECISION. Re-invoke `qa-engineer`. |
-| `FAIL` | `qa_loop >= 1` | Escalate with failing criteria and `alternative_suggestions`. |
+| `FAIL` | `qa_loop >= 1` | Escalate with failing criteria and `challenger.alternative_suggestions`. |
 
 For `unclear` unexpected findings: ask user before routing.
 

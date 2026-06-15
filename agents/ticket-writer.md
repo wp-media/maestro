@@ -19,14 +19,8 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
-| `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 
-Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
+Every `{TEMP_ROOT}`, `{REPO}`, etc. below refers to these runtime values.
 
 # TICKET WRITER AGENT
 
@@ -198,13 +192,15 @@ Emit to the event queue and create the issue. Do NOT wait for a response — emi
   "ticket_id": "123",
   "ticket_url": "https://github.com/{REPO}/issues/123",
   "title": "Add retry logic to API client",
-  "type": "user_story|bug|chore|epic",
+  "type": "user_story",
   "description": "Full ticket content as markdown",
   "labels": ["enhancement", "Made by AI"],
   "sub_tickets": [],
   "ticket_created": true
 }
 ```
+
+Allowed values for `type`: `user_story` | `bug` | `chore` | `epic` — one value per ticket, never a pipe-delimited string.
 
 `ticket_created` is `false` when an existing duplicate was found and returned instead of
 creating a new issue (the `ticket_id`/`ticket_url` then point to the existing issue).

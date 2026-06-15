@@ -14,14 +14,8 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
-| `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 
-Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
+Every `{TEMP_ROOT}`, `{REPO}`, etc. below refers to these runtime values.
 
 # Challenger
 
@@ -55,13 +49,7 @@ For each angle below, ask: **what would cause this plan to fail?**
 3. **Missing dependencies** — Are there callers, hooks, Subscribers, or ServiceProviders that need to change and are not listed in the spec?
 4. **Effort realism** — Is the effort estimate consistent with the files and complexity involved?
 
-   | Effort | Calibration |
-   |---|---|
-   | `XS` | ≤ 1 file, trivial change |
-   | `S`  | 2–3 files, no new patterns |
-   | `M`  | 3–6 files, or introduces a new class/interface |
-   | `L`  | 7–10 files, architectural shift |
-   | `XL` | 10+ files or new module |
+   Use the same XS–XL effort scale defined in `grooming-agent` — see its return contract for calibration thresholds.
 
 5. **Scope and risk** — Is anything in scope introducing disproportionate risk for the stated benefit?
 6. **Observable behavior (Hyrum's Law)** — Does this change any observable behavior, including undocumented behavior? WordPress plugin users and third-party plugins build on everything: hook timing, filter return value shapes, cache header presence, admin notice order. Any observable behavior change is a potential breaking change regardless of whether it is documented. Ask: is the behavior change intentional? Is it documented in the spec? If neither answer is clearly yes, flag it as at least SHOULD_HAVE.
@@ -144,6 +132,8 @@ Do not rewrite the spec. Return the verdict and findings AND the following JSON 
   }
 }
 ```
+
+> **Non-routed fields:** `plan_version`, `revised_risk_level`, and `reasoning` are audit/transparency fields — the orchestrator does not route on them. `revised_risk_level` is computed but the orchestrator continues using grooming's original `risk_level` unless you explicitly consume it; treat it as informational unless the orchestrator is updated to adopt it post-challenge.
 
 `alternative_suggestions` is **required** when `verdict != APPROVED`. Provide 1–2 concrete, actionable alternatives the orchestrator can present to a human or pass back to grooming.
 

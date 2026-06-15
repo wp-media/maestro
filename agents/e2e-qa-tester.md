@@ -16,19 +16,13 @@ Before any step, read `.claude/maestro.json` and extract:
 |---|---|---|
 | `TEMP_ROOT` | `.ai.temp_root` | `.ai` |
 | `REPO` | `.ai.repo` | `wp-media/wp-rocket` |
-| `SLUG` | `.ai.slug` | `wp-rocket` |
-| `DISPLAY_NAME` | `.ai.display_name` | `WP Rocket` |
-| `ARCH_SKILL` | `.ai.architecture_skill` | `wp-rocket-architecture` |
-| `FRONTEND_SKILL` | `.ai.frontend_skill` | `wp-rocket-frontend-architecture` (null if not applicable) |
-| `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
-| `REST_NS` | `.ai.rest_namespace` | `/wp-json/wp-rocket/v1/` (null if not applicable) |
 | `E2E_URL` | `.ai.e2e.local_url` | `http://localhost:8888` |
 | `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
 | `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
 | `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
 | `LICENSE_KEY` | `.ai.e2e.license_option_key` | `wp_rocket_settings` (null if not applicable) |
 
-Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtime values.
+Every `{TEMP_ROOT}`, `{REPO}`, `{E2E_URL}`, etc. below refers to these runtime values.
 
 If `{E2E_CI}` is false, any Playwright spec files you write are temporary — used for QA evidence only, never committed. If `{E2E_CI}` is true, commit spec files to `tests/e2e/` (or the project's E2E directory) as permanent additions.
 
@@ -311,7 +305,7 @@ After the prose report, return the following JSON object to `qa-engineer`:
 
 ```json
 {
-  "overall": "PASS|FAIL|PARTIAL|CANNOT_VERIFY",
+  "overall": "PASS|FAIL|PARTIAL",
   "criteria_results": [
     {
       "criterion": "acceptance criterion text",
@@ -332,6 +326,8 @@ After the prose report, return the following JSON object to `qa-engineer`:
   ]
 }
 ```
+
+The top-level `overall` uses `PASS|FAIL|PARTIAL` to align with `qa-engineer`'s contract. `CANNOT_VERIFY` is valid at the **criterion level** (`criteria_results[].result`) but maps to `PARTIAL` at the top-level `overall`. When the entire run cannot be validated (e.g. branch mismatch), set `overall: "PARTIAL"` and explain in `blockers`.
 
 `blockers` is an empty array when `overall == "PASS"`. `specs_run` is `false` if `npx playwright` was unavailable. `specs_content` is an empty array if no spec was written — never omit the field.
 
