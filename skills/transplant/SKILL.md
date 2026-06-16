@@ -41,6 +41,10 @@ if [ -f "$MANIFEST" ]; then
 else
   MODE="fresh"
 fi
+
+# Check for legacy .aiassistant directory
+AIASSISTANT_EXISTS=false
+[ -d "$TARGET_ROOT/.aiassistant" ] && AIASSISTANT_EXISTS=true
 ```
 
 **Fresh mode** — if `.claude/` already contains files (but no manifest), warn:
@@ -157,6 +161,7 @@ Analyse the project at {TARGET_ROOT} for transplanting the Maestro issue-workflo
 mode: fresh
 maestro_root: {MAESTRO_ROOT}
 target_root: {TARGET_ROOT}
+aiassistant_exists: {AIASSISTANT_EXISTS}
 
 {INTERVIEW_CONTEXT_BLOCK}
 
@@ -178,6 +183,7 @@ Analyse the project at {TARGET_ROOT} for a Maestro workflow upgrade.
 mode: upgrade
 maestro_root: {MAESTRO_ROOT}
 target_root: {TARGET_ROOT}
+aiassistant_exists: {AIASSISTANT_EXISTS}
 manifest_path: {TARGET_ROOT}/.claude/transplant-manifest.json
 
 The manifest (version 2) contains a `components` array with `{ maestro_source, output_path, sha256 }` per written file — use this for team-change detection instead of a refs directory. Use `git -C {MAESTRO_ROOT} show {maestro_commit}:{maestro_source}` to reconstruct Maestro baselines.
@@ -238,7 +244,19 @@ If reviewer returned `APPROVED`:
 > "Review the context doc at `{analyst.context_path}` and confirm to generate the workflow — or describe what needs correcting."
 
 **Upgrade mode:**
-> "Here is the upgrade plan (Section 10 of the context doc). `MERGE` components will be semantically merged preserving team edits. `APPLY` components will be re-transplanted as-is (no team changes detected). `PRESERVE` and `SKIP` components will not be touched. Confirm to proceed — or describe what needs adjusting."
+
+Build the confirmation message:
+
+> "Here is the upgrade plan (Section 10 of the context doc). `MERGE` components will be semantically merged preserving team edits. `APPLY` components will be re-transplanted as-is (no team changes detected). `PRESERVE` and `SKIP` components will not be touched.
+
+> {if analyst.remove_candidates non-empty:}
+> ⚠️  {analyst.remove_count} orphaned component(s) found — present at last transplant but no longer in Maestro:
+> {for each remove_candidate: `  • {output_path} (was {maestro_source})`}
+> Delete these from the target project after the upgrade? (y/n — default: n)
+
+> Confirm to proceed — or describe what needs adjusting."
+
+Record the user's orphan deletion answer as `DELETE_ORPHANS` (true/false, default false).
 
 **Wait for explicit confirmation before continuing.**
 
@@ -248,50 +266,39 @@ If the user requests corrections: update `{TARGET_ROOT}/.claude/transplant-conte
 
 ## Phase 2 — Directory Setup
 
-Create the target structure:
+Create all output directories dynamically from the analyst's dispatch_plans — no hardcoded list needed:
 
 ```bash
-mkdir -p "$TARGET_ROOT/.claude/agents"
-mkdir -p "$TARGET_ROOT/.claude/skills/issue-workflow/scripts"
-mkdir -p "$TARGET_ROOT/.claude/skills/issue-workflow/refs"
-mkdir -p "$TARGET_ROOT/bin"
+echo "$ANALYST_JSON" | jq -r '
+  .dispatch_plans | to_entries[].value[] |
+  .output_path | select(. != null)
+' | xargs -I{} dirname {} | sort -u | xargs mkdir -p
 ```
+
+This automatically handles any new component the analyst discovered, including newly added skills that weren't in any previous hardcoded list.
+
+**Legacy `bin/` cleanup (v2 migration):** Before spawning writers, remove any workflow scripts left at the old location:
+
+```bash
+for f in dev-start.sh dev-seed.sh dev-down.sh; do
+  [ -f "$TARGET_ROOT/bin/$f" ] && rm -f "$TARGET_ROOT/bin/$f"
+done
+rmdir "$TARGET_ROOT/bin" 2>/dev/null || true
+```
+
+The `rmdir` silently no-ops if `bin/` still has other project scripts — only removes it if empty.
 
 ---
 
 ## Phase 2 — Build Dispatch Plans
 
-Read `{TARGET_ROOT}/.claude/transplant-context.md` to extract the disposition table (Section 8). Cross-reference it with the component paths below to build one dispatch plan per cluster.
+The analyst's return JSON now includes a `dispatch_plans` map — consume it directly:
 
-**Component path reference:**
+```bash
+DISPATCH_PLANS="$(echo "$ANALYST_JSON" | jq '.dispatch_plans')"
+```
 
-| Component | Maestro source path | Target output path |
-|---|---|---|
-| `agents/grooming-agent.md` | `{M}/agents/grooming-agent.md` | `{T}/.claude/agents/grooming-agent.md` |
-| `agents/challenger.md` | `{M}/agents/challenger.md` | `{T}/.claude/agents/challenger.md` |
-| `agents/backend-agent.md` | `{M}/agents/backend-agent.md` | `{T}/.claude/agents/backend-agent.md` |
-| `agents/frontend-agent.md` | `{M}/agents/frontend-agent.md` | `{T}/.claude/agents/frontend-agent.md` |
-| `agents/lead-reviewer.md` | `{M}/agents/lead-reviewer.md` | `{T}/.claude/agents/lead-reviewer.md` |
-| `agents/qa-engineer.md` | `{M}/agents/qa-engineer.md` | `{T}/.claude/agents/qa-engineer.md` |
-| `agents/e2e-qa-tester.md` | `{M}/agents/e2e-qa-tester.md` | `{T}/.claude/agents/e2e-qa-tester.md` |
-| `agents/release-agent.md` | `{M}/agents/release-agent.md` | `{T}/.claude/agents/release-agent.md` |
-| `agents/ticket-writer.md` | `{M}/agents/ticket-writer.md` | `{T}/.claude/agents/ticket-writer.md` |
-| `skills/orchestrator/SKILL.md` | `{M}/skills/orchestrator/SKILL.md` | `{T}/.claude/skills/orchestrator/SKILL.md` |
-| `skills/issue-workflow/SKILL.md` | `{M}/skills/issue-workflow/SKILL.md` | `{T}/.claude/skills/issue-workflow/SKILL.md` |
-| `skills/dod/SKILL.md` | `{M}/skills/dod/SKILL.md` | `{T}/.claude/skills/dod/SKILL.md` |
-| `skills/e2e/SKILL.md` | `{M}/skills/e2e/SKILL.md` | `{T}/.claude/skills/e2e/SKILL.md` |
-| `skills/docs/SKILL.md` | `{M}/skills/docs/SKILL.md` | `{T}/.claude/skills/docs/SKILL.md` |
-| `skills/compliance/SKILL.md` | `{M}/skills/compliance/SKILL.md` | `{T}/.claude/skills/compliance/SKILL.md` |
-| `skills/knowledge-graph/SKILL.md` | `{M}/skills/knowledge-graph/SKILL.md` | `{T}/.claude/skills/knowledge-graph/SKILL.md` |
-| `scripts/issue-sync.sh` | `{M}/skills/issue-workflow/scripts/issue-sync.sh` | `{T}/.claude/skills/issue-workflow/scripts/issue-sync.sh` |
-| `scripts/make-issue-branch.sh` | `{M}/skills/issue-workflow/scripts/make-issue-branch.sh` | `{T}/.claude/skills/issue-workflow/scripts/make-issue-branch.sh` |
-| `scripts/init-pr-draft.sh` | `{M}/skills/issue-workflow/scripts/init-pr-draft.sh` | `{T}/.claude/skills/issue-workflow/scripts/init-pr-draft.sh` |
-| `refs/pr-template.md` | `{M}/skills/issue-workflow/refs/pr-template.md` | `{T}/.claude/skills/issue-workflow/refs/pr-template.md` |
-| `bin/dev-start.sh` | `{M}/bin/dev-up.sh` | `{T}/bin/dev-start.sh` |
-| `bin/dev-seed.sh` | — (generated from scratch) | `{T}/bin/dev-seed.sh` |
-| `bin/dev-down.sh` | `{M}/bin/dev-down.sh` | `{T}/bin/dev-down.sh` |
-
-`{M}` = `MAESTRO_ROOT`, `{T}` = `TARGET_ROOT`
+Each cluster key maps to an array of `{ name, disposition, source_path, output_path }` objects. No manual table lookup is needed.
 
 Each dispatch plan follows this structure (replace placeholders with resolved absolute paths):
 
@@ -331,23 +338,39 @@ For **MERGE** components in upgrade mode, add three extra fields so the writer c
 
 In upgrade mode, `disposition` values come from the context doc's **Section 10 — Upgrade Plan** (SKIP / PRESERVE / APPLY / MERGE) rather than Section 8. Writers handle each disposition differently — see `transplant-writer.md`.
 
-**Cluster groupings:**
+---
 
-| Cluster | Components |
-|---|---|
-| `orchestration` | `skills/orchestrator/SKILL.md`, `skills/issue-workflow/SKILL.md` |
-| `grooming` | `agents/grooming-agent.md`, `agents/challenger.md` |
-| `implementation` | `agents/backend-agent.md`, `agents/frontend-agent.md` |
-| `quality` | `agents/lead-reviewer.md`, `agents/qa-engineer.md`, `agents/e2e-qa-tester.md` |
-| `release` | `agents/release-agent.md`, `agents/ticket-writer.md` |
-| `skills` | `skills/dod/SKILL.md`, `skills/e2e/SKILL.md`, `skills/docs/SKILL.md`, `skills/knowledge-graph/SKILL.md`, `skills/compliance/SKILL.md` |
-| `scripts` | `bin/dev-start.sh`, `bin/dev-seed.sh`, `bin/dev-down.sh`, `scripts/issue-sync.sh`, `scripts/make-issue-branch.sh`, `scripts/init-pr-draft.sh`, `refs/pr-template.md` |
+## Phase 2 — Inline KEEP_AS_IS
+
+Before spawning writer agents, handle all KEEP_AS_IS and DROP components directly in the orchestrator. This avoids spawning writer agents for trivial file copies.
+
+For each cluster in `DISPATCH_PLANS`, iterate components:
+
+- **DROP**: Skip. Record name in `files_skipped`.
+- **KEEP_AS_IS**: Copy source to output, apply the universal pre-write pass via sed, compute sha256, record in `files_written` and `file_hashes`:
+
+```bash
+cp "$source_path" "$output_path"
+sed -i.bak \
+  -e '/maestro\.json/d' \
+  -e 's/\bMaestro\b/this workflow/g' \
+  -e 's/bin\/dev-up\.sh/.claude\/bin\/dev-start.sh/g' \
+  -e 's/bash bin\/dev-up\.sh/bash .claude\/bin\/dev-start.sh/g' \
+  -e 's/bash bin\/dev-start\.sh/bash .claude\/bin\/dev-start.sh/g' \
+  -e 's/^name: maestro:/name: /' \
+  -e 's/`\/maestro:\([^`]*\)`/`\/\1`/g' \
+  "$output_path"
+rm -f "${output_path}.bak"
+SHA256=$( (sha256sum "$output_path" 2>/dev/null || shasum -a 256 "$output_path") | awk '{print $1}' )
+```
+
+After processing, **remove KEEP_AS_IS and DROP entries from each cluster's component array** before passing to writers. If a cluster's component array is empty after filtering, do not spawn a writer for that cluster.
 
 ---
 
 ## Phase 2 — Spawn Writers
 
-Spawn all 7 `transplant-writer` agents **simultaneously**, each receiving its dispatch plan as prompt input.
+Spawn one `transplant-writer` agent per cluster that has at least one ADAPT, REWRITE, MERGE, or GENERATE component (after inline processing removed KEEP_AS_IS and DROP). Clusters with no remaining components are skipped. Each receiving its dispatch plan as prompt input.
 
 Each prompt must be self-contained — writers are isolated agents with no access to this conversation:
 
@@ -391,7 +414,7 @@ Write `{TARGET_ROOT}/.claude/transplant-manifest.json` with this structure:
 
 ```json
 {
-  "version": "2",
+  "version": "3",
   "transplanted_at": "{ISO 8601 UTC timestamp}",
   "maestro_commit": "{MAESTRO_COMMIT}",
   "project_type": "{analyst.project_type}",
@@ -420,6 +443,10 @@ Write `{TARGET_ROOT}/.claude/transplant-manifest.json` with this structure:
 
 One entry per file in the aggregated `file_hashes`. DROPped/SKIPped/PREServed components are absent (they have no output file or no new sha256).
 
+```bash
+chmod +x "$TARGET_ROOT"/.claude/bin/*.sh 2>/dev/null || true
+```
+
 ---
 
 ## Phase 3 — QA Pass (Claude Opus)
@@ -442,7 +469,7 @@ files_merged: {JSON array of all files_merged from aggregated writer results, em
 
 **On red verdict:** run a targeted re-work pass:
 
-1. Group findings by cluster (use the cluster groupings table from Phase 2).
+1. Group findings by cluster (use the cluster keys from DISPATCH_PLANS).
 2. For each cluster with FAIL findings, build a targeted dispatch plan containing only the flagged components. Append a `qa_feedback` array to the plan:
    ```json
    {
@@ -484,6 +511,25 @@ rm -f "$TARGET_ROOT/.claude/transplant-context.md"
 
 **If yes (default):** keep both files.
 
+**If `.aiassistant/` was found at `$TARGET_ROOT`:**
+
+> "The `.aiassistant/` directory was read during analysis and all relevant customizations have been incorporated into the transplanted workflow. Delete it now? (y/n — default: y)"
+
+**If yes (default):**
+```bash
+rm -rf "$TARGET_ROOT/.aiassistant"
+```
+
+Note in the final summary:
+```
+  .aiassistant/ removed — workflow is now self-contained in .claude/.
+```
+
+**If no:** leave it and note in the final summary:
+```
+  ⚠️  .aiassistant/ not removed — clean up manually when ready.
+```
+
 ---
 
 Print the final summary:
@@ -524,9 +570,8 @@ Dropped: {list or "none"}
 ─────────────────────────────────────────
 Next steps:
   1. Review generated agents — especially orchestrator.md, backend-agent.md, and qa-engineer.md
-  2. Run: chmod +x {TARGET_ROOT}/bin/*.sh
-  3. Commit .claude/ and bin/ to the target repo
-  4. Test: cd {TARGET_ROOT} && bash bin/dev-start.sh
+  2. Commit .claude/ to the target repo
+  3. Test: cd {TARGET_ROOT} && bash .claude/bin/dev-start.sh
 ─────────────────────────────────────────
 ```
 
@@ -542,6 +587,12 @@ Target: {TARGET_ROOT}
   PRESERVED({count}): {list — team-only changes, Maestro unchanged, not touched}
   SKIPPED  ({count}): {list — no changes on either side}
 
+{if remove_candidates non-empty and DELETE_ORPHANS true:}
+  REMOVED  ({count}): {list — no longer in Maestro, deleted from target}
+{if remove_candidates non-empty and DELETE_ORPHANS false:}
+⚠️  Orphans kept ({count} — not in Maestro, kept by user choice):
+  {each output_path}
+
 {if fixme_values non-empty:}
 ⚠️  Manual review needed:
   {each fixme_value}
@@ -550,6 +601,14 @@ Target: {TARGET_ROOT}
 ⚠️  Merge conflicts (manual resolution required):
   {component}: {description of conflict}
 ─────────────────────────────────────────
+```
+
+**Orphan deletion** — if `DELETE_ORPHANS` is true, delete confirmed orphans after the summary is printed:
+
+```bash
+for output_path in analyst.remove_candidates[*].output_path; do
+  rm -f "$output_path"
+done
 ```
 
 ---

@@ -61,7 +61,90 @@ git -C {target_root} remote get-url origin 2>/dev/null || echo "no-remote"
 
 # Detect WordPress signals
 ls {target_root}/.wp-env.json {target_root}/wp-config.php {target_root}/wp-config-sample.php 2>/dev/null || true
+
+# Project AI conventions — read these before assigning any disposition
+cat {target_root}/AGENTS.md 2>/dev/null || true
+cat {target_root}/CLAUDE.md 2>/dev/null || true
+cat {target_root}/.claude/CLAUDE.md 2>/dev/null || true
 ```
+
+If any of these files exist, read them in full before continuing. Their content is authoritative for:
+- Tool names and exact commands the agents must use
+- Forbidden patterns or approaches
+- Project-specific workflow conventions
+- Coding standards and naming rules
+
+Record all binding constraints in Section 9 (Analyst Notes) so every writer agent sees them. These override codebase inference — if AGENTS.md says "use `npm run test:unit`", that is the test command regardless of what `package.json` suggests.
+
+---
+
+## Step 1b — Legacy workflow check
+
+If `aiassistant_exists: true` was passed in the prompt, read the legacy `.aiassistant/` directory:
+
+```bash
+ls -la {target_root}/.aiassistant/ 2>/dev/null
+find {target_root}/.aiassistant -name "*.md" | sort 2>/dev/null
+```
+
+Read every `.md` file found. For each one, extract **project-specific customizations** — stack-specific commands, tool references, file paths, conventions, anything that deviates from a generic workflow — and identify which transplant component it corresponds to.
+
+Record these as `aiassistant_findings`: a list of `{ file, component, customizations }`. These inform disposition decisions in Step 8 (a component with meaningful legacy customizations should be REWRITE rather than ADAPT, and the writer must incorporate those specifics) and are recorded in the context doc under Section 9.
+
+---
+
+## Step 1c — Discover transplantable components
+
+Scan the Maestro source tree to build the component list dynamically. This replaces any hardcoded component table.
+
+```bash
+# Discover agents
+ls {maestro_root}/agents/*.md
+
+# Discover skills
+ls {maestro_root}/skills/*/SKILL.md
+```
+
+**Exclusion list — do not transplant these:**
+
+Agents: `transplant-analyst.md`, `transplant-analyst-reviewer.md`, `transplant-consistency.md`, `transplant-qa.md`, `transplant-writer.md`
+
+Skills: `maestro/`, `onboard-project/`, `transplant/`, `sprint/`
+
+**Script components** (always included, not discovered from dir listing):
+
+```
+scripts/issue-sync.sh      → {maestro_root}/skills/issue-workflow/scripts/issue-sync.sh      → {target_root}/.claude/skills/issue-workflow/scripts/issue-sync.sh
+scripts/make-issue-branch.sh → {maestro_root}/skills/issue-workflow/scripts/make-issue-branch.sh → {target_root}/.claude/skills/issue-workflow/scripts/make-issue-branch.sh
+scripts/init-pr-draft.sh   → {maestro_root}/skills/issue-workflow/scripts/init-pr-draft.sh   → {target_root}/.claude/skills/issue-workflow/scripts/init-pr-draft.sh
+refs/pr-template.md        → {maestro_root}/skills/issue-workflow/refs/pr-template.md        → {target_root}/.claude/skills/issue-workflow/refs/pr-template.md
+bin/dev-start.sh           → {maestro_root}/bin/dev-up.sh                                    → {target_root}/.claude/bin/dev-start.sh
+bin/dev-seed.sh            → (generated from scratch)                                        → {target_root}/.claude/bin/dev-seed.sh
+bin/dev-down.sh            → {maestro_root}/bin/dev-down.sh                                  → {target_root}/.claude/bin/dev-down.sh
+```
+
+**Path resolution for discovered components:**
+
+| Component type | Source path | Output path |
+|---|---|---|
+| Agent (`agents/foo.md`) | `{maestro_root}/agents/foo.md` | `{target_root}/.claude/agents/foo.md` |
+| Skill (`skills/foo/SKILL.md`) | `{maestro_root}/skills/foo/SKILL.md` | `{target_root}/.claude/skills/foo/SKILL.md` |
+
+**Cluster routing:**
+
+| Component | Cluster |
+|---|---|
+| `orchestrator`, `issue-workflow` | `orchestration` |
+| `grooming-agent`, `challenger` | `grooming` |
+| `backend-agent`, `frontend-agent` | `implementation` |
+| `lead-reviewer`, `qa-engineer`, `e2e-qa-tester` | `quality` |
+| `release-agent`, `ticket-writer` | `release` |
+| All other skills not listed above | `skills` |
+| Scripts, refs, bin files | `scripts` |
+
+Any new skill added to Maestro that isn't in the routing table above automatically routes to the `skills` cluster.
+
+Build `DISCOVERED_COMPONENTS` as an ordered list: `[{ name, cluster, source_path, output_path }]`. Use this list as the authoritative component inventory for Steps 8 and 9.
 
 ---
 
@@ -228,6 +311,15 @@ Extract:
 - `maestro_commit` — the git commit SHA of the Maestro repo at last transplant time
 - `project_type`
 - `components` — the array of `{ maestro_source, output_path (relative), sha256 }` entries
+- `version` — manifest schema version (current: `"3"`)
+
+**v2 → v3 migration (bin/ path fix):** If the manifest `version` is `"2"` (or absent), auto-migrate any component `output_path` that starts with `bin/dev-` to `.claude/bin/dev-`:
+```
+"bin/dev-start.sh" → ".claude/bin/dev-start.sh"
+"bin/dev-seed.sh"  → ".claude/bin/dev-seed.sh"
+"bin/dev-down.sh"  → ".claude/bin/dev-down.sh"
+```
+Apply this rewrite to the in-memory components array before computing any diffs. Do not modify the manifest file on disk — it will be rewritten with version `"3"` at the end of the upgrade run.
 
 If `maestro_commit` is `"unknown"` or the field is missing, the baseline cannot be reconstructed. In this case, set every component's upgrade disposition to `SKIP` and add a single analyst note: "maestro_commit unavailable — upgrade diff skipped, all components preserved." Proceed to Step 9c with all `SKIP` dispositions.
 
@@ -312,6 +404,25 @@ For any component where:
 Flag it as a **conflict** rather than MERGE. The writer will not attempt an automatic merge — instead it will surface the conflict to the user for manual resolution.
 
 Add a `## 11. Conflicts` section to the context doc listing any such cases.
+
+---
+
+### Step 9e — Orphan detection
+
+For each component in the manifest's `components` array, check whether its `maestro_source` is still present in `DISCOVERED_COMPONENTS` (from Step 1c). If it is absent — because the file was deleted from Maestro or moved to the exclusion list — it is an orphan.
+
+```bash
+# For each maestro_source in manifest components:
+ls "{maestro_root}/{maestro_source}" 2>/dev/null || echo "MISSING"
+```
+
+A component is an orphan only if it was **written** at the last transplant (present in the manifest's `components` array) AND no longer exists in Maestro. Components that were DROPped previously are not in the manifest and are never orphans.
+
+For each orphan found:
+- Add a `REMOVE` row to the Section 10 upgrade plan table with columns: component name, `REMOVE`, "No longer in Maestro", `—`
+- Record in `remove_candidates`: `{ maestro_source, output_path }` using the absolute output path from the manifest
+
+Add a `## 12. Orphans` section to the context doc if any are found.
 
 ---
 
@@ -460,41 +571,38 @@ Every component must have a decision. Use the rules below.
 - `agents/frontend-agent.md` → ADAPT if frontend split exists, DROP if API/CLI/library
 - `agents/e2e-qa-tester.md` → ADAPT if Playwright/Cypress found, DROP otherwise
 - `skills/e2e/SKILL.md` → ADAPT if E2E found, DROP otherwise
-- `bin/dev-start.sh` → ADAPT if still wp-env based, REWRITE for everything else
-- `bin/dev-seed.sh` → REWRITE if seeding exists, DROP otherwise
-- `bin/dev-down.sh` → ADAPT if wp-env, REWRITE for docker-compose, KEEP_AS_IS if make-based
+- `.claude/bin/dev-start.sh` → ADAPT if still wp-env based, REWRITE for everything else
+- `.claude/bin/dev-seed.sh` → REWRITE if seeding exists, DROP otherwise
+- `.claude/bin/dev-down.sh` → ADAPT if wp-env, REWRITE for docker-compose, KEEP_AS_IS if make-based
+- `skills/groom/SKILL.md` → ADAPT (strip `maestro:` prefix from skill name; no other project-specific content)
+- `skills/challenge/SKILL.md` → ADAPT (strip `maestro:` prefix from skill name)
+- `skills/qa/SKILL.md` → ADAPT (strip `maestro:` prefix from skill name)
+- `skills/review/SKILL.md` → ADAPT (strip `maestro:` prefix from skill name)
+
+Generate one row per component in `DISCOVERED_COMPONENTS`. Apply the default disposition rules above to each discovered component. If a component was not present when the default rules were written (i.e. it has no explicit rule), infer its disposition from its type and content:
+- A skill that is purely a standalone entry point for an already-transplanted agent → ADAPT (strip name prefix, no other changes)
+- An agent that contains WP-specific content in a non-WP project → REWRITE
+- An agent with no project-specific content → KEEP_AS_IS
+- A component you cannot classify → ADAPT (safest default)
 
 | Component | Decision | Reasoning |
 |---|---|---|
-| `agents/grooming-agent.md` | {ADAPT\|REWRITE} | {reason} |
-| `agents/challenger.md` | KEEP_AS_IS | Project-agnostic |
-| `agents/backend-agent.md` | {ADAPT\|REWRITE} | {reason} |
-| `agents/frontend-agent.md` | {ADAPT\|DROP} | {reason} |
-| `agents/lead-reviewer.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
-| `agents/qa-engineer.md` | {ADAPT\|REWRITE} | {reason} |
-| `agents/e2e-qa-tester.md` | {ADAPT\|DROP} | {reason} |
-| `agents/release-agent.md` | KEEP_AS_IS | Generic git/gh |
-| `agents/ticket-writer.md` | ADAPT | Repo reference only |
-| `skills/orchestrator/SKILL.md` | ADAPT | {reason} |
-| `skills/issue-workflow/SKILL.md` | ADAPT | Script paths, config keys |
-| `skills/dod/SKILL.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
-| `skills/e2e/SKILL.md` | {ADAPT\|DROP} | {reason} |
-| `skills/docs/SKILL.md` | KEEP_AS_IS | Generic |
-| `skills/compliance/SKILL.md` | {KEEP_AS_IS\|DROP} | {reason} |
-| `skills/knowledge-graph/SKILL.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
-| `scripts/issue-sync.sh` | KEEP_AS_IS | Generic GitHub CLI |
-| `scripts/make-issue-branch.sh` | KEEP_AS_IS | Generic git |
-| `scripts/init-pr-draft.sh` | KEEP_AS_IS | Generic |
-| `refs/pr-template.md` | KEEP_AS_IS | Generic |
-| `bin/dev-start.sh` | {ADAPT\|REWRITE} | {reason} |
-| `bin/dev-seed.sh` | {REWRITE\|DROP} | {reason} |
-| `bin/dev-down.sh` | {KEEP_AS_IS\|ADAPT\|REWRITE} | {reason} |
 
 ---
 
 ## 9. Analyst Notes
 
 {Free-form. Include: unusual project structure, important constraints, WP-specific quirks to keep or drop, environment variables that must exist, anything the writer agents need to know that doesn't fit above.}
+
+{If aiassistant_exists was true, add:}
+
+### Legacy .aiassistant findings
+
+| File | Corresponding component | Customizations to preserve |
+|---|---|---|
+| {file path} | {component name} | {list of project-specific items extracted} |
+
+{One row per .aiassistant file found. If no meaningful customizations were found in a file, omit that row.}
 ```
 
 ---
@@ -518,9 +626,27 @@ Every component must have a decision. Use the rules below.
   "rewrite_count": 2,
   "drop_count": 3,
   "drops": ["agents/frontend-agent.md", "skills/e2e/SKILL.md", "skills/compliance/SKILL.md"],
-  "analyst_notes": "one-line summary of the most important constraint or finding"
+  "analyst_notes": "one-line summary of the most important constraint or finding",
+  "dispatch_plans": {
+    "orchestration": [
+      {
+        "name": "orchestrator",
+        "disposition": "ADAPT",
+        "source_path": "/absolute/maestro/skills/orchestrator/SKILL.md",
+        "output_path": "/absolute/target/.claude/skills/orchestrator/SKILL.md"
+      }
+    ],
+    "grooming": [],
+    "implementation": [],
+    "quality": [],
+    "release": [],
+    "skills": [],
+    "scripts": []
+  }
 }
 ```
+
+Every discovered component must appear in exactly one cluster. DROPped components MUST still appear in `dispatch_plans` (the orchestrator needs them to record `files_skipped`).
 
 **Upgrade mode:**
 ```json
@@ -535,8 +661,30 @@ Every component must have a decision. Use the rules below.
   "preserve_count": 5,
   "skip_count": 15,
   "conflict_count": 0,
-  "merges": ["agents/backend-agent.md", "skills/orchestrator/SKILL.md", "bin/dev-start.sh"],
+  "remove_count": 1,
+  "merges": ["agents/backend-agent.md", "skills/orchestrator/SKILL.md", ".claude/bin/dev-start.sh"],
   "conflicts": [],
-  "analyst_notes": "one-line summary of key changes and risk level"
+  "remove_candidates": [
+    { "maestro_source": "agents/deprecated-agent.md", "output_path": "/absolute/target/.claude/agents/deprecated-agent.md" }
+  ],
+  "analyst_notes": "one-line summary of key changes and risk level",
+  "dispatch_plans": {
+    "orchestration": [
+      {
+        "name": "orchestrator",
+        "disposition": "APPLY",
+        "source_path": "/absolute/maestro/skills/orchestrator/SKILL.md",
+        "output_path": "/absolute/target/.claude/skills/orchestrator/SKILL.md"
+      }
+    ],
+    "grooming": [],
+    "implementation": [],
+    "quality": [],
+    "release": [],
+    "skills": [],
+    "scripts": []
+  }
 }
 ```
+
+Every discovered component must appear in exactly one cluster. Components with `SKIP` or `PRESERVE` disposition MUST still appear in `dispatch_plans` (the orchestrator needs them to record the full component inventory).

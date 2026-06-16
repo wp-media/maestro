@@ -122,7 +122,7 @@ grep -n "\.claude/skills/" {file}
 ```
 
 **FIX**:
-- `bin/dev-up.sh` → `bin/dev-start.sh`
+- `bin/dev-up.sh` → `.claude/bin/dev-start.sh`
 - `.claude/skills/` → `.claude/skills/`
 
 ---

@@ -93,8 +93,17 @@ Keep the variable list (REPO, TEMP_ROOT, etc.) intact below it.
 
 **3. Path fixes:**
 - `.claude/skills/issue-workflow/scripts/` → `.claude/skills/issue-workflow/scripts/`
-- `bin/dev-up.sh` → `bin/dev-start.sh`
-- `bash bin/dev-up.sh` → `bash bin/dev-start.sh`
+- `bin/dev-up.sh` → `.claude/bin/dev-start.sh`
+- `bash bin/dev-up.sh` → `bash .claude/bin/dev-start.sh`
+- `bash bin/dev-start.sh` → `bash .claude/bin/dev-start.sh`
+
+**4. Skill namespace fix (skill files only):**
+If the file's frontmatter contains `name: maestro:*`, strip the `maestro:` prefix from the `name:` field only:
+- `name: maestro:groom` → `name: groom`
+- `name: maestro:challenge` → `name: challenge`
+- `name: maestro:qa` → `name: qa`
+- `name: maestro:review` → `name: review`
+Do not change `description:` or any other field.
 
 ---
 
@@ -228,27 +237,27 @@ You now have all three versions needed for a semantic 3-way merge.
 
 ## Step 3 — Scripts cluster special handling
 
-When your cluster is `scripts`, the `bin/dev-start.sh` and `bin/dev-down.sh` files need careful treatment.
+When your cluster is `scripts`, the `.claude/bin/dev-start.sh` and `.claude/bin/dev-down.sh` files need careful treatment.
 
-### `bin/dev-start.sh`
+### `.claude/bin/dev-start.sh`
 
 Read `{maestro_root}/bin/dev-up.sh` as a structural reference. Write a new `dev-start.sh` for the target project based on context Section 3 (Dev Environment):
 
-- **wp-env projects (ADAPT):** Keep the wp-env structure, derive the slug from the project directory name (`basename "$TARGET_ROOT"`), update the URL to match the context doc, replace `.maestro/bin/dev-seed.sh` reference with `bin/dev-seed.sh`
+- **wp-env projects (ADAPT):** Keep the wp-env structure, derive the slug from the project directory name (`basename "$TARGET_ROOT"`), update the URL to match the context doc, replace `.maestro/bin/dev-seed.sh` reference with `.claude/bin/dev-seed.sh`
 - **docker-compose projects (REWRITE):** `docker-compose up -d`, then seed if applicable, then print URL
 - **npm-based projects (REWRITE):** Background start of the dev server + health-check loop
 - **make-based projects (REWRITE):** `make dev` or equivalent
 
-Always: set -euo pipefail, print the local URL at the end, call `bin/dev-seed.sh` if seeding exists.
+Always: set -euo pipefail, print the local URL at the end, call `.claude/bin/dev-seed.sh` if seeding exists.
 
-### `bin/dev-seed.sh`
+### `.claude/bin/dev-seed.sh`
 
 If disposition is DROP, skip. Otherwise write a minimal, project-specific seed script:
 - Read the seed command from the context doc
 - Add a guard: skip if already seeded (check for a sentinel or just print a warning)
 - `set -euo pipefail`
 
-### `bin/dev-down.sh`
+### `.claude/bin/dev-down.sh`
 
 Read `{maestro_root}/bin/dev-down.sh` as reference. Adapt for the target's stop mechanism.
 
@@ -269,8 +278,8 @@ TEMP_ROOT={temp_root from context Section 3 Dev Environment}
 BASE_BRANCH={base_branch from context Section 6}
 TEST_CMD={exact test command from context Section 2}
 LINT_CMD={exact lint command from context Section 2, omit line if N/A}
-BOOT_CMD=bash bin/dev-start.sh
-SEED_CMD=bash bin/dev-seed.sh{omit line if no seeding}
+BOOT_CMD=bash .claude/bin/dev-start.sh
+SEED_CMD=bash .claude/bin/dev-seed.sh{omit line if no seeding}
 LOCAL_URL={local URL from context Section 3, omit line if N/A}
 ADMIN_URL={admin URL from context Section 3, omit line if N/A}
 ```
