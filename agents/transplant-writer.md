@@ -92,7 +92,7 @@ Keep the variable list (REPO, TEMP_ROOT, etc.) intact below it.
 - Remove `maestro:` command/skill prefixes from any prose references
 
 **3. Path fixes:**
-- `.claude/skills/issue-workflow/scripts/` → `.claude/commands/issue-workflow/scripts/`
+- `.claude/skills/issue-workflow/scripts/` → `.claude/skills/issue-workflow/scripts/`
 - `bin/dev-up.sh` → `bin/dev-start.sh`
 - `bash bin/dev-up.sh` → `bash bin/dev-start.sh`
 

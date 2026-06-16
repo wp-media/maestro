@@ -1,6 +1,7 @@
 ---
 name: maestro:transplant
 description: Generate a bespoke issue-workflow for any target project. Phase 1 — a Claude Opus analyst reads the project deeply and produces a disposition report. Phase 2 — on approval, parallel writer agents transplant every Maestro workflow component, adapted to the target project's actual stack, test runner, dev environment, and conventions. Use when a project needs its own self-contained issue-workflow without taking a direct dependency on Maestro.
+disable-model-invocation: true
 ---
 
 # Transplant — Bespoke Issue Workflow Generator
@@ -251,8 +252,8 @@ Create the target structure:
 
 ```bash
 mkdir -p "$TARGET_ROOT/.claude/agents"
-mkdir -p "$TARGET_ROOT/.claude/commands/issue-workflow/scripts"
-mkdir -p "$TARGET_ROOT/.claude/commands/issue-workflow/refs"
+mkdir -p "$TARGET_ROOT/.claude/skills/issue-workflow/scripts"
+mkdir -p "$TARGET_ROOT/.claude/skills/issue-workflow/refs"
 mkdir -p "$TARGET_ROOT/bin"
 ```
 
@@ -275,17 +276,17 @@ Read `{TARGET_ROOT}/.claude/transplant-context.md` to extract the disposition ta
 | `agents/e2e-qa-tester.md` | `{M}/agents/e2e-qa-tester.md` | `{T}/.claude/agents/e2e-qa-tester.md` |
 | `agents/release-agent.md` | `{M}/agents/release-agent.md` | `{T}/.claude/agents/release-agent.md` |
 | `agents/ticket-writer.md` | `{M}/agents/ticket-writer.md` | `{T}/.claude/agents/ticket-writer.md` |
-| `commands/orchestrator.md` | `{M}/commands/orchestrator.md` | `{T}/.claude/commands/orchestrator.md` |
-| `commands/issue-workflow.md` | `{M}/commands/issue-workflow.md` | `{T}/.claude/commands/issue-workflow.md` |
-| `commands/dod.md` | `{M}/commands/dod.md` | `{T}/.claude/commands/dod.md` |
-| `commands/e2e.md` | `{M}/commands/e2e.md` | `{T}/.claude/commands/e2e.md` |
-| `commands/docs.md` | `{M}/commands/docs.md` | `{T}/.claude/commands/docs.md` |
-| `commands/compliance.md` | `{M}/commands/compliance.md` | `{T}/.claude/commands/compliance.md` |
-| `commands/knowledge-graph.md` | `{M}/commands/knowledge-graph.md` | `{T}/.claude/commands/knowledge-graph.md` |
-| `scripts/issue-sync.sh` | `{M}/commands/issue-workflow/scripts/issue-sync.sh` | `{T}/.claude/commands/issue-workflow/scripts/issue-sync.sh` |
-| `scripts/make-issue-branch.sh` | `{M}/commands/issue-workflow/scripts/make-issue-branch.sh` | `{T}/.claude/commands/issue-workflow/scripts/make-issue-branch.sh` |
-| `scripts/init-pr-draft.sh` | `{M}/commands/issue-workflow/scripts/init-pr-draft.sh` | `{T}/.claude/commands/issue-workflow/scripts/init-pr-draft.sh` |
-| `refs/pr-template.md` | `{M}/commands/issue-workflow/refs/pr-template.md` | `{T}/.claude/commands/issue-workflow/refs/pr-template.md` |
+| `skills/orchestrator/SKILL.md` | `{M}/skills/orchestrator/SKILL.md` | `{T}/.claude/skills/orchestrator/SKILL.md` |
+| `skills/issue-workflow/SKILL.md` | `{M}/skills/issue-workflow/SKILL.md` | `{T}/.claude/skills/issue-workflow/SKILL.md` |
+| `skills/dod/SKILL.md` | `{M}/skills/dod/SKILL.md` | `{T}/.claude/skills/dod/SKILL.md` |
+| `skills/e2e/SKILL.md` | `{M}/skills/e2e/SKILL.md` | `{T}/.claude/skills/e2e/SKILL.md` |
+| `skills/docs/SKILL.md` | `{M}/skills/docs/SKILL.md` | `{T}/.claude/skills/docs/SKILL.md` |
+| `skills/compliance/SKILL.md` | `{M}/skills/compliance/SKILL.md` | `{T}/.claude/skills/compliance/SKILL.md` |
+| `skills/knowledge-graph/SKILL.md` | `{M}/skills/knowledge-graph/SKILL.md` | `{T}/.claude/skills/knowledge-graph/SKILL.md` |
+| `scripts/issue-sync.sh` | `{M}/skills/issue-workflow/scripts/issue-sync.sh` | `{T}/.claude/skills/issue-workflow/scripts/issue-sync.sh` |
+| `scripts/make-issue-branch.sh` | `{M}/skills/issue-workflow/scripts/make-issue-branch.sh` | `{T}/.claude/skills/issue-workflow/scripts/make-issue-branch.sh` |
+| `scripts/init-pr-draft.sh` | `{M}/skills/issue-workflow/scripts/init-pr-draft.sh` | `{T}/.claude/skills/issue-workflow/scripts/init-pr-draft.sh` |
+| `refs/pr-template.md` | `{M}/skills/issue-workflow/refs/pr-template.md` | `{T}/.claude/skills/issue-workflow/refs/pr-template.md` |
 | `bin/dev-start.sh` | `{M}/bin/dev-up.sh` | `{T}/bin/dev-start.sh` |
 | `bin/dev-seed.sh` | — (generated from scratch) | `{T}/bin/dev-seed.sh` |
 | `bin/dev-down.sh` | `{M}/bin/dev-down.sh` | `{T}/bin/dev-down.sh` |
@@ -334,12 +335,12 @@ In upgrade mode, `disposition` values come from the context doc's **Section 10 �
 
 | Cluster | Components |
 |---|---|
-| `orchestration` | `commands/orchestrator.md`, `commands/issue-workflow.md` |
+| `orchestration` | `skills/orchestrator/SKILL.md`, `skills/issue-workflow/SKILL.md` |
 | `grooming` | `agents/grooming-agent.md`, `agents/challenger.md` |
 | `implementation` | `agents/backend-agent.md`, `agents/frontend-agent.md` |
 | `quality` | `agents/lead-reviewer.md`, `agents/qa-engineer.md`, `agents/e2e-qa-tester.md` |
 | `release` | `agents/release-agent.md`, `agents/ticket-writer.md` |
-| `skills` | `commands/dod.md`, `commands/e2e.md`, `commands/docs.md`, `commands/knowledge-graph.md`, `commands/compliance.md` |
+| `skills` | `skills/dod/SKILL.md`, `skills/e2e/SKILL.md`, `skills/docs/SKILL.md`, `skills/knowledge-graph/SKILL.md`, `skills/compliance/SKILL.md` |
 | `scripts` | `bin/dev-start.sh`, `bin/dev-seed.sh`, `bin/dev-down.sh`, `scripts/issue-sync.sh`, `scripts/make-issue-branch.sh`, `scripts/init-pr-draft.sh`, `refs/pr-template.md` |
 
 ---
@@ -496,7 +497,7 @@ Target: {TARGET_ROOT}
 
 Files written ({total count}):
   Agents:   {list of .claude/agents/*.md written}
-  Commands: {list of .claude/commands/*.md written}
+  Commands: {list of .claude/skills/*/SKILL.md written}
   Scripts:  {list of bin/ and scripts/ written}
 
 Dropped: {list or "none"}
@@ -565,4 +566,4 @@ Target: {TARGET_ROOT}
 | MERGE writer cannot find `maestro_commit` in git history | Writer preserves the team's file unchanged and records a merge conflict. Surfaces in upgrade summary. |
 | Target `.claude/` already exists and user confirmed | Proceed — writers use Write which overwrites. |
 | Context doc missing a section | Proceed — writers will use FIXME markers for missing values. Flag in summary. |
-| `analyst.repo == "FIXME"` | Note in summary: "Fill in `REPO=` in `.claude/commands/orchestrator.md` constants block." |
+| `analyst.repo == "FIXME"` | Note in summary: "Fill in `REPO=` in `.claude/skills/orchestrator/SKILL.md` constants block." |

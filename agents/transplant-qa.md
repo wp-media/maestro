@@ -66,7 +66,7 @@ grep -in "read.*\.json.*and extract\|\.claude/maestro\|before any step.*read" {f
 
 ### Check C — Orchestrator has hardcoded constants block
 
-Read `{target_root}/.claude/commands/orchestrator.md`. Verify it contains a `## Project Config` section with at minimum `REPO=`, `TEMP_ROOT=`, and `BASE_BRANCH=` set to real values.
+Read `{target_root}/.claude/skills/orchestrator/SKILL.md`. Verify it contains a `## Project Config` section with at minimum `REPO=`, `TEMP_ROOT=`, and `BASE_BRANCH=` set to real values.
 
 **FAIL** if:
 - The `## Project Config` section is missing
@@ -89,17 +89,17 @@ grep -in "wp-env\|wpcs\|phpunit\.xml\|wp plugin\|wp_options\|/wp-admin/\|add_fil
 
 **FAIL** if found.
 
-Additional: if `commands/compliance.md` is present in the written files for a non-WP project, **FAIL** — it should have been dropped.
+Additional: if `skills/compliance/SKILL.md` is present in the written files for a non-WP project, **FAIL** — it should have been dropped.
 
 ---
 
 ### Check E — Stack consistency
 
-Read `agents/backend-agent.md` and `commands/dod.md` if they exist in `files_written`. Verify:
+Read `agents/backend-agent.md` and `skills/dod/SKILL.md` if they exist in `files_written`. Verify:
 - The test command used matches the context doc's exact test command
 - The lint command used (if present) matches the context doc's lint command
 
-Read `commands/orchestrator.md`. Verify `BOOT_CMD` matches the context doc's start command.
+Read `skills/orchestrator/SKILL.md`. Verify `BOOT_CMD` matches the context doc's start command.
 
 **FAIL** if a command in the file contradicts the context doc.
 
@@ -110,7 +110,7 @@ For non-PHP projects: scan all written files for PHP-specific patterns — `.php
 ### Check F — Outstanding FIXMEs
 
 ```bash
-grep -rn "FIXME" {target_root}/.claude/agents/ {target_root}/.claude/commands/ {target_root}/bin/ 2>/dev/null
+grep -rn "FIXME" {target_root}/.claude/agents/ {target_root}/.claude/skills/ {target_root}/bin/ 2>/dev/null
 ```
 
 **WARN** for each FIXME found — these surface as manual steps in the transplant summary but do not block green.

@@ -119,7 +119,7 @@ Without Maestro                    With Maestro
 ─────────────────────              ──────────────────────────────
 project-a/                         Maestro plugin (installed once)
   .claude/agents/ ──┐                agents/        ← one score, always current
-  .claude/skills/ ──┤                commands/      ← one score, always current
+  .claude/skills/ ──┤                skills/        ← one score, always current
      (drifting)    │
                    │              project-a/
 project-b/         │                .claude/maestro.json   ← ensemble identity
@@ -287,10 +287,10 @@ maestro/
 │
 ├── agents/                                  ← 12 fully config-driven agents
 │
-├── commands/                                ← Skills (slash commands)
-│   ├── orchestrator.md
-│   ├── onboard-project.md
-│   ├── issue-workflow.md
+├── skills/                                  ← Skills (slash commands)
+│   ├── orchestrator/SKILL.md
+│   ├── onboard-project/SKILL.md
+│   ├── issue-workflow/SKILL.md
 │   └── …
 │
 └── specs/phpcs/                             ← Recurring PHPCS fix patterns

@@ -111,7 +111,7 @@ AI must NOT:
 * Use `add_action` / `add_filter` directly where the project uses a Subscriber pattern.
 
 Follow existing patterns — read the project's architecture skill
-(`.claude/commands/<slug>-architecture.md`) before making structural changes.
+(`.claude/skills/<slug>-architecture/SKILL.md`) before making structural changes.
 
 ---
 

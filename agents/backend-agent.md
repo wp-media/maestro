@@ -44,7 +44,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 1. Read the spec in full.
 2. Read the dispatch plan — note exactly which files you own and any constraints.
-3. Read `.claude/commands/{ARCH_SKILL}.md` and `.claude/commands/compliance.md`.
+3. Read `.claude/skills/{ARCH_SKILL}/SKILL.md` and `.claude/skills/compliance/SKILL.md`.
 4. Read each PHP file you are responsible for in full.
 
 ---
@@ -56,8 +56,8 @@ Follow the spec's **Implementation Plan** for backend files only. Do not touch J
 - Follow TDD: write or update tests alongside implementation.
 - Unit tests in `tests/Unit/`, integration tests in `tests/Integration/`.
 - Integration tests use `@group FeatureName` for targeted runs.
-- Follow the project's hook pattern as defined in `.claude/commands/{ARCH_SKILL}.md`.
-- Follow the project's option access pattern defined in `.claude/commands/{ARCH_SKILL}.md`.
+- Follow the project's hook pattern as defined in `.claude/skills/{ARCH_SKILL}/SKILL.md`.
+- Follow the project's option access pattern defined in `.claude/skills/{ARCH_SKILL}/SKILL.md`.
 - WordPress hooks through a Subscriber — never direct `add_action`/`add_filter`.
 
 **Risk-tiered test execution** — use the command from the spec's "Test Command" section. If not specified, apply the default table:
@@ -72,7 +72,7 @@ Follow the spec's **Implementation Plan** for backend files only. Do not touch J
 
 ### Step 3 — Documentation update
 
-Invoke the `docs` skill inline (`.claude/commands/docs.md`).
+Invoke the `docs` skill inline (`.claude/skills/docs/SKILL.md`).
 
 Pass the explicit list of PHP files you changed in Step 2 — the skill needs this rather than inferring from git.
 
@@ -86,7 +86,7 @@ Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ### Step 4 — DOD L1 (self-check)
 
-Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
+Invoke the `dod` skill inline (`.claude/skills/dod/SKILL.md`) with `layer: "1"`.
 
 The skill runs the 6 checks: manual validation, automated tests, documentation, PR description, CI (local commands at this layer), and file-scope compliance. It returns `overall: "PASS" | "WARN"` plus per-check evidence.
 

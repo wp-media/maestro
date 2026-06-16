@@ -41,7 +41,7 @@ Check each rule below in order. For every violation:
 
 ### Rule 1 — Non-WP projects must DROP compliance.md
 
-If project type does NOT start with `wp-`, `commands/compliance.md` MUST be `DROP`.
+If project type does NOT start with `wp-`, `skills/compliance/SKILL.md` MUST be `DROP`.
 
 **FAIL** if disposition is `KEEP_AS_IS` or `ADAPT` for a non-WP project.
 → Auto-fix: change disposition to `DROP`.
@@ -52,7 +52,7 @@ If project type does NOT start with `wp-`, `commands/compliance.md` MUST be `DRO
 
 If `has_e2e` is false / E2E framework is `None`:
 - `agents/e2e-qa-tester.md` MUST be `DROP`
-- `commands/e2e.md` MUST be `DROP`
+- `skills/e2e/SKILL.md` MUST be `DROP`
 
 **FAIL** if either is not `DROP`.
 → Auto-fix: change disposition to `DROP`.
@@ -112,7 +112,7 @@ Read the source files in `maestro_root` for any component marked `KEEP_AS_IS` th
 **Known safe (always project-agnostic — skip this check for them):**
 - `agents/challenger.md`
 - `agents/release-agent.md`
-- `commands/docs.md`
+- `skills/docs/SKILL.md`
 - `scripts/issue-sync.sh`
 - `scripts/make-issue-branch.sh`
 - `scripts/init-pr-draft.sh`
@@ -162,7 +162,7 @@ More than 3 `FIXME` entries in the context doc suggests the analyst could not ad
   ],
   "findings": [
     {
-      "component": "commands/dod.md",
+      "component": "skills/dod/SKILL.md",
       "rule": "8",
       "severity": "FAIL | WARN",
       "description": "dod.md marked KEEP_AS_IS but source contains `./vendor/bin/phpunit` — project is Node.js",

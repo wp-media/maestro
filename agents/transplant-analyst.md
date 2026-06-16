@@ -296,7 +296,7 @@ Add **Section 10 — Upgrade Plan** to the context doc:
 |---|---|---|---|---|
 | `agents/backend-agent.md` | MERGE | Added Step 4b scope-creep gate | Updated test runner to Jest | Low — different sections |
 | `agents/challenger.md` | SKIP | No change | No change | — |
-| `commands/orchestrator.md` | APPLY | New Workflow tool in Step 5 | No change | — |
+| `skills/orchestrator/SKILL.md` | APPLY | New Workflow tool in Step 5 | No change | — |
 | `agents/frontend-agent.md` | PRESERVE | No change | Rewrote for Vue 3 | — |
 | `bin/dev-start.sh` | MERGE | Added --no-seed flag | Added npm ci step | Medium — both in setup block |
 ```
@@ -451,15 +451,15 @@ Every component must have a decision. Use the rules below.
 **Default dispositions (override only with evidence):**
 - `agents/challenger.md` → always KEEP_AS_IS (100% agnostic)
 - `agents/release-agent.md` → always KEEP_AS_IS (generic git/gh)
-- `commands/docs.md` → always KEEP_AS_IS
+- `skills/docs/SKILL.md` → always KEEP_AS_IS
 - `scripts/issue-sync.sh` → always KEEP_AS_IS
 - `scripts/make-issue-branch.sh` → always KEEP_AS_IS
 - `scripts/init-pr-draft.sh` → always KEEP_AS_IS
 - `refs/pr-template.md` → always KEEP_AS_IS
-- `commands/compliance.md` → KEEP_AS_IS if WP project, DROP otherwise
+- `skills/compliance/SKILL.md` → KEEP_AS_IS if WP project, DROP otherwise
 - `agents/frontend-agent.md` → ADAPT if frontend split exists, DROP if API/CLI/library
 - `agents/e2e-qa-tester.md` → ADAPT if Playwright/Cypress found, DROP otherwise
-- `commands/e2e.md` → ADAPT if E2E found, DROP otherwise
+- `skills/e2e/SKILL.md` → ADAPT if E2E found, DROP otherwise
 - `bin/dev-start.sh` → ADAPT if still wp-env based, REWRITE for everything else
 - `bin/dev-seed.sh` → REWRITE if seeding exists, DROP otherwise
 - `bin/dev-down.sh` → ADAPT if wp-env, REWRITE for docker-compose, KEEP_AS_IS if make-based
@@ -475,13 +475,13 @@ Every component must have a decision. Use the rules below.
 | `agents/e2e-qa-tester.md` | {ADAPT\|DROP} | {reason} |
 | `agents/release-agent.md` | KEEP_AS_IS | Generic git/gh |
 | `agents/ticket-writer.md` | ADAPT | Repo reference only |
-| `commands/orchestrator.md` | ADAPT | {reason} |
-| `commands/issue-workflow.md` | ADAPT | Script paths, config keys |
-| `commands/dod.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
-| `commands/e2e.md` | {ADAPT\|DROP} | {reason} |
-| `commands/docs.md` | KEEP_AS_IS | Generic |
-| `commands/compliance.md` | {KEEP_AS_IS\|DROP} | {reason} |
-| `commands/knowledge-graph.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
+| `skills/orchestrator/SKILL.md` | ADAPT | {reason} |
+| `skills/issue-workflow/SKILL.md` | ADAPT | Script paths, config keys |
+| `skills/dod/SKILL.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
+| `skills/e2e/SKILL.md` | {ADAPT\|DROP} | {reason} |
+| `skills/docs/SKILL.md` | KEEP_AS_IS | Generic |
+| `skills/compliance/SKILL.md` | {KEEP_AS_IS\|DROP} | {reason} |
+| `skills/knowledge-graph/SKILL.md` | {KEEP_AS_IS\|ADAPT} | {reason} |
 | `scripts/issue-sync.sh` | KEEP_AS_IS | Generic GitHub CLI |
 | `scripts/make-issue-branch.sh` | KEEP_AS_IS | Generic git |
 | `scripts/init-pr-draft.sh` | KEEP_AS_IS | Generic |
@@ -517,7 +517,7 @@ Every component must have a decision. Use the rules below.
   "adapt_count": 11,
   "rewrite_count": 2,
   "drop_count": 3,
-  "drops": ["agents/frontend-agent.md", "commands/e2e.md", "commands/compliance.md"],
+  "drops": ["agents/frontend-agent.md", "skills/e2e/SKILL.md", "skills/compliance/SKILL.md"],
   "analyst_notes": "one-line summary of the most important constraint or finding"
 }
 ```
@@ -535,7 +535,7 @@ Every component must have a decision. Use the rules below.
   "preserve_count": 5,
   "skip_count": 15,
   "conflict_count": 0,
-  "merges": ["agents/backend-agent.md", "commands/orchestrator.md", "bin/dev-start.sh"],
+  "merges": ["agents/backend-agent.md", "skills/orchestrator/SKILL.md", "bin/dev-start.sh"],
   "conflicts": [],
   "analyst_notes": "one-line summary of key changes and risk level"
 }

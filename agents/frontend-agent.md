@@ -44,7 +44,7 @@ Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. below refers to these runtim
 
 1. Read the spec in full.
 2. Read the dispatch plan — note exactly which files you own and any constraints.
-3. Read `.claude/commands/{FRONTEND_SKILL}.md` and `.claude/commands/compliance.md`.
+3. Read `.claude/skills/{FRONTEND_SKILL}/SKILL.md` and `.claude/skills/compliance/SKILL.md`.
 4. Read each JS/CSS/HTML file you are responsible for in full.
 
 ---
@@ -79,7 +79,7 @@ If no JS test suite is configured in `package.json`, mark `automated-tests` as `
 
 ### Step 3 — Documentation update
 
-Invoke the `docs` skill inline (`.claude/commands/docs.md`).
+Invoke the `docs` skill inline (`.claude/skills/docs/SKILL.md`).
 
 Pass the explicit list of JS/CSS/HTML files you changed in Step 2 — the skill needs this rather than inferring from git.
 
@@ -93,7 +93,7 @@ Record: `docs.status`, `docs.files_updated`, `docs.files_created`.
 
 ### Step 4 — DOD L1 (self-check)
 
-Invoke the `dod` skill inline (`.claude/commands/dod.md`) with `layer: "1"`.
+Invoke the `dod` skill inline (`.claude/skills/dod/SKILL.md`) with `layer: "1"`.
 
 For frontend changes, the relevant checks are:
 - `automated-tests` → Check whether the project has a JS test suite configured (read from `package.json`). If not, mark `automated-tests` as `N/A` in DOD L1.

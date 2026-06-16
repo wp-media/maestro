@@ -179,7 +179,7 @@ Path: `{TEMP_ROOT}/issues/<N>/workflow-log.html`
 
 - **Create** the log at startup with just the header and an empty event list.
 - **Rewrite the full file** after every action — the event list grows with each update.
-- See `.claude/commands/orchestrator/html-log-format.md` for the full HTML structure and event patterns. Load it on demand (not at session start) to keep context lean.
+- See `.claude/skills/orchestrator/html-log-format.md` for the full HTML structure and event patterns. Load it on demand (not at session start) to keep context lean.
 
 ---
 
@@ -573,7 +573,7 @@ git worktree add {TEMP_ROOT}/issues/<N>/worktrees/backend <branch>
 git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
 ```
 
-**Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/implementation.js` with the Read tool, then call the Workflow tool with:
+**Call the Workflow tool** — read `.claude/skills/orchestrator/runners/implementation.js` with the Read tool, then call the Workflow tool with:
 - `script`: the file contents
 - `args`:
   ```json
@@ -631,7 +631,7 @@ CI is monitored by DOD L2 Check 5 in both modes.
 - **Lead Review** — skip if `effort IN [XS, S]` AND `risk_level == LOW`. Set `skipLeadReview: true`.
 - **QA** — skip only for purely internal refactors. Set `skipQa: true`. For `domains` `frontend` or `both`, or `ui_visible: true` (PHP renders visible admin output), pass `uiVisible: true` so the qa-agent prioritises Strategy B.
 
-**Call the Workflow tool** — read `.claude/commands/orchestrator/workflows/quality-gates.js` with the Read tool, then call the Workflow tool with:
+**Call the Workflow tool** — read `.claude/skills/orchestrator/runners/quality-gates.js` with the Read tool, then call the Workflow tool with:
 - `script`: the file contents
 - `args`:
   ```json
@@ -897,6 +897,6 @@ verifying that downstream agents comply:
 
 ## HTML log format
 
-See `.claude/commands/orchestrator/html-log-format.md` for the complete HTML structure,
+See `.claude/skills/orchestrator/html-log-format.md` for the complete HTML structure,
 CSS, event type patterns, and per-agent detail panel guidelines. Load it on demand when
 you need to write or update a log event — not at session start.

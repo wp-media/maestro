@@ -113,7 +113,7 @@ Use the knowledge graph first, then read files.
 
 If the issue describes a current behavior that you want to verify *before* writing the
 spec — for example, "the cache header is missing on logged-in users" — invoke the `e2e`
-skill (`.claude/commands/e2e.md`) with `tier: "basic"` to reproduce against the
+skill (`.claude/skills/e2e/SKILL.md`) with `tier: "basic"` to reproduce against the
 local environment at `{E2E_URL}` (boot it with `{E2E_BOOT}` if not running).
 
 Skip this step entirely if `E2E_URL` or `E2E_BOOT` is null in `.claude/maestro.json` —
@@ -152,7 +152,7 @@ This is a separate question from where the fix goes — ask it first.
   - Option B: move/refactor — state effort, risk, and the architectural improvement gained.
 
 **d. Project-specific architecture checks:**
-Read `.claude/commands/{ARCH_SKILL}.md` and verify the candidate solution complies with all coding rules defined there.
+Read `.claude/skills/{ARCH_SKILL}/SKILL.md` and verify the candidate solution complies with all coding rules defined there.
 
 **e. Are there edge cases the issue does not mention?**
 List them. The implementation must handle them.

@@ -29,7 +29,7 @@ Read `context_path` in full. Extract and hold as authoritative:
 
 ## Step 2 — Extract orchestrator constants
 
-Read `{target_root}/.claude/commands/orchestrator.md`. Find the `## Project Config` block. Parse every constant:
+Read `{target_root}/.claude/skills/orchestrator/SKILL.md`. Find the `## Project Config` block. Parse every constant:
 - `REPO`
 - `TEMP_ROOT`
 - `BASE_BRANCH`
@@ -123,7 +123,7 @@ grep -n "\.claude/skills/" {file}
 
 **FIX**:
 - `bin/dev-up.sh` → `bin/dev-start.sh`
-- `.claude/skills/` → `.claude/commands/`
+- `.claude/skills/` → `.claude/skills/`
 
 ---
 
