@@ -21,6 +21,9 @@ Print the following organised command reference to the user. Do not run anything
 | Command | What it does |
 |---|---|
 | `/maestro:groom 42` | Groom a single issue — produce a spec, optionally post the summary |
+| `/maestro:challenge 42` | Adversarially review the grooming spec before implementation |
+| `/maestro:review [PR]` | Lead code review on the current branch or a given PR |
+| `/maestro:qa [PR]` | QA validation — boots the environment, tests acceptance criteria |
 
 ## Review
 | Command | What it does |
