@@ -17,6 +17,14 @@ Print the following organised command reference to the user. Do not run anything
 | `/maestro:deliver 42` | Run the full pipeline from a GitHub issue |
 | `/maestro:orchestrator` | Jump into routing if the issue is already loaded |
 
+## Standalone pipeline steps
+| Command | What it does |
+|---|---|
+| `/maestro:groom 42` | Groom a single issue — produce a spec, optionally post the summary |
+| `/maestro:challenge 42` | Adversarially review the grooming spec before implementation |
+| `/maestro:review [PR]` | Lead code review on the current branch or a given PR |
+| `/maestro:qa [PR]` | QA validation — boots the environment, tests acceptance criteria |
+
 ## Review
 | Command | What it does |
 |---|---|
