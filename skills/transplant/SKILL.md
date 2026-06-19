@@ -171,7 +171,7 @@ Interview field rules:
 - Field value is `"none"` → user confirmed the thing does not exist. Do not look for it.
 - Field value is `"FIXME: ..."` → neither the user nor the codebase supplied it. Leave it as FIXME and surface it as a manual step in your return JSON.
 
-Use interview answers to drive disposition decisions: non-PHP projects should have PHP-specific checks rewritten or dropped; projects with no browser UI should have e2e-qa-tester dropped; test runner answers directly determine what replaces PHPUnit in DOD Check 2 and implementation agents.
+Use interview answers to drive disposition decisions: non-PHP projects should have PHP-specific checks rewritten or dropped; projects with no browser UI should have wp-e2e-qa-tester / web-e2e-qa-tester dropped; test runner answers directly determine what replaces PHPUnit in DOD Check 2 and implementation agents.
 
 Produce transplant-context.md at {TARGET_ROOT}/.claude/transplant-context.md and return the JSON summary.
 ```

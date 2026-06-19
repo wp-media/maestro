@@ -224,8 +224,17 @@ a structured test report.
 
 Agent definition: `agents/qa-engineer.md` in the Maestro plugin.
 
-The local WordPress environment at `http://localhost:8888` (admin / password) is used for
-browser validation via Playwright MCP.
+For UI/browser changes, `qa-engineer` delegates to a browser specialist chosen by the harness
+kind declared in `.stack.harness`:
+
+- `agents/wp-e2e-qa-tester.md` — WordPress browser QA (`harness.kind == "wp-local"`). Reads the
+  admin entry path, login URL, and credentials from `.stack.harness` (no longer hardcoded).
+- `agents/web-e2e-qa-tester.md` — config-driven browser QA for generic non-WordPress web apps
+  (`harness.kind == "web"`). **UNTESTED — pending validation against a real non-WordPress web
+  project; treat its browser coverage as unproven.**
+
+The local browser environment (for WordPress, `http://localhost:8888` with the login read from
+`.stack.harness.browser_login`) is driven via Playwright MCP.
 
 ---
 

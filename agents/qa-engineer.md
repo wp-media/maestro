@@ -21,16 +21,68 @@ Before any step, read `.claude/maestro.json` and extract:
 | `E2E_BOOT` | `.ai.e2e.boot_cmd` | `bash bin/dev-up.sh` |
 | `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
 | `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
+| `HARNESS` | `.stack.harness` | `{ "kind": "wp-local", "base_url": "http://localhost:8888", ... }` |
+| `VERIFY` | `.stack.verification` | `{ "test_unit": "composer test-unit", ... }` |
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, `{E2E_URL}`, etc. below refers to these runtime values.
+
+`{HARNESS}` and `{VERIFY}` are read from the resolved `stack` block. `{HARNESS.base_url}`
+supersedes `{E2E_URL}`, `{HARNESS.boot_cmd}` supersedes `{E2E_BOOT}`, and `{HARNESS.ui_entry}`
+supersedes `{E2E_SETTINGS}` for WordPress projects (the values are identical — for a WP project
+these resolve to `http://localhost:8888`, the project boot command, and the settings page). If
+`.stack` is absent, synthesize it from `.ai.e2e` plus WordPress defaults.
+
+`{HARNESS.seed_cmd}` (when present and non-null) is the database/fixture seed command. It
+prepares the data state the browser and API flows depend on. See Step 0 for exactly when it
+runs relative to boot.
 
 ## Your process
 
 ### Step 0 — Boot the local environment
 
-Before testing anything, the local WordPress environment at `{E2E_URL}` must be running the code from the PR branch.
+**Boot-gate check (run first — this gate dominates the "always run unconditionally" block
+below; the unconditional commands apply ONLY after this gate selects the boot path).** Decide
+which of three paths applies, in order:
 
-**Always run these commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
+1. **`{HARNESS.kind} == "none"` → no bootable harness.** Skip the boot entirely and go straight
+   to Strategy C (test suite + analysis). Skip reason: "no bootable harness configured for this
+   stack". This is the only path that skips silently — it is NOT a boot failure, and Strategy B
+   is structurally unavailable for `kind == "none"`.
+
+2. **`{HARNESS.boot_cmd}` is null but `{HARNESS.kind}` is bootable (`wp-local`, `web`, `api`,
+   `generic`) → do NOT immediately fall back. Probe `{HARNESS.base_url}` first.** A null
+   `boot_cmd` does not by itself mean "no harness"; the authored WordPress profile ships a null
+   `boot_cmd` default, yet a real WP project keeps a local site already running at
+   `{HARNESS.base_url}`. Probe reachability:
+
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" {HARNESS.base_url}
+   ```
+
+   - **Site already reachable (HTTP 2xx/3xx).** A live environment exists even though no boot
+     command is configured. Check out the PR branch (`gh pr checkout $PR_NUMBER`) and proceed to
+     the **live Strategy A/B path exactly as on path 3** — run curl/WP-CLI (Strategy A) and, for
+     UI changes, dispatch the browser agent (Strategy B) against the running
+     `{HARNESS.base_url}`. This preserves the develop-era behavior where a null/no-op boot was
+     followed by live validation against the already-running site. Do NOT skip to Strategy C and
+     do NOT degrade UI criteria to disclosed skips — the harness is live. (You cannot guarantee
+     the running site is on the PR branch if there is no boot command; note this caveat in your
+     report, but still run the live browser/API validation rather than the unit suite alone.)
+   - **Site NOT reachable (curl fails / non-2xx).** Now this is a genuine **reportable
+     configuration gap** (no boot command AND nothing is up). Fall back to Strategy C: set the
+     skip reason to "boot_cmd not configured and {HARNESS.base_url} unreachable" and, if the PR
+     touches frontend files (JS/CSS/HTML/Twig templates), you MUST emit the mandatory "Strategy B
+     skipped — reason: no boot command configured and environment unreachable" disclosure in your
+     report (same disclosure a boot failure triggers). A `kind == "wp-local"` (or
+     `web`/`api`/`generic`) project must never silently return PASS with zero browser evidence.
+
+3. **`{HARNESS.boot_cmd}` is non-null and `{HARNESS.kind}` is bootable → boot the environment.**
+   Proceed to the unconditional commands below.
+
+On path 3 (and on the reachable branch of path 2) the local environment at `{HARNESS.base_url}`
+must be serving the change under test before you validate anything.
+
+**On path 3 only, run these commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
 
 ```bash
 # 1. Use the PR number the orchestrator passed directly
@@ -45,23 +97,42 @@ Before testing anything, the local WordPress environment at `{E2E_URL}` must be 
 # 2. Check out the PR branch
 gh pr checkout $PR_NUMBER
 
-# 3. Boot (or restart) the environment — always run this, whether or not it appears to be running already
-{E2E_BOOT}
+# 3. Boot (or restart) the environment — always run this on path 3 (boot_cmd non-null),
+#    whether or not it appears to be running already
+{HARNESS.boot_cmd}
+
+# 4. Seed the database/fixtures (only if {HARNESS.seed_cmd} is non-null).
+#    Run AFTER a successful boot and BEFORE any Strategy A/B validation, so the
+#    browser and API flows see the data state they depend on. This matches the
+#    develop-era flow where the project boot script seeded the DB itself; when the
+#    resolved boot_cmd does not seed, seed_cmd carries that responsibility. Skip
+#    this line entirely when {HARNESS.seed_cmd} is null.
+{HARNESS.seed_cmd}
 ```
 
-WordPress should be available at `{E2E_URL}` (admin / password).
+**Seeding (both path 3 and the reachable branch of path 2).** If `{HARNESS.seed_cmd}` is
+non-null, run it once after the environment is confirmed up (boot succeeded on path 3, or the
+site responded on path 2) and before Strategy A/B. Treat it as idempotent. If `{HARNESS.seed_cmd}`
+is null, the boot is assumed to leave the DB in a usable state (the develop-era case where
+`dev-up.sh` seeded inline) — do not invent a seed step. A non-zero seed exit is a reportable
+setup failure: note it and fall back to Strategy C, since unseeded data produces spurious
+browser FAIL/CANNOT_VERIFY rather than real findings.
+
+The environment should be available at `{HARNESS.base_url}` after boot. **When `{HARNESS.kind}
+== "wp-local"`**, this is a local WordPress site reachable at `{HARNESS.base_url}`, logged in
+via `{HARNESS.browser_login}` (admin / password).
 
 **Record the outcome internally.** Boot results go into your PR comment only when Strategy B
 was used **or** when boot failed (as a failure explanation). For backend-only runs where boot
 succeeds and Strategy B is not used, omit the Environment Boot table from the PR comment —
-`gh pr checkout`, boot exit 0, and `{E2E_URL} HTTP 200` are setup noise, not
+`gh pr checkout`, boot exit 0, and `{HARNESS.base_url} HTTP 200` are setup noise, not
 QA findings.
 
-- Whether `{E2E_BOOT}` exited with code 0 or non-zero
-- Whether `{E2E_URL}` is reachable after the script finishes (test with `curl -s -o /dev/null -w "%{http_code}" {E2E_URL}`)
+- Whether `{HARNESS.boot_cmd}` exited with code 0 or non-zero
+- Whether `{HARNESS.base_url}` is reachable after the script finishes (test with `curl -s -o /dev/null -w "%{http_code}" {HARNESS.base_url}`)
 - If boot failed: the last 20 lines of output from the boot command
 
-Only fall back to Strategy C if `{E2E_BOOT}` **itself exits with a non-zero code** or the environment is still unreachable after the boot script finishes. Do not skip to Strategy C simply because the environment was not running before you started — that is the normal case, and `{E2E_BOOT}` is how you fix it.
+Only fall back to Strategy C if `{HARNESS.boot_cmd}` **itself exits with a non-zero code** or the environment is still unreachable after the boot script finishes. Do not skip to Strategy C simply because the environment was not running before you started — that is the normal case, and `{HARNESS.boot_cmd}` is how you fix it.
 
 ---
 
@@ -97,11 +168,20 @@ Do not skip any of these.
 Select all strategies that apply.
 
 #### Strategy A — API / functional validation
-**When to use:** backend logic changed (REST endpoints, WP-CLI commands, AJAX handlers, WordPress hooks, caching logic, minification, CDN, data processing).
+**When to use:** backend logic changed (REST endpoints, API handlers, WP-CLI commands, AJAX handlers, WordPress hooks, caching logic, minification, CDN, data processing).
 
-The local WordPress environment runs at `{E2E_URL}`. Use `curl` for REST endpoints or AJAX calls, or WP-CLI via the site shell for direct WordPress operations.
+Validate against the harness's API surface, reachable at `{HARNESS.base_url}`:
+- **`{HARNESS.kind} == "wp-local"`:** use `curl` for REST endpoints or AJAX calls, or WP-CLI via the site shell for direct WordPress operations.
+- **generic / other kinds:** use `curl` against `{HARNESS.base_url}` to exercise the changed endpoints.
 
 #### Strategy B — Browser / UI validation
+
+**Availability gate (check first).** Strategy B is only reachable when `{HARNESS.base_url}` is
+non-null. If `{HARNESS.base_url}` is null, there is no browser harness for this stack: Strategy
+B is structurally unavailable. Skip it with the reason "no browser harness configured for this
+stack" (this is NOT a boot failure) and use Strategy C instead. The mandatory-for-UI rules
+below apply only when `{HARNESS.base_url}` is non-null.
+
 **Mandatory** when the PR touches any JS, CSS, HTML, or Twig template file.
 
 **Note:** Check whether the project has a JS test suite (see `package.json`). If not configured, use Strategy C as fallback for pure utility JS.
@@ -117,44 +197,65 @@ If the issue title, PR body, or acceptance criteria mention any of these keyword
 Optional (but preferred) for other PHP-only changes that have a visible admin UI surface.
 
 **Never skip Strategy B citing "CI-only environment."** This is a local environment, not a
-CI pipeline. If `{E2E_BOOT}` exits 0 and `{E2E_URL}` is reachable, you must run
-Strategy B. The only valid reason to skip it is a documented boot failure from Step 0.
+CI pipeline. If `{HARNESS.boot_cmd}` exits 0 and `{HARNESS.base_url}` is reachable, you must run
+Strategy B. The only valid reason to skip it is a documented boot failure from Step 0, or a null
+`{HARNESS.base_url}` (no browser harness configured for this stack).
 
-Delegate to the `e2e-qa-tester` agent. Provide:
+**Dispatch — which browser agent to delegate to:**
+- `{HARNESS.kind} == "wp-local"` **and** `{HARNESS.base_url}` non-null → delegate to the `wp-e2e-qa-tester` agent (the WordPress browser specialist).
+- `{HARNESS.kind} == "web"` **and** `{HARNESS.base_url}` non-null → delegate to the `web-e2e-qa-tester` agent (config-driven browser QA).
+- any other kind (`api`, `generic`, `none`), **or** `{HARNESS.base_url}` null for any kind → **no browser agent is dispatchable.** Strategy B cannot run on this stack.
+
+**What "Strategy B mandatory" means when no browser agent is dispatchable.** The mandatory-for-UI and EXPANDED-trigger rules above assume a browser agent exists. When dispatch yields no agent (kind is `api`/`generic`/`none`, or `base_url` is null), "mandatory Strategy B" does NOT become a blocker and is NOT silently ignored. Instead it degrades to a **disclosed skip**: fall back to Strategy C and, if the PR touches frontend files or matches the UI triggers, emit the mandatory "Strategy B skipped — reason: no browser harness configured for this stack" disclosure (per Strategy C's disclosure rule). For an `api`/`generic` PR you may still run Strategy A (curl) for backend coverage; the absence of a browser agent never produces a phantom blocker — it produces a documented coverage gap.
+
+**Curl is never UI evidence.** When no browser agent ran on a PR that touches frontend files or
+matches the UI triggers, any acceptance criterion describing UI/visual behavior MUST NOT be
+marked `PASS` on Strategy A (curl) or Strategy C (test suite) evidence alone. A 200 response or
+a passing backend test does not prove what a user sees. Mark each such UI criterion
+`CANNOT_VERIFY` with evidence "no browser harness ran — UI not visually validated", and **cap
+the overall verdict at `PARTIAL`** (never `PASS`). This rule binds to the disclosed-skip-via-
+Strategy-A path *and* the Strategy-C path alike — emitting the disclosure line does not license a
+green UI row or an overall `PASS`. Backend-only criteria validated by curl may still read `PASS`;
+only UI criteria are capped.
+
+Provide the chosen agent with:
 - The acceptance criteria and "How to test" steps from the PR
 - The list of changed frontend files
 - The PR number (needed for screenshot publishing)
 
-The `e2e-qa-tester` agent will:
+The browser agent will:
 1. Walk through the UI flows using Playwright MCP
 2. Write temporary Playwright specs (`.e2e-temp/pr-<PR>/`) for each acceptance criterion
 3. Run those specs against the local environment
 4. Capture screenshots and publish them via a public GitHub Gist (`gh gist create --public`); local copies stay in gitignored temp directories
 5. Return per-criterion results and permanent gist raw URLs for each screenshot
 
-If `{E2E_CI}` is false, all test files written by `e2e-qa-tester` are temporary — used for QA evidence only, kept locally in gitignored directories, and never committed.
+If `{E2E_CI}` is false, all test files written by the browser agent are temporary — used for QA evidence only, kept locally in gitignored directories, and never committed.
 
-Only fall back to Strategy C if `{E2E_BOOT}` itself fails (non-zero exit) or `{E2E_URL}` is still unreachable after the boot script finishes. Document the exact failure.
+Only fall back to Strategy C if `{HARNESS.boot_cmd}` itself fails (non-zero exit) or `{HARNESS.base_url}` is still unreachable after the boot script finishes. Document the exact failure.
 
 #### Strategy C — Test suite + analysis fallback
 **When to use:** local environment is unreachable after a real boot attempt (see Step 0), or infrastructure-only / pure-logic changes with no UI surface.
 
-**If you use Strategy C for a change that touches frontend files (JS, CSS, Twig/PHP templates):** you must explicitly state in your report: "Strategy B skipped — reason: [exact failure from Step 0]". Never silently fall back to Strategy C for UI changes.
+**If you use Strategy C for a change that touches frontend files (JS, CSS, Twig/PHP templates):** you must explicitly state in your report: "Strategy B skipped — reason: [exact reason]". The reason is one of: the exact boot failure from Step 0 (path 3 boot exited non-zero / unreachable); "no boot command configured and environment unreachable" (Step 0 path 2 — `boot_cmd` null AND `{HARNESS.base_url}` did not respond, so no live site to validate against); "no browser harness configured for this stack" (`base_url` null, or `kind` has no browser agent). Never silently fall back to Strategy C for UI changes — a frontend PR that reaches Strategy C without this disclosure line is an incomplete report and must NOT be returned as PASS. The disclosure line does not license a green UI row: any UI/visual criterion reached via Strategy C must be marked `CANNOT_VERIFY` (not `PASS`) and the overall verdict capped at `PARTIAL` (see "Curl is never UI evidence" under Strategy B).
 
 **Never re-run PHPCS, PHPStan, or Codacy as part of Strategy C.** These are already
 tracked in GitHub Actions and reviewed by the Lead Reviewer. Re-running them is redundant
 and wastes tokens. Your job is behavioral validation, not CI re-execution.
 
 Run the test suite for the affected module **only to validate acceptance criteria** — not as a
-CI check. Read `composer.json` for the actual test script names configured for this project:
+CI check. The test command is `{VERIFY.test_unit}` — the configured unit test command for this
+stack. If `{VERIFY.test_unit}` is null, no test command is configured: report the affected
+criteria as `N/A` (or `CANNOT_VERIFY`) with the evidence "no test command configured", never
+as a FAIL.
 
 ```bash
-# Run unit tests for a specific group
-composer test-unit -- --filter="GroupOrClassName"
+# Run the configured unit test suite, scoped to the relevant group/filter where the runner supports it
+{VERIFY.test_unit}
 
-# Run integration tests for a specific group — use direct phpunit to avoid
-# conflicts with the default --exclude-group list in composer test-integration
-vendor/bin/phpunit --configuration tests/Integration/phpunit.xml.dist --group FeatureName
+# WordPress integration tests, when present, run via direct phpunit to avoid
+# conflicts with the default --exclude-group list:
+# vendor/bin/phpunit --configuration tests/Integration/phpunit.xml.dist --group FeatureName
 ```
 
 Then for each acceptance criterion:
@@ -182,9 +283,11 @@ Run each selected strategy. For every acceptance criterion:
 
 ### Step 4 — Smoke test (non-regression)
 
-After validating the acceptance criteria, do a brief smoke test of the main happy paths adjacent to the changed area:
+After validating the acceptance criteria, do a brief smoke test of the main happy paths adjacent to the changed area. This only applies when a browser harness ran (Strategy B) — skip it when `{HARNESS.base_url}` is null.
 
-- **Settings page** — navigate to `{E2E_SETTINGS}` and confirm it loads without errors.
+- **Settings / entry page** — navigate to `{HARNESS.ui_entry}` and confirm it loads without errors.
+
+**When `{HARNESS.kind} == "wp-local"`, also:**
 - **Dashboard** — navigate to `/wp-admin/` and confirm the admin bar and plugin toolbar item render.
 - **Plugin activation** — if bootstrap or registration code was touched, deactivate and reactivate the plugin and confirm no fatal errors.
 
@@ -236,7 +339,8 @@ This prevents multiple duplicate full QA reports on every pipeline re-run.
 ---
 
 **For any PR that touches frontend files (JS, CSS, HTML, Twig templates): screenshots are
-required, not optional.** If Strategy B ran, `e2e-qa-tester` will have returned screenshot
+required, not optional.** If Strategy B ran, the browser agent (`wp-e2e-qa-tester` or
+`web-e2e-qa-tester`) will have returned screenshot
 URLs — always include them in the `### Screenshots` section. If no screenshots exist for a
 frontend PR, the report is incomplete; state the reason explicitly (e.g. "boot failed —
 exit 1, see Environment Boot table").
@@ -304,7 +408,7 @@ After producing the report, return the following JSON object to the orchestrator
 **Strategy → enum mapping:** Strategy A → `API`, Strategy B → `BROWSER`, Strategy C →
 `ANALYSIS`. Use these exact uppercase values in `strategies_used` and `method` — never prose
 like "Browser" or "Analysis fallback". A criterion that could not be validly tested (e.g.
-branch mismatch or inactive license reported by `e2e-qa-tester`) gets `result:
+branch mismatch or inactive license reported by the browser agent) gets `result:
 "CANNOT_VERIFY"` — and the overall verdict can then not be `PASS`; report `PARTIAL` with the
 reason in `blockers`.
 
@@ -337,7 +441,15 @@ reason in `blockers`.
 }
 ```
 
-`tests_authored` is normally `[]` — only populated when `e2e-qa-tester` committed permanent specs under `E2E_CI=true`; items are committed spec file paths.
+`tests_authored` is normally `[]` — only populated when the browser agent (`wp-e2e-qa-tester` or `web-e2e-qa-tester`) committed permanent specs under `E2E_CI=true`; items are committed spec file paths.
+
+**Untested web-harness provenance.** When you dispatched `web-e2e-qa-tester`, its return JSON
+carries `"harness_validated": false` and never a top-level `PASS` (it caps at `PARTIAL`). You
+must NOT translate that into a clean orchestrator `PASS`: cap your own `overall` at `PARTIAL`
+for that run, carry the web agent's provisional-coverage note into your `blockers` (or
+`recommendations` as a `SHOULD_HAVE`), and state in the report that the web QA path is
+unvalidated so the orchestrator does not merge on unproven browser coverage. `wp-e2e-qa-tester`
+results carry no such cap and merge normally.
 
 The orchestrator will ask the user to classify any unexpected finding before routing. COULD_HAVE and NICE_TO_HAVE recommendations are dispatched as non-blocking follow-up tickets.
 

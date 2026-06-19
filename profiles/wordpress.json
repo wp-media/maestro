@@ -1,0 +1,42 @@
+{
+  "profile": "wordpress",
+  "kind": "authored",
+  "detect": {
+    "signals": [
+      { "glob": "*.php", "header": "Plugin Name:", "weight": 10 },
+      { "file": "composer.json", "weight": 3 },
+      { "file": "wp-content", "weight": 2 }
+    ],
+    "min_score": 10
+  },
+  "verification": {
+    "lint":      { "cmd": "composer phpcs-changed", "fallback": "composer run phpcs", "autofix": "composer phpcs:fix" },
+    "typecheck": { "cmd": "composer run-stan", "fallback": "composer phpstan" },
+    "test_unit": { "cmd": "composer test-unit", "fallback": "composer test" },
+    "test_integration": { "cmd": "vendor/bin/phpunit --configuration tests/Integration/phpunit.xml.dist" },
+    "build":     null
+  },
+  "source_dirs": ["src/", "inc/", "classes/"],
+  "public_api_surface": [
+    "WordPress hooks (add_action/add_filter additions)",
+    "AJAX actions, REST routes",
+    "option_keys, capabilities",
+    "WP-CLI commands"
+  ],
+  "harness": {
+    "kind": "wp-local",
+    "base_url": "http://localhost:8888",
+    "boot_cmd": null,
+    "seed_cmd": "bash .maestro/bin/dev-seed.sh",
+    "ui_entry": "/wp-admin/options-general.php?page=<plugin-page>",
+    "browser_login": { "url": "/wp-login.php", "user": "admin", "pass": "password" },
+    "e2e_runner": "npx --yes playwright test"
+  },
+  "gates": ["compliance"],
+  "variants": { "concept": "editions", "values": ["free", "pro"] },
+  "idioms": [
+    "Use esc_html/esc_attr/esc_url/wp_kses_post for output by context",
+    "No jQuery in new JS — native DOM",
+    "Use the project-registered capability, not manage_options"
+  ]
+}

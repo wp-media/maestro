@@ -5,6 +5,11 @@ description: Check a change against WordPress.org plugin rules and PHPCS standar
 
 # WordPress Compliance
 
+This is the **profile-gated compliance gate** that the `wordpress` profile enables. The
+orchestrator runs it **only when `compliance` appears in `.stack.gates`** (it always does for
+the WordPress profile; derived stacks have `gates: []` and never invoke this gate). When it
+fires, behavior is identical to today — the WordPress.org checks below are unchanged.
+
 Ensure compatibility with:
 - WordPress Plugin Check
 - Repository PHPCS rules

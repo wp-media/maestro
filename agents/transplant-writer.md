@@ -212,7 +212,7 @@ You now have all three versions needed for a semantic 3-way merge.
 2. **Identify the Maestro delta**: What changed between the baseline (git output) and `source_path`?
    - Read both files carefully.
    - Identify every changed section, added step, new rule, removed content, updated JSON contract, etc.
-   - Summarize the delta as a list of semantic changes: "Added Step 4d (anti-scope-creep gate)", "Updated model routing table to add e2e-qa-tester row", "Changed QA loop limit from 2 to 3", etc.
+   - Summarize the delta as a list of semantic changes: "Added Step 4d (anti-scope-creep gate)", "Updated model routing table to add wp-e2e-qa-tester row", "Changed QA loop limit from 2 to 3", etc.
 
 3. **Identify the team's customizations**: What changed between what the transplant would have produced and the current team file?
    - The team's file is `output_path` (their current version).
