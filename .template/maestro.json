@@ -1,5 +1,29 @@
 {
   "_note": "Copy to .claude/maestro.json and fill in all fields. Remove the editions block entirely if the plugin has no free/pro split. Remove null tooling entries that don't apply.",
+
+  "_stack_note": "Resolved stack block — written by /onboard-project after derive-then-confirm. Agents read ONLY this flat block; commands are flattened to strings. ai.e2e is now an alias of stack.harness during migration (stack.harness is the source of truth, ai.e2e mirrors it).",
+  "stack": {
+    "profile": "wordpress",
+    "profile_version": "1",
+    "verification": {
+      "lint": "composer phpcs-changed", "lint_fallback": "composer run phpcs",
+      "autofix": "composer phpcs:fix",
+      "typecheck": "composer run-stan", "typecheck_fallback": "composer phpstan",
+      "test_unit": "composer test-unit", "test_unit_fallback": "composer test",
+      "build": null
+    },
+    "source_dirs": ["src/", "inc/", "classes/"],
+    "public_api_surface": ["WordPress hooks", "AJAX actions, REST routes", "option_keys, capabilities", "WP-CLI commands"],
+    "harness": {
+      "kind": "wp-local", "base_url": "http://localhost:8888",
+      "boot_cmd": "bash .maestro/bin/dev-up.sh", "ui_entry": "/wp-admin/options-general.php?page=wprocket",
+      "browser_login": { "url": "/wp-login.php", "user": "admin", "pass": "password" },
+      "e2e_runner": "npx --yes playwright test"
+    },
+    "gates": ["compliance"],
+    "variants": { "concept": "editions", "values": ["free", "pro"] }
+  },
+
   "name": "<project-slug>",
   "repo": "wp-media/<project-slug>",
   "type": "wordpress-plugin",

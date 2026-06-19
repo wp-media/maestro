@@ -13,6 +13,13 @@ and report the results as a structured JSON object.
 Read `.claude/maestro.json`. Extract:
 - `TEMP_ROOT` = `.ai.temp_root`
 - `BASE_BRANCH` = (passed as input from orchestrator, defaults to `origin/develop`)
+- `VERIFY` = `.stack.verification` (`lint`, `lint_fallback`, `typecheck`, `test_unit`, `autofix`, `build` — any may be `null`)
+- `SOURCE_DIRS` = `.stack.source_dirs`
+- `API_SURFACE` = `.stack.public_api_surface`
+
+Every command read from `VERIFY` is **null-guarded**: when a command is `null` (or absent),
+the corresponding step is **skipped with an explicit note** in the evidence — a missing command
+is NEVER a `FAIL`. This is the single most important correctness rule in this skill.
 
 ---
 
@@ -75,29 +82,29 @@ Identify changed source files:
 git diff {BASE_BRANCH} --name-only
 ```
 
-For each changed PHP source file in the project's source directories (`src/`, `inc/`, `classes/`, etc.), check that a corresponding test file exists. Test files should mirror the source structure.
+For each changed source file under a `{SOURCE_DIRS}` path, check that a corresponding test file exists. Test files should mirror the source structure.
 
-Then run the test suite using the project's defined commands (read `composer.json` scripts):
+Then run the test suite using the project's configured command, `{VERIFY.test_unit}`:
 ```bash
-# Example — use the project's actual test command
-composer test-unit
+# Use the resolved command from .stack.verification.test_unit
+{VERIFY.test_unit}
 ```
 
-- **PASS**: All changed PHP source files have tests AND tests pass
+If `{VERIFY.test_unit}` is `null`, report this check as **N/A** with evidence `"no test command configured"` — do NOT treat the absence of a test command as a failure.
+
+- **PASS**: All changed source files have tests AND `{VERIFY.test_unit}` passes
 - **WARN**: A changed file has no corresponding test. When reporting this, you MUST include an explicit written statement in `evidence`: the filename, the reason a test does not exist (not "too small" or "follow-up ticket" — those are rationalizations), and whether the missing test represents a real gap. "Later" is the load-bearing word — there is no later. If the only honest reason is "I didn't write it", that is a FAIL, not a WARN.
-- **FAIL**: Tests fail or error out, OR the agent's stated reason for a missing test is "I'll do it in a follow-up"
+- **FAIL**: `{VERIFY.test_unit}` fails or errors out, OR the agent's stated reason for a missing test is "I'll do it in a follow-up"
+- **N/A**: `{VERIFY.test_unit}` is `null` — no test command is configured for this stack
 
 ---
 
 ### Check 3 — Documentation updated
 
-Run `git diff {BASE_BRANCH} --name-only` and look for changes to the public API surface:
-- New or changed WordPress hooks
-- New or changed AJAX actions or REST routes
-- New or changed configuration keys, option names, or capabilities
-- New or changed plugin metadata
-- New or changed exported public methods on ServiceProvider-bound services
-- New or changed WP-CLI commands
+Run `git diff {BASE_BRANCH} --name-only` and look for changes to any item in `{API_SURFACE}` —
+the public API surface declared for this stack in `.stack.public_api_surface`. For a WordPress
+project this resolves to WordPress hooks, AJAX actions / REST routes, option_keys / capabilities,
+and WP-CLI commands.
 
 Then check if docs were updated:
 ```bash
@@ -148,24 +155,36 @@ Check that all required sections from the template are present and non-empty:
 
 **Layer 1 (no PR yet — local CI commands):**
 
-Read `composer.json` for the project's defined commands. Run them in this order:
+Run the project's configured commands from `{VERIFY}` in this order. **Every command is
+null-guarded** — if a command is `null` (or absent), skip that step and note it in evidence;
+a missing command is a skip-with-note, NEVER a `FAIL`.
+
 ```bash
-# Fast check on changed files first
-composer phpcs-changed 2>/dev/null || composer run phpcs 2>/dev/null
-# Static analysis
-composer run-stan 2>/dev/null || composer phpstan 2>/dev/null
-# Unit tests
-composer test-unit 2>/dev/null || composer test 2>/dev/null
+# Lint — fast check on changed files first, falling back if configured
+{VERIFY.lint} 2>/dev/null || {VERIFY.lint_fallback} 2>/dev/null
+# Static analysis — primary, falling back if configured
+{VERIFY.typecheck} 2>/dev/null || {VERIFY.typecheck_fallback} 2>/dev/null
+# Unit tests — primary, falling back if configured
+{VERIFY.test_unit} 2>/dev/null || {VERIFY.test_unit_fallback} 2>/dev/null
 ```
 
-Use the exact script names defined in `composer.json` — do not invent them.
+For each line, the `|| {*_fallback}` clause is emitted **only when that fallback is non-null**
+(every WordPress default is — `composer run phpcs`, `composer phpstan`, `composer test` — which
+keeps these commands byte-identical to the develop-era gate). If a primary is `null`, skip that
+step entirely (do not run its fallback). If a primary is set but its `*_fallback` is `null`, run
+only the primary. Specifically: if `{VERIFY.lint}` is `null`, skip lint; if `{VERIFY.typecheck}`
+is `null`, skip static analysis; if `{VERIFY.test_unit}` is `null`, skip unit tests. Note each
+skipped step in evidence as "no <step> command configured". These are the resolved commands from
+`.stack.verification` — do not invent script names.
 
-If PHPCS reports violations, auto-fix then re-check:
+If the lint step reports violations and `{VERIFY.autofix}` is set, auto-fix then re-check:
 ```bash
-composer phpcs:fix 2>/dev/null || composer phpcbf 2>/dev/null
+{VERIFY.autofix} 2>/dev/null
 # Confirm 0 remaining violations
-composer phpcs-changed 2>/dev/null || composer run phpcs 2>/dev/null
+{VERIFY.lint} 2>/dev/null || {VERIFY.lint_fallback} 2>/dev/null
 ```
+If `{VERIFY.autofix}` is `null`, skip the auto-fix step and report remaining violations as
+found (still subject to the verdict rules below — a missing autofix command is not itself a FAIL).
 
 **Layer 2 (PR exists — remote CI status):**
 

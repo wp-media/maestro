@@ -137,7 +137,7 @@ bin/dev-down.sh            → {maestro_root}/bin/dev-down.sh                   
 | `orchestrator`, `issue-workflow` | `orchestration` |
 | `grooming-agent`, `challenger` | `grooming` |
 | `backend-agent`, `frontend-agent` | `implementation` |
-| `lead-reviewer`, `qa-engineer`, `e2e-qa-tester` | `quality` |
+| `lead-reviewer`, `qa-engineer`, `wp-e2e-qa-tester`, `web-e2e-qa-tester` | `quality` |
 | `release-agent`, `ticket-writer` | `release` |
 | All other skills not listed above | `skills` |
 | Scripts, refs, bin files | `scripts` |
@@ -569,7 +569,8 @@ Every component must have a decision. Use the rules below.
 - `refs/pr-template.md` → always KEEP_AS_IS
 - `skills/compliance/SKILL.md` → KEEP_AS_IS if WP project, DROP otherwise
 - `agents/frontend-agent.md` → ADAPT if frontend split exists, DROP if API/CLI/library
-- `agents/e2e-qa-tester.md` → ADAPT if Playwright/Cypress found, DROP otherwise
+- `agents/wp-e2e-qa-tester.md` → ADAPT if WordPress + Playwright/Cypress found, DROP otherwise
+- `agents/web-e2e-qa-tester.md` → ADAPT if non-WordPress web app + Playwright/Cypress found, DROP otherwise
 - `skills/e2e/SKILL.md` → ADAPT if E2E found, DROP otherwise
 - `.claude/bin/dev-start.sh` → ADAPT if still wp-env based, REWRITE for everything else
 - `.claude/bin/dev-seed.sh` → REWRITE if seeding exists, DROP otherwise

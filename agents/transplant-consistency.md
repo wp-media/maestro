@@ -22,7 +22,7 @@ Read `context_path` in full. Extract and hold as authoritative:
 - Exact `LINT_CMD` (may be N/A)
 - `BOOT_CMD`
 - `TEMP_ROOT`
-- All components marked `DROP` in Section 8 (collect their names, e.g. `e2e-qa-tester`, `frontend-agent`, `compliance`)
+- All components marked `DROP` in Section 8 (collect their names, e.g. `wp-e2e-qa-tester`, `web-e2e-qa-tester`, `frontend-agent`, `compliance`)
 - Project type and primary language
 
 ---
@@ -82,7 +82,7 @@ If `TEMP_ROOT` is not `.ai`, those are inconsistencies.
 
 ### Check 3 — Routing table vs actual agent files
 
-Read `orchestrator.md`. Find the model routing table — the block mapping agent names to models (typically a table or list under a heading like "Model routing" or "Agent dispatch"). Extract every agent filename referenced (e.g., `grooming-agent`, `backend-agent`, `e2e-qa-tester`).
+Read `orchestrator.md`. Find the model routing table — the block mapping agent names to models (typically a table or list under a heading like "Model routing" or "Agent dispatch"). Extract every agent filename referenced (e.g., `grooming-agent`, `backend-agent`, `wp-e2e-qa-tester`).
 
 For each referenced agent:
 ```bash
@@ -95,7 +95,7 @@ test -f "{target_root}/.claude/agents/{agent-name}.md"
 
 ### Check 4 — Dropped component references
 
-From the context doc Section 8, collect all components with disposition `DROP`. Build a list of their short names (e.g., `e2e-qa-tester`, `frontend-agent`, `compliance`, `e2e`).
+From the context doc Section 8, collect all components with disposition `DROP`. Build a list of their short names (e.g., `wp-e2e-qa-tester`, `web-e2e-qa-tester`, `frontend-agent`, `compliance`, `e2e`).
 
 For each `files_written` file, grep for each dropped component name:
 ```bash
@@ -104,11 +104,11 @@ grep -in "{dropped-name}" {file}
 
 **FIX** each hit depending on context:
 - If the reference is in a routing table row → remove the row
-- If the reference is in a prose sentence like "spawn the e2e-qa-tester agent" → remove the sentence or the entire step if the step only exists for that agent
+- If the reference is in a prose sentence like "spawn the wp-e2e-qa-tester agent" → remove the sentence or the entire step if the step only exists for that agent
 - If the reference is in a conditional block that skips gracefully → leave it (it is a guard, not a dependency)
 - If the reference is a skill invocation like `/e2e` → remove the invocation step
 
-Use judgment: a reference like "if e2e-qa-tester is available" is a guard and is fine. A reference like "spawn e2e-qa-tester" in an unconditional step is a broken dependency.
+Use judgment: a reference like "if wp-e2e-qa-tester is available" is a guard and is fine. A reference like "spawn wp-e2e-qa-tester" in an unconditional step is a broken dependency.
 
 ---
 

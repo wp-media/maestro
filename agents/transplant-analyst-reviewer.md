@@ -51,7 +51,8 @@ If project type does NOT start with `wp-`, `skills/compliance/SKILL.md` MUST be 
 ### Rule 2 — No E2E → DROP e2e components
 
 If `has_e2e` is false / E2E framework is `None`:
-- `agents/e2e-qa-tester.md` MUST be `DROP`
+- `agents/wp-e2e-qa-tester.md` MUST be `DROP`
+- `agents/web-e2e-qa-tester.md` MUST be `DROP`
 - `skills/e2e/SKILL.md` MUST be `DROP`
 
 **FAIL** if either is not `DROP`.

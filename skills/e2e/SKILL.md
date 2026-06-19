@@ -70,7 +70,7 @@ agent's execution window.
 
    **Browser (settings page, dashboard notices, interactive UI):**
    Use the Playwright MCP directly for basic-tier smoke. Do not delegate to
-   `e2e-qa-tester` at this tier (that is the extended tier path):
+   `wp-e2e-qa-tester` at this tier (that is the extended tier path):
    ```
    mcp__playwright__navigate({ url: "{E2E_URL}/wp-login.php" })
    # login
@@ -102,7 +102,7 @@ agent's execution window.
 - ✅ Do: verify the **one primary scenario** from the spec or grooming plan
 - ✅ Do: probe current-system behavior (grooming-agent only) when an assumption needs verification
 - 🚫 Do not: cover all acceptance criteria (that is extended tier)
-- 🚫 Do not: write or commit Playwright specs (that is extended tier via `e2e-qa-tester`)
+- 🚫 Do not: write or commit Playwright specs (that is extended tier via `wp-e2e-qa-tester` / `web-e2e-qa-tester`)
 - 🚫 Do not: publish screenshots (that is extended tier)
 
 ---
@@ -114,9 +114,11 @@ comparison, and Playwright spec authoring with screenshot evidence.
 
 **Invoker:** `qa-engineer` only.
 
-**Execution:** the qa-engineer agent delegates browser flows to the `e2e-qa-tester`
-sub-agent, which handles Playwright MCP driving, temporary spec authoring under
-`.e2e-temp/`, screenshot publishing via the commit-SHA method, and clean-up.
+**Execution:** the qa-engineer agent delegates browser flows to a browser sub-agent chosen by
+`.stack.harness.kind` — `wp-e2e-qa-tester` for WordPress (`wp-local`), or `web-e2e-qa-tester`
+for generic web apps (`web`, **untested — pending validation**). The sub-agent handles
+Playwright MCP driving, temporary spec authoring under `.e2e-temp/`, screenshot publishing via
+the commit-SHA method, and clean-up.
 
 The qa-engineer agent itself handles:
 - Strategy A (API / functional validation via curl and WP-CLI)
@@ -124,7 +126,8 @@ The qa-engineer agent itself handles:
 
 For details, read:
 - `.claude/agents/qa-engineer.md` — strategy selection and report format
-- `.claude/agents/e2e-qa-tester.md` — browser flow execution, spec authoring, screenshot publishing
+- `.claude/agents/wp-e2e-qa-tester.md` — WordPress browser flow execution, spec authoring, screenshot publishing
+- `.claude/agents/web-e2e-qa-tester.md` — generic web-app browser flow execution (untested — pending validation)
 
 The extended tier writes Playwright specs to `.e2e-temp/` (gitignored, never committed when `{E2E_CI}` is false)
 and screenshots to `.e2e-screenshots/`. Screenshots are published to a public GitHub Gist (`gh gist create --public`) to get permanent, publicly accessible raw URLs — no commits to the PR branch. Gist raw URLs never 404 in PR comments, unlike commit-SHA-based URLs.
@@ -150,5 +153,5 @@ and screenshots to `.e2e-screenshots/`. Screenshots are published to a public Gi
   curl -s -o /dev/null -w "%{http_code}" {E2E_SETTINGS}
   ```
 - For cache-header tests, send a request to a front-end URL and inspect the project's cache response headers.
-- The basic tier never writes Playwright spec files and is invoked by grooming-agent only. Implementation agents (backend-agent, frontend-agent) do not invoke the e2e skill — full E2E validation belongs to the qa-engineer + e2e-qa-tester tier.
-- If `{E2E_CI}` is true, the project maintains a permanent E2E suite — `e2e-qa-tester` will commit spec files rather than delete them.
+- The basic tier never writes Playwright spec files and is invoked by grooming-agent only. Implementation agents (backend-agent, frontend-agent) do not invoke the e2e skill — full E2E validation belongs to the qa-engineer + wp-e2e-qa-tester / web-e2e-qa-tester tier.
+- If `{E2E_CI}` is true, the project maintains a permanent E2E suite — the browser sub-agent (`wp-e2e-qa-tester` / `web-e2e-qa-tester`) will commit spec files rather than delete them.

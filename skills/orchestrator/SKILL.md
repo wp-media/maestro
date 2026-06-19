@@ -18,8 +18,20 @@ Read `.claude/maestro.json` at startup and extract these values. Pass them expli
 | `EDITIONS` | `.ai.editions` | `null` or `["free","pro"]` |
 | `E2E_SETTINGS` | `.ai.e2e.settings_path` | `/wp-admin/options-general.php?page=wprocket` |
 | `E2E_CI` | `.ai.e2e.ci_integration` | `false` |
+| `STACK` | `.stack` | the resolved stack block — `verification`, `source_dirs`, `public_api_surface`, `harness`, `gates`, `variants` |
 
 Every `{TEMP_ROOT}`, `{REPO}`, `{ARCH_SKILL}`, etc. in this skill refers to these runtime values.
+
+**Stack compat shim (read at startup):** if `.stack` is **absent** from `maestro.json` (e.g. a
+pre-migration WP project), synthesize `STACK` in memory from `.ai.e2e` plus the `wordpress.json`
+profile defaults — `verification` = the composer/phpunit commands, `source_dirs` =
+`["src/", "inc/", "classes/"]`, `public_api_surface` = the WP hooks/AJAX/REST/WP-CLI list,
+`harness` = `.ai.e2e` mapped onto the `harness` shape (`kind: "wp-local"`, `base_url`,
+`boot_cmd`, `ui_entry` ← `.ai.e2e.settings_path`, `browser_login`), `gates: ["compliance"]`,
+`variants` ← `.ai.editions`. When `.stack` is present it is the source of truth and `.ai.e2e`
+is treated as a read alias of `.stack.harness`. Either way, downstream agents receive the same
+`STACK` block — a WP project emits identical commands and paths whether or not it has been
+re-onboarded.
 
 # Orchestrator — {REPO}
 
@@ -408,7 +420,8 @@ suggests low actual risk), confirm with the user before deciding.
 | `qa-engineer` | `sonnet` | `haiku` when `effort=XS AND risk=LOW AND complexity=LOW` |
 | `release-agent` | `haiku` | — |
 | `ticket-writer` | `haiku` | — |
-| `e2e-qa-tester` | `sonnet` | — |
+| `wp-e2e-qa-tester` | `sonnet` | — |
+| `web-e2e-qa-tester` | `sonnet` | — |
 
 Pass the resolved model as the `model` parameter on every Agent tool spawn. For agents with frontmatter `model: haiku`, this is redundant but harmless — always pass it explicitly so the intent is clear in the orchestrator context.
 
@@ -588,7 +601,8 @@ git worktree add {TEMP_ROOT}/issues/<N>/worktrees/frontend <branch>
     "frontendDispatch": "<dispatch plan string — null if backend-only>",
     "worktrees": { "backend": "<path>", "frontend": "<path>" },
     "sessionLearnings": "<section 13 content>",
-    "currentModel": "<current model name>"
+    "currentModel": "<current model name>",
+    "stack": "<STACK block — passed on the same channel as the other config vars so the implementation agents read verification commands, source_dirs, public_api_surface, and harness from config rather than hardcoding>"
   }
   ```
 
@@ -658,11 +672,21 @@ CI is monitored by DOD L2 Check 5 in both modes.
     "e2eUrl": "<LOCAL_URL from project config>",
     "e2eBoot": "<BOOT_CMD from project config>",
     "e2eSettings": "<E2E_SETTINGS from project config — e.g. /wp-admin/options-general.php?page=slug>",
-    "e2eCi": "<E2E_CI from project config>"
+    "e2eCi": "<E2E_CI from project config>",
+    "stack": "<STACK block — DOD L2 and qa-engineer read verification commands, source_dirs, public_api_surface, and harness from here instead of hardcoding>",
+    "runCompliance": "<true only if \"compliance\" is in STACK.gates — see below>"
   }
   ```
 
 The Workflow runs DOD L2 (independent gate), lead-reviewer, and qa-engineer — in parallel or sequential depending on `executionMode`, skipping any gate whose flag is `true`. It returns `{ dod, review, qa }`. Route on each result as described in Steps 7, 8, and 9 below.
+
+**Profile-gated gates — run a gate ONLY if it is listed in `STACK.gates`:** the `compliance`
+gate is WordPress-specific and is enabled by the `wordpress` profile, which sets
+`gates: ["compliance"]`. Before dispatching, set `runCompliance = ("compliance" is in
+STACK.gates)`. Derived stacks have `gates: []`, so `runCompliance` is `false` and the
+compliance gate never fires. Apply the same rule to any future gate: it executes only when its
+name appears in `STACK.gates`. Log a ROUTING DECISION event recording which gates from
+`STACK.gates` will run.
 
 ---
 
@@ -867,17 +891,20 @@ You act as a context editor, not a context relay. Each agent receives only what 
 — not the full conversation history.
 
 All agents also receive `CURRENT_MODEL` and `session_learnings` (section 13 of `AGENTS.md`).
+Implementation and QA agents additionally receive the `STACK` block on the config channel (see
+the dispatch args above) so they read verification commands, source dirs, public API surface,
+and harness targets from config rather than hardcoding them.
 
 | Agent | Receives |
 |---|---|
 | `ticket-writer` (create) | Raw input only |
 | `grooming-agent` | Issue object + repo access |
 | `challenger` | Issue object + grooming object + `session_learnings` |
-| `backend-agent` | Issue object + spec path + dispatch plan |
-| `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (when scopes overlap) |
+| `backend-agent` | Issue object + spec path + dispatch plan + `STACK` |
+| `frontend-agent` | Issue object + spec path + dispatch plan + backend API contract (when scopes overlap) + `STACK` |
 | `release-agent` | Issue #, branch name, base branch, acceptance criteria, spec path |
 | `lead-reviewer` | PR URL + spec path (`{TEMP_ROOT}/issues/<N>/spec.md`) + acceptance criteria + `session_learnings` |
-| `qa-engineer` | PR number + acceptance criteria + base branch |
+| `qa-engineer` | PR number + acceptance criteria + base branch + `STACK` |
 | `ticket-writer` (nth_followup) | Single NTH feedback item (not full context) |
 
 ---

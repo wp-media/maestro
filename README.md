@@ -104,7 +104,8 @@ Twelve specialists. Each one has a single job.
 | `frontend-agent` | JS/CSS/HTML implementation, DOD L1 |
 | `lead-reviewer` | Code review against spec and architecture rules |
 | `qa-engineer` | Tests the PR against acceptance criteria |
-| `e2e-qa-tester` | Browser QA via Playwright MCP |
+| `wp-e2e-qa-tester` | WordPress browser QA via Playwright MCP |
+| `web-e2e-qa-tester` | Config-driven browser QA for non-WP web apps (untested — pending validation) |
 | `release-agent` | Pushes branch, creates draft PR |
 | `ticket-writer` | Creates well-formed GitHub issues for follow-ups |
 
