@@ -227,7 +227,7 @@
       "test_cmd": null,
       "settings_path": "/wp-admin/options-general.php?page=<plugin-page>",
       "ci_integration": false,
-      "_license_option_key_note": "WP option key that holds the plugin license/activation data. Used by e2e-qa-tester to skip licensed-feature tests when the license is not active. Set to null if the plugin has no license gating.",
+      "_license_option_key_note": "WP option key that holds the plugin license/activation data. Used by wp-e2e-qa-tester to skip licensed-feature tests when the license is not active. Set to null if the plugin has no license gating.",
       "license_option_key": null
     }
   }
