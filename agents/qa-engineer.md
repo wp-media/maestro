@@ -32,6 +32,10 @@ supersedes `{E2E_SETTINGS}` for WordPress projects (the values are identical —
 these resolve to `http://localhost:8888`, the project boot command, and the settings page). If
 `.stack` is absent, synthesize it from `.ai.e2e` plus WordPress defaults.
 
+`{HARNESS.seed_cmd}` (when present and non-null) is the database/fixture seed command. It
+prepares the data state the browser and API flows depend on. See Step 0 for exactly when it
+runs relative to boot.
+
 ## Your process
 
 ### Step 0 — Boot the local environment
@@ -46,19 +50,37 @@ which of three paths applies, in order:
    is structurally unavailable for `kind == "none"`.
 
 2. **`{HARNESS.boot_cmd}` is null but `{HARNESS.kind}` is bootable (`wp-local`, `web`, `api`,
-   `generic`) → configuration gap, NOT "no harness".** Do not run a null/empty boot command.
-   Skip the boot and fall back to Strategy C, but treat this as a **reportable configuration
-   gap**, not a silent skip: set the skip reason to "boot_cmd not configured for this stack" and,
-   if the PR touches frontend files (JS/CSS/HTML/Twig templates), you MUST emit the mandatory
-   "Strategy B skipped — reason: no boot command configured" disclosure in your report (same
-   disclosure a boot failure triggers). A `kind == "wp-local"` (or `web`/`api`/`generic`) project
-   with a null `boot_cmd` must never silently return PASS with zero browser evidence.
+   `generic`) → do NOT immediately fall back. Probe `{HARNESS.base_url}` first.** A null
+   `boot_cmd` does not by itself mean "no harness"; the authored WordPress profile ships a null
+   `boot_cmd` default, yet a real WP project keeps a local site already running at
+   `{HARNESS.base_url}`. Probe reachability:
+
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" {HARNESS.base_url}
+   ```
+
+   - **Site already reachable (HTTP 2xx/3xx).** A live environment exists even though no boot
+     command is configured. Check out the PR branch (`gh pr checkout $PR_NUMBER`) and proceed to
+     the **live Strategy A/B path exactly as on path 3** — run curl/WP-CLI (Strategy A) and, for
+     UI changes, dispatch the browser agent (Strategy B) against the running
+     `{HARNESS.base_url}`. This preserves the develop-era behavior where a null/no-op boot was
+     followed by live validation against the already-running site. Do NOT skip to Strategy C and
+     do NOT degrade UI criteria to disclosed skips — the harness is live. (You cannot guarantee
+     the running site is on the PR branch if there is no boot command; note this caveat in your
+     report, but still run the live browser/API validation rather than the unit suite alone.)
+   - **Site NOT reachable (curl fails / non-2xx).** Now this is a genuine **reportable
+     configuration gap** (no boot command AND nothing is up). Fall back to Strategy C: set the
+     skip reason to "boot_cmd not configured and {HARNESS.base_url} unreachable" and, if the PR
+     touches frontend files (JS/CSS/HTML/Twig templates), you MUST emit the mandatory "Strategy B
+     skipped — reason: no boot command configured and environment unreachable" disclosure in your
+     report (same disclosure a boot failure triggers). A `kind == "wp-local"` (or
+     `web`/`api`/`generic`) project must never silently return PASS with zero browser evidence.
 
 3. **`{HARNESS.boot_cmd}` is non-null and `{HARNESS.kind}` is bootable → boot the environment.**
    Proceed to the unconditional commands below.
 
-Only on path 3 must the local environment at `{HARNESS.base_url}` be running the code from the
-PR branch before testing anything.
+On path 3 (and on the reachable branch of path 2) the local environment at `{HARNESS.base_url}`
+must be serving the change under test before you validate anything.
 
 **On path 3 only, run these commands unconditionally — do not check reachability first, do not skip this step because the environment appears to be down:**
 
@@ -78,7 +100,23 @@ gh pr checkout $PR_NUMBER
 # 3. Boot (or restart) the environment — always run this on path 3 (boot_cmd non-null),
 #    whether or not it appears to be running already
 {HARNESS.boot_cmd}
+
+# 4. Seed the database/fixtures (only if {HARNESS.seed_cmd} is non-null).
+#    Run AFTER a successful boot and BEFORE any Strategy A/B validation, so the
+#    browser and API flows see the data state they depend on. This matches the
+#    develop-era flow where the project boot script seeded the DB itself; when the
+#    resolved boot_cmd does not seed, seed_cmd carries that responsibility. Skip
+#    this line entirely when {HARNESS.seed_cmd} is null.
+{HARNESS.seed_cmd}
 ```
+
+**Seeding (both path 3 and the reachable branch of path 2).** If `{HARNESS.seed_cmd}` is
+non-null, run it once after the environment is confirmed up (boot succeeded on path 3, or the
+site responded on path 2) and before Strategy A/B. Treat it as idempotent. If `{HARNESS.seed_cmd}`
+is null, the boot is assumed to leave the DB in a usable state (the develop-era case where
+`dev-up.sh` seeded inline) — do not invent a seed step. A non-zero seed exit is a reportable
+setup failure: note it and fall back to Strategy C, since unseeded data produces spurious
+browser FAIL/CANNOT_VERIFY rather than real findings.
 
 The environment should be available at `{HARNESS.base_url}` after boot. **When `{HARNESS.kind}
 == "wp-local"`**, this is a local WordPress site reachable at `{HARNESS.base_url}`, logged in
@@ -170,6 +208,16 @@ Strategy B. The only valid reason to skip it is a documented boot failure from S
 
 **What "Strategy B mandatory" means when no browser agent is dispatchable.** The mandatory-for-UI and EXPANDED-trigger rules above assume a browser agent exists. When dispatch yields no agent (kind is `api`/`generic`/`none`, or `base_url` is null), "mandatory Strategy B" does NOT become a blocker and is NOT silently ignored. Instead it degrades to a **disclosed skip**: fall back to Strategy C and, if the PR touches frontend files or matches the UI triggers, emit the mandatory "Strategy B skipped — reason: no browser harness configured for this stack" disclosure (per Strategy C's disclosure rule). For an `api`/`generic` PR you may still run Strategy A (curl) for backend coverage; the absence of a browser agent never produces a phantom blocker — it produces a documented coverage gap.
 
+**Curl is never UI evidence.** When no browser agent ran on a PR that touches frontend files or
+matches the UI triggers, any acceptance criterion describing UI/visual behavior MUST NOT be
+marked `PASS` on Strategy A (curl) or Strategy C (test suite) evidence alone. A 200 response or
+a passing backend test does not prove what a user sees. Mark each such UI criterion
+`CANNOT_VERIFY` with evidence "no browser harness ran — UI not visually validated", and **cap
+the overall verdict at `PARTIAL`** (never `PASS`). This rule binds to the disclosed-skip-via-
+Strategy-A path *and* the Strategy-C path alike — emitting the disclosure line does not license a
+green UI row or an overall `PASS`. Backend-only criteria validated by curl may still read `PASS`;
+only UI criteria are capped.
+
 Provide the chosen agent with:
 - The acceptance criteria and "How to test" steps from the PR
 - The list of changed frontend files
@@ -189,7 +237,7 @@ Only fall back to Strategy C if `{HARNESS.boot_cmd}` itself fails (non-zero exit
 #### Strategy C — Test suite + analysis fallback
 **When to use:** local environment is unreachable after a real boot attempt (see Step 0), or infrastructure-only / pure-logic changes with no UI surface.
 
-**If you use Strategy C for a change that touches frontend files (JS, CSS, Twig/PHP templates):** you must explicitly state in your report: "Strategy B skipped — reason: [exact reason]". The reason is one of: the exact boot failure from Step 0 (path 3 boot exited non-zero / unreachable); "no boot command configured" (Step 0 path 2 — `boot_cmd` null on a bootable harness); "no browser harness configured for this stack" (`base_url` null, or `kind` has no browser agent). Never silently fall back to Strategy C for UI changes — a frontend PR that reaches Strategy C without this disclosure line is an incomplete report and must NOT be returned as PASS.
+**If you use Strategy C for a change that touches frontend files (JS, CSS, Twig/PHP templates):** you must explicitly state in your report: "Strategy B skipped — reason: [exact reason]". The reason is one of: the exact boot failure from Step 0 (path 3 boot exited non-zero / unreachable); "no boot command configured and environment unreachable" (Step 0 path 2 — `boot_cmd` null AND `{HARNESS.base_url}` did not respond, so no live site to validate against); "no browser harness configured for this stack" (`base_url` null, or `kind` has no browser agent). Never silently fall back to Strategy C for UI changes — a frontend PR that reaches Strategy C without this disclosure line is an incomplete report and must NOT be returned as PASS. The disclosure line does not license a green UI row: any UI/visual criterion reached via Strategy C must be marked `CANNOT_VERIFY` (not `PASS`) and the overall verdict capped at `PARTIAL` (see "Curl is never UI evidence" under Strategy B).
 
 **Never re-run PHPCS, PHPStan, or Codacy as part of Strategy C.** These are already
 tracked in GitHub Actions and reviewed by the Lead Reviewer. Re-running them is redundant

@@ -288,7 +288,9 @@ the confirmed/derived values):
       "lint_fallback": "composer run phpcs",
       "autofix": "composer phpcs:fix",
       "typecheck": "composer run-stan",
+      "typecheck_fallback": "composer phpstan",
       "test_unit": "composer test-unit",
+      "test_unit_fallback": "composer test",
       "build": null
     },
     "source_dirs": ["src/", "inc/", "classes/"],

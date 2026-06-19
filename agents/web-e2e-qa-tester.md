@@ -110,7 +110,10 @@ If the linked issue describes a bug (not a new feature), you must prove the bug 
 
 | Acceptance Criterion | Method | Result |
 |---|---|---|
-| Original bug: <one-line description> | Browser | ✅ Bug no longer reproducible — [what you observed] |
+| Original bug: <one-line description> | Browser | CANNOT_VERIFY (provisional) — bug not reproducible in browser, but web harness unvalidated — [what you observed] |
+
+(Even when the bug clearly no longer reproduces, this row's `result` is `CANNOT_VERIFY` with the
+provisional caveat, never a clean PASS — see the criterion-level cap in Return JSON.)
 
 If you cannot verify the original failure mode (the issue is too vague, or the environment doesn't support it), document the skip reason. Do not silently omit the regression check.
 
@@ -266,7 +269,8 @@ Follow the `qa-engineer` output format. For every acceptance criterion:
 - Exact action (URL navigated, element interacted with)
 - Observed result
 - Evidence (gist raw screenshot URL, console error excerpt)
-- PASS / FAIL / PARTIAL
+- FAIL / PARTIAL / CANNOT_VERIFY — never PASS at the criterion level (this harness is
+  unvalidated; an observed-pass criterion is reported CANNOT_VERIFY with the provenance caveat)
 
 Include a `### Screenshots` section with inline images using the gist raw URLs:
 ```
@@ -308,8 +312,8 @@ After the prose report, return the following JSON object to `qa-engineer`:
     {
       "criterion": "acceptance criterion text",
       "method": "BROWSER|ANALYSIS",
-      "result": "PASS|FAIL|PARTIAL|CANNOT_VERIFY",
-      "evidence": "URL navigated, element interacted with, observed outcome — for spec-run validation, name the spec file here",
+      "result": "FAIL|PARTIAL|CANNOT_VERIFY",
+      "evidence": "URL navigated, element interacted with, observed outcome — for spec-run validation, name the spec file here; for an observed-pass criterion use CANNOT_VERIFY and state the unvalidated-harness caveat in this field",
       "screenshot_url": "https://gist.githubusercontent.com/USER/GIST_ID/raw/filename.png — or empty string if no screenshot taken"
     }
   ],
@@ -334,10 +338,20 @@ in prose, so the routing layer can never strip it:
   harness" caveat forward.
 - This agent **may NOT emit a top-level `overall: "PASS"`.** The best verdict it is permitted to
   return is `PARTIAL` — a bare `PASS` from unproven machinery is exactly what the spec forbids
-  ("do not claim hardened browser coverage"). Even when every criterion individually reads
-  `PASS`, cap the top-level `overall` at `PARTIAL` and add a blocker-style note:
-  `"web harness unvalidated — results provisional, all criteria passed but the web QA path has
-  not been proven against a real project"`. The enum is therefore `FAIL|PARTIAL` only.
+  ("do not claim hardened browser coverage"). Cap the top-level `overall` at `PARTIAL` and add a
+  blocker-style note: `"web harness unvalidated — results provisional, the web QA path has not
+  been proven against a real project"`. The enum is therefore `FAIL|PARTIAL` only.
+- **The untested status must ride in EVERY criterion row, not only the top-level enum.** Because
+  the harness itself is unproven, no individual criterion may read `result: "PASS"` either: a
+  green row flowing into `qa-engineer`'s `criteria_results` reads as hardened coverage the moment
+  it leaves this agent. A criterion you observed pass cleanly is reported as
+  `result: "CANNOT_VERIFY"` with evidence that states both the observation AND the provenance
+  caveat, e.g. `"observed expected behavior in browser, but web harness is unvalidated —
+  treat as provisional"`. Reserve `result: "FAIL"` for criteria you actually saw fail. The
+  permitted criterion-level `result` values for this agent are therefore
+  `FAIL|PARTIAL|CANNOT_VERIFY` — never `PASS`. This guarantees the unvalidated-harness provenance
+  is structural at the row level, so a downstream comment can never render a table of green UI
+  criteria sourced from this agent.
 
 `CANNOT_VERIFY` is valid at the **criterion level** (`criteria_results[].result`) but maps to `PARTIAL` at the top-level `overall`. When the entire run cannot be validated (e.g. branch mismatch), set `overall: "PARTIAL"` and explain in `blockers`.
 
