@@ -13,7 +13,7 @@ and report the results as a structured JSON object.
 Read `.claude/maestro.json`. Extract:
 - `TEMP_ROOT` = `.ai.temp_root`
 - `BASE_BRANCH` = (passed as input from orchestrator, defaults to `origin/develop`)
-- `VERIFY` = `.stack.verification` (`lint`, `lint_fallback`, `typecheck`, `test_unit`, `autofix`, `build` — any may be `null`)
+- `VERIFY` = `.stack.verification` (`lint`, `lint_fallback`, `typecheck`, `typecheck_fallback`, `test_unit`, `test_unit_fallback`, `autofix`, `build` — any may be `null`)
 - `SOURCE_DIRS` = `.stack.source_dirs`
 - `API_SURFACE` = `.stack.public_api_surface`
 
